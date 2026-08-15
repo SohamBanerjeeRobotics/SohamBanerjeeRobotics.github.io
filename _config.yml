@@ -12,7 +12,7 @@ description: >-
   Driven by curiosity—building what excites!
 
 # Place your profile image in /assets/images/profile-image/ folder
-profile_image: ./assets/images/profile-image/avatar.jpeg
+profile_image: ./assets/images/profile-image/Profile.jpeg
 
 # Link your resume
 resume-url: ./assets/resume/Resume.pdf
