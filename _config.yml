@@ -1,142 +1,147 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-
 # Main Page Setup
 
-title: John Doe's Portfolio # This is what shows up in the tab of the browser
-
+title: Soham Banerjee's Portfolio # Browser tab title
 
 
 # Hero Section
-name: John Doe
-headline: headline message
-description: >- # dont remove this line. this will ignore all new lines until the next section
-  Write an awesome intro and discuss your highlights and qualification. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+name: Soham Banerjee
+headline: Robotics & Control Engineer | AI & Autonomous Systems
+description: >-
+  Obsessed with turning complex math into physical movement. I blend mechanical foundations, 
+  control theory, and deep learning to build intelligent physical systems and 3D simulations. 
+  Driven by curiosity—building what excites!
 
-# Place your profile image in /assets/images/profile-image/folder and edit the file name
+# Place your profile image in /assets/images/profile-image/ folder
 profile_image: ./assets/images/profile-image/avatar.jpeg
 
-
 # Link your resume
-# You can place your resume in assets/resume/{resume.pdf or add external link such as pdf saved in google drive 
-resume-url: https://drive.google.com/file/d/13Z3duVzh-gguPU5r03oJVEE6rV9rd3DS/view?usp=sharing # or /assets/resume/resume.pdf
+resume-url: ./assets/resume/Resume_Soham_Banerjee_Two_Pager_Core_2.pdf
 
+# External Links (small social icons)
+external-links:
+  linkedin: https://www.linkedin.com/in/soham-banerjee-867a82255/
+  github: https://github.com/SohamBanerjeeRobotics
+  medium: https://medium.com/@banerjeesohamrobotics
+  stackoverflow:
+  x-twitter:
+  threads:
+  instragram:
+  youtube:
+  discord:
+  bluesky:
 
-# Set up external links - this will show up as small icons next to your name.
-
-external-links:    # input only your own url slug. The icons with missing entries will not appear.
-  linkedin: test    # https://www.linkedin.com/in/{your url slug} 
-  github: leea12    # https://github.com/{your url slug} 
-  stackoverflow: test      # https://stackoverflow.com/users/{your url slug}
-  medium:            # https://medium.com/@{your url slug} 
-  x-twitter:   # https://x.com/{your url slug} 
-  threads:            # https://threads.net/@{your url slug} 
-  instragram:       # https://instagram.com/{your url slug} 
-  youtube:           # https://youtube.com/@{your url slug} 
-  discord:            # https://discord.com/users/{your url slug} 
-  bluesky:           # https://bsky.app/profile/{your url slug} 
-  
-
-# Skills Section - Add the list of your Skills by categories/tools. The indentation for each level needs to be precise. 
+# Skills Section
 skills:
-  - category: 3D Modeling
+  - category: Control Systems & Dynamics
     tools:
-    - Onshape
-    - Solidworks
-    - Creo
-    - Fusion 360 (Autodesk)
-    - Blender (for complex shapes or animations)
-    - Siemens NX
-    - Inventor (Autodesk)
-    - CATIA (Dassault Systèmes)
-  - category: Prototyping
+      - System Modeling & Dynamics
+      - Linear & Nonlinear Control
+      - Model Predictive Control (MPC)
+      - PID Control
+      - Computed Torque Control (CTC)
+      - LMI-Based Control
+      - Regional Pole Placement (RPP)
+      - Lyapunov-Based Control
+      - Control Lyapunov Functions (CLF)
+      - System Identification
+      - Hybrid Zero Dynamics (HZD)
+      - Hybrid Linear Inverted Pendulum (H-LIP)
+      - MATLAB / Simulink / Simscape
+      - dSPACE
+
+  - category: Embedded Systems & Hardware
     tools:
-    - SLA
-    - CNC
-    - FDM
-    - SLS
-    - DMLS
-    - PolyJet Printing
-    - Vacuum Casting
-    - Laser Cutting
-    - Water Jet Cutting
-    - Arduino / Raspberry Pi
-    - Breadboarding for circuit testing
-  - category: Design Standards / Practices
+      - STM32
+      - Arduino Uno / Nano / Giga
+      - ESP32
+      - Jetson Nano
+      - Raspberry Pi
+      - Embedded Control
+      - Motor Control
+      - Sensor Integration
+      - Hardware Testing & Experimental Validation
+      - dSPACE
+      - PlatformIO
+      - Arduino IDE
+
+  - category: Robotics & Autonomous Systems
     tools:
-    - GD&T ASME Y14
-    - ISO fits and tolerances
-    - PLM (PTC Windchill / Arena)   
-  - category: PCB Design
+      - Robot Kinematics & Dynamics
+      - Forward & Inverse Kinematics
+      - Denavit-Hartenberg Modeling
+      - Motion Planning
+      - Path Planning
+      - Trajectory Generation
+      - SLAM
+      - Localization
+      - AMCL
+      - Occupancy Grid Mapping
+      - Configuration Space (C-Space)
+      - Mobile Robot Navigation
+      - Bipedal Locomotion
+      - Underactuated Systems
+      - Drone / Quadrotor Navigation
+      - ROS / ROS2
+      - ROS2 Control
+      - Gazebo
+      - Webots
+      - MuJoCo
+      - CoppeliaSim
+      - RViz
+      - Peter Corke Robotics Toolbox
+
+  - category: Software Development & DevOps
     tools:
-    - Altium Designer
-    - Altium
-    - Eagle 
-    - KiCad
-  - category: Problem Solving / Risk Management
+      - Linux
+      - Git
+      - GitHub
+      - Docker
+      - Kubernetes
+      - PlatformIO
+      - Arduino IDE
+      - LaTeX
+
+  - category: CAD, Multiphysics & Engineering Simulation
     tools:
-    - Root Cause Analysis (e.g., 5 Whys, Fishbone Diagram)
-    - DFMEA / PFMEA 
-    - Six Sigma methodologies
-    - Shain Red-X
+      - SolidWorks
+      - Fusion 360
+      - ANSYS
+      - COMSOL
+      - Wolfram Mathematica
+      - PyroSim
+      - Fire Dynamics Simulator (FDS)
+      - Bambu Studio
+      - Ultimaker Cura
+      - 3D Printing
 
+  - category: AI, Machine Learning & Reinforcement Learning
+    tools:
+      - Reinforcement Learning
+      - Deep Reinforcement Learning
+      - Actor-Critic Methods
+      - Asynchronous Deep Deterministic Policy Gradient (ADDPG)
+      - Multi-Armed Bandits
+      - Greedy / ε-Greedy / UCB
+      - Hill Climbing
+      - Variational Autoencoders (VAE)
+      - ELBO
+      - Representation Learning
+      - Generative Models
+      - Python
+      - PyBullet
+      - Gymnasium
 
-# Contact Form Setup. Setup an account and copy over the key. When someone fills out the form, it will be received in your email.
-formspree-key:   https://formspree.io/f/{8-digit key}
+# Contact Form Setup
+formspree-key: "xzepvzao"
 
-
-
-# Active theme (Updatethis to switch themes). Make sure to keep the indentation the samne.
-colors: # this is the basic theme
-  text: "#1a1c20"
-  border: "#ddd"
-  link: "#4a76ee"
-  highlight: "#0c0cf2"
-  background: "#ffffff"
-  light_background: "#f3f5fb"
-
-# A few examples. 
-basic theme:
-  text: "#1a1c20"
-  border: "#ddd"
-  link: "#4a76ee"
-  highlight: "#0c0cf2"
-  background: "#ffffff"
-  light_background: "#f3f5fb"
-  
-  mint theme:
-  text: "#2c3333"
-  border: "#e0f2ef"
-  link: "#40b3a2"
-  highlight: "#2a9d8f"
-  background: "#f7fbfa"
-  light_background: "#f0f9f7"
-  
-lemon theme:
-  text: "#2d2926"
-  border: "#f7f3e3"
-  link: "#ffc94d"
-  highlight: "#ffb800"
-  background: "#fffdf5"
-  light_background: "#fff9e6"
-  
-  pink theme:
-  text: "#2d2d2d"
-  border: "#f8e2e2"
-  link: "#ff8fa3"
-  highlight: "#ff4d6d"
-  background: "#fff8f8"
-  light_background: "#fff5f6"
-
-
-
-
+# Active Theme Colors (Light Rich Creamy Yellow)
+colors:
+  text: "#2D2A26"          # Deep charcoal for crisp reading contrast
+  border: "#EADDA6"        # Subtle creamy border
+  link: "#9E7B00"          # Warm amber link color
+  highlight: "#F3E39E"     # Creamy accent highlight
+  background: "#FAF0CA"    # Light, rich cream background
+  light_background: "#FFF9E6" # Soft off-white cream container fill
 
 
 #########################################################################################################
@@ -146,7 +151,6 @@ collections:
   projects:
     output: true
     permalink: /projects/:path/
-
 
 markdown: kramdown
 highlighter: rouge
@@ -166,24 +170,3 @@ plugins:
 
 include:
   - _projects
-
-
-# Exclude from processing.
-# The following items will not be processed, by default.
-# Any item listed under the `exclude:` key here will be automatically added to
-# the internal "default list".
-#
-# Excluded items can be processed by explicitly listing the directories or
-# their entries' file path in the `include:` list.
-#
-# exclude:
-#   - .sass-cache/
-#   - .jekyll-cache/
-#   - gemfiles/
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules/
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
