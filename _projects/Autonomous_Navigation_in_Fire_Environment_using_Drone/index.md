@@ -69,7 +69,7 @@ local maxima.
 The navigation algorithms were integrated into a **ROS2-based control
 architecture** and evaluated in simulation.
 
-{% include youtube-video.html id="rmShWcB8KSHAQrzi" autoplay="false" width="900px" %}
+{% include youtube-video.html id="dBY5fK-LCBU" autoplay="false" width="900px" %}
 
 <span style="font-size: 10px">
 Fire propagation and thermal environment generated for the navigation study.
