@@ -53,7 +53,7 @@ The drone estimates the direction toward the fire source from the local
 Three navigation strategies were implemented and compared:
 
 - **Greedy Hill Climbing** for directly following the temperature gradient.
-- **$\epsilon$-Greedy Multi-Armed Bandit** for balancing exploration and
+- **epsilon-Greedy Multi-Armed Bandit** for balancing exploration and
   exploitation.
 - **Upper Confidence Bound (UCB)** for uncertainty-aware directional selection.
 
@@ -62,7 +62,7 @@ weak temperature gradients and environments containing misleading secondary
 fire sources. The results showed that greedy hill climbing works well when a
 strong temperature gradient is available, whereas exploration-based bandit
 methods become more useful when the gradient is weak or contains misleading
-local maxima. :contentReference[oaicite:1]{index=1} :contentReference[oaicite:2]{index=2}
+local maxima.
 
 ## Drone Navigation
 
