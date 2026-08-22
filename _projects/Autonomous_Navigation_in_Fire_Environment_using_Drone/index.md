@@ -78,7 +78,7 @@ Fire propagation and thermal environment generated for the navigation study.
 The drone was then simulated while autonomously navigating through the
 generated thermal environment toward the fire source.
 
-{% include youtube-video.html id="YOUR_DRONE_NAVIGATION_VIDEO_ID" autoplay="false" width="900px" %}
+{% include youtube-video.html id="[YOUR_DRONE_NAVIGATION_VIDEO_ID](https://youtu.be/Z2JG9PCoQVU)" autoplay="false" width="900px" %}
 
 <span style="font-size: 10px">
 Autonomous drone navigation using temperature-based decision making.
