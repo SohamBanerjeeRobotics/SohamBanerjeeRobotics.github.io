@@ -42,12 +42,45 @@ skills:
       - LMI-Based Control
       - Regional Pole Placement (RPP)
       - Lyapunov-Based Control
-      - Control Lyapunov Functions (CLF)
       - System Identification
       - Hybrid Zero Dynamics (HZD)
       - Hybrid Linear Inverted Pendulum (H-LIP)
       - MATLAB / Simulink / Simscape
       - dSPACE
+
+  - category: Robotics & Autonomous Systems
+    tools:
+      - Robot Kinematics & Dynamics
+      - Forward & Inverse Kinematics
+      - Denavit-Hartenberg Modeling
+      - Motion & Path Planning
+      - Trajectory Generation
+      - SLAM & Localization
+      - Occupancy Grid Mapping
+      - Mobile Robot Navigation
+      - Bipedal Locomotion
+      - Underactuated Systems
+      - Drone / Quadrotor Navigation
+      - ROS / ROS2
+      - Gazebo
+      - Webots
+      - MuJoCo
+      - CoppeliaSim
+      - ROS2 Control
+
+  - category: AI, Machine Learning & Reinforcement Learning
+    tools:
+      - Reinforcement Learning
+      - Deep Reinforcement Learning
+      - Actor-Critic Methods
+      - Asynchronous Deep Deterministic Policy Gradient (ADDPG)
+      - Multi-Armed Bandits
+      - Hill Climbing
+      - Variational Autoencoders (VAE)
+      - Representation Learning
+      - Python
+      - PyBullet
+      - Gymnasium
 
   - category: Embedded Systems & Hardware
     tools:
@@ -60,45 +93,15 @@ skills:
       - Motor Control
       - Sensor Integration
       - Hardware Testing & Experimental Validation
-      - dSPACE
       - PlatformIO
       - Arduino IDE
-
-  - category: Robotics & Autonomous Systems
-    tools:
-      - Robot Kinematics & Dynamics
-      - Forward & Inverse Kinematics
-      - Denavit-Hartenberg Modeling
-      - Motion Planning
-      - Path Planning
-      - Trajectory Generation
-      - SLAM
-      - Localization
-      - AMCL
-      - Occupancy Grid Mapping
-      - Configuration Space (C-Space)
-      - Mobile Robot Navigation
-      - Bipedal Locomotion
-      - Underactuated Systems
-      - Drone / Quadrotor Navigation
-      - ROS / ROS2
-      - ROS2 Control
-      - Gazebo
-      - Webots
-      - MuJoCo
-      - CoppeliaSim
-      - RViz
-      - Peter Corke Robotics Toolbox
 
   - category: Software Development & DevOps
     tools:
       - Linux
-      - Git
-      - GitHub
+      - Git / GitHub
       - Docker
       - Kubernetes
-      - PlatformIO
-      - Arduino IDE
       - LaTeX
 
   - category: CAD, Multiphysics & Engineering Simulation
@@ -108,29 +111,10 @@ skills:
       - ANSYS
       - COMSOL
       - Wolfram Mathematica
-      - PyroSim
-      - Fire Dynamics Simulator (FDS)
+      - PyroSim / FDS
+      - 3D Printing
       - Bambu Studio
       - Ultimaker Cura
-      - 3D Printing
-
-  - category: AI, Machine Learning & Reinforcement Learning
-    tools:
-      - Reinforcement Learning
-      - Deep Reinforcement Learning
-      - Actor-Critic Methods
-      - Asynchronous Deep Deterministic Policy Gradient (ADDPG)
-      - Multi-Armed Bandits
-      - Greedy / ε-Greedy / UCB
-      - Hill Climbing
-      - Variational Autoencoders (VAE)
-      - ELBO
-      - Representation Learning
-      - Generative Models
-      - Python
-      - PyBullet
-      - Gymnasium
-
 # Contact Form Setup
 formspree-key: "xzepvzao"
 
