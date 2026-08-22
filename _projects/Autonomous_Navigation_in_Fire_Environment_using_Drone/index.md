@@ -16,7 +16,7 @@ skills:
   - Thermal Field Modeling
   - Python
 
-main-image: /fire_drone_main.jpg
+main-image: /fire_drone_main.jpeg
 ---
 
 ## Overview
@@ -39,7 +39,7 @@ sinks.
 The resulting thermal environments were used to study how different
 temperature distributions affect the navigation behavior of the drone.
 
-{% include image-gallery.html images="/fire_environment.jpg" height="400" %}
+{% include image-gallery.html images="/fire_environment.jpeg" height="400" %}
 
 <span style="font-size: 10px">
 Simulated indoor fire environment and temperature distribution.
