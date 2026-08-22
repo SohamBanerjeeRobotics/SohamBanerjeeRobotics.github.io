@@ -53,7 +53,7 @@ The drone estimates the direction toward the fire source from the local
 Three navigation strategies were implemented and compared:
 
 - **Greedy Hill Climbing** for directly following the temperature gradient.
-- **epsilon-Greedy Multi-Armed Bandit** for balancing exploration and
+- ***epsilon*-Greedy Multi-Armed Bandit** for balancing exploration and
   exploitation.
 - **Upper Confidence Bound (UCB)** for uncertainty-aware directional selection.
 
@@ -78,7 +78,7 @@ Fire propagation and thermal environment generated for the navigation study.
 The drone was then simulated while autonomously navigating through the
 generated thermal environment toward the fire source.
 
-{% include youtube-video.html id="[YOUR_DRONE_NAVIGATION_VIDEO_ID](https://youtu.be/Z2JG9PCoQVU)" autoplay="false" width="900px" %}
+{% include youtube-video.html id="Z2JG9PCoQVU" autoplay="false" width="900px" %}
 
 <span style="font-size: 10px">
 Autonomous drone navigation using temperature-based decision making.
@@ -90,7 +90,7 @@ The experiments demonstrated that the choice of navigation strategy depends
 strongly on the structure of the thermal field. Greedy hill climbing provided
 efficient localization when the temperature gradient was strong, while
 $\epsilon$-greedy exploration was more effective when the drone started far
-from the fire source or encountered misleading thermal maxima. :contentReference[oaicite:3]{index=3}
+from the fire source or encountered misleading thermal maxima.
 
 The project provided an end-to-end workflow combining **thermal environment
 simulation, robotic decision making, reinforcement learning, and autonomous
@@ -100,7 +100,7 @@ drone navigation**.
 
 - Developed fire environments using **PyroSim/FDS**.
 - Built a **ROS2-based autonomous navigation framework**.
-- Implemented **Hill Climbing, $\epsilon$-Greedy, and UCB** navigation strategies.
+- Implemented **Hill Climbing, *epsilon*-Greedy, and UCB** navigation strategies.
 - Evaluated navigation performance under different thermal configurations.
 - Studied the effect of **exploration and local temperature gradients** on
   autonomous fire-source localization.
