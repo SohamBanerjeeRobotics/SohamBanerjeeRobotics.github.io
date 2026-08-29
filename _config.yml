@@ -34,17 +34,16 @@ external-links:
 skills:
   - category: Control Systems & Dynamics
     tools:
+      - System Identification
       - System Modeling & Dynamics
       - Linear & Nonlinear Control
+      - Feedback & Feedforward Control
       - Model Predictive Control (MPC)
-      - PID Control
       - Computed Torque Control (CTC)
-      - LMI-Based Control
+      - LMI & BMI Based Control
       - Regional Pole Placement (RPP)
-      - Lyapunov-Based Control
-      - System Identification
-      - Hybrid Zero Dynamics (HZD)
-      - Hybrid Linear Inverted Pendulum (H-LIP)
+      - Lyapunov-Based Control Design
+      - State Estimator & Filter Design
       - MATLAB / Simulink / Simscape
       - dSPACE
 
@@ -56,37 +55,43 @@ skills:
       - Motion & Path Planning
       - Trajectory Generation
       - SLAM & Localization
-      - Occupancy Grid Mapping
       - Mobile Robot Navigation
-      - Bipedal Locomotion
-      - Underactuated Systems
       - Drone / Quadrotor Navigation
       - ROS / ROS2
       - Gazebo
       - Webots
       - MuJoCo
       - CoppeliaSim
-      - ROS2 Control
-
+      - Underactuated Systems
+      - Bipedal Locomotion
+      
   - category: AI, Machine Learning & Reinforcement Learning
     tools:
-      - Reinforcement Learning
-      - Deep Reinforcement Learning
-      - Actor-Critic Methods
-      - Asynchronous Deep Deterministic Policy Gradient (ADDPG)
-      - Multi-Armed Bandits
-      - Hill Climbing
-      - Variational Autoencoders (VAE)
-      - Representation Learning
-      - Python
-      - PyBullet
-      - Gymnasium
+      - Regression & Classification
+      - Clustering, Association & Anomaly Detection
+      - Feature Extraction
+      - PCA & LDA
+      - Deep Neural Netwroks
+      - CNN & RNN
+      - Transformer Architecture
+      - Gaussian Mixture Models
+      - VAE & Diffusion Architecture
+      - Keras
+      - Pytorch
+      - Tensorflow 
+      - Multi-Armed Bandits & MDP
+      - Single-Agent Reinforcement Learning
+      - Single-Agent Deep Reinforcement Learning (DRL)
+      - Actor-Critic Methods (A2C, A3C, DDPG, PPO, TD3, etc.)
+      - Multi-Agent Reinforcement Learning & POMDP
+      - Python, PyBullet & Gymnasium
 
   - category: Embedded Systems & Hardware
     tools:
-      - STM32
       - Arduino Uno / Nano / Giga
       - ESP32
+      - STM32
+      - Teensy
       - Jetson Nano
       - Raspberry Pi
       - Embedded Control
@@ -98,6 +103,7 @@ skills:
 
   - category: Software Development & DevOps
     tools:
+      - C++
       - Linux
       - Git / GitHub
       - Docker
@@ -110,7 +116,6 @@ skills:
       - Fusion 360
       - ANSYS
       - COMSOL
-      - Wolfram Mathematica
       - PyroSim / FDS
       - 3D Printing
       - Bambu Studio
