@@ -24,7 +24,7 @@ main-image: /mapless_navigation_front.jpeg
 Traditional mobile robot navigation systems, such as SLAM-based architectures, rely on building dense obstacle maps from expensive high-resolution sensors . These methods are computationally intensive and slow to update dynamically . 
 
 This project implements an end-to-end mapless motion planner for differential-drive mobile robots using continuous Deep Reinforcement Learning . Based on **Asynchronous Deterministic Policy Gradient (ADDPG)**, the model takes a highly compressed 14-dimensional state representation—comprising 10 sparse laser range samples, 2D relative target positions in polar coordinates, and previous velocity commands—and outputs smooth continuous linear and angular velocity commands . Trained entirely within a simulated environment ( Pybullet), the learned policy directly transfers to physical robotic hardware (Kobuki-based TurtleBot) without any real-world fine-tuning .
-
+This whole idea is taken from the paper : Virtual-to-Real Deep Reinforcement Learning: Continuous Control of Mobile Robots for Mapless Navigation by *Tai et al*
 ---
 
 ## State & Action Space Formulation
