@@ -16,7 +16,7 @@ skills:
   - Python
   - PyTorch / TensorFlow
 
-main-image: /mapless_navigation_front.jpeg
+main-image: /mapless_navigation_front.jpg
 ---
 
 ## Overview
