@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 2D Drone Trajectory Planning with Rectangular Obstacle Avoidance
+title: Receding Horizon Control for Autonomous Crazyflie Navigation
 description: >
     Formulated and implemented an open-loop 2D drone trajectory optimization 
     framework with double-integrator dynamics, Runge-Kutta 4th Order (RK4) discretization, 
@@ -17,7 +17,7 @@ skills:
   - ROS / Webots Simulation
   - Python
 
-main-image: /drone_2d_main.jpeg
+main-image: /drone_2d_main.jpg
 ---
 
 ## Overview
