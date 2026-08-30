@@ -89,7 +89,7 @@ Autonomous drone navigation using temperature-based decision making.
 The experiments demonstrated that the choice of navigation strategy depends
 strongly on the structure of the thermal field. Greedy hill climbing provided
 efficient localization when the temperature gradient was strong, while
-$\epsilon$-greedy exploration was more effective when the drone started far
+*epsilon*-greedy exploration was more effective when the drone started far
 from the fire source or encountered misleading thermal maxima.
 
 The project provided an end-to-end workflow combining **thermal environment
