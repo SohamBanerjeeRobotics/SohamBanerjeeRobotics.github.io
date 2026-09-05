@@ -1,20 +1,712 @@
----
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soham Banerjee — Robotics & Control Engineer</title>
+<meta name="description" content="Portfolio of Soham Banerjee — Robotics & Control Engineer working on autonomous systems, control theory, and deep reinforcement learning.">
 
-layout: wrapper
----
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-{% include hero.html%}
+<style>
+  :root{
+    --bg:#000000;
+    --bg-2:#050508;
+    --panel: rgba(255,255,255,0.02);
+    --panel-border: rgba(255,255,255,0.055);
+    --violet:#8b5cf6;
+    --blue:#3b82f6;
+    --cyan:#22d3ee;
+    --text:#f1f0f7;
+    --muted:#847f98;
+    --muted-2:#4c485e;
+    --radius:16px;
+    --maxw:1180px;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Inter',sans-serif; line-height:1.65; overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    cursor:none;
+  }
+  a, button, input, textarea{ cursor:none; }
+  @media (pointer: coarse){
+    body, a, button, input, textarea{ cursor:auto; }
+  }
+  ::selection{ background:rgba(139,92,246,0.4); color:#fff; }
+  h1,h2,h3,h4{ font-family:'Sora',sans-serif; margin:0; letter-spacing:-0.02em; }
+  a{ color:inherit; text-decoration:none; }
+  .mono{ font-family:'JetBrains Mono',monospace; }
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 32px; }
+  img{ max-width:100%; display:block; }
 
+  /* ambient glow background */
+  .glow-field{ position:fixed; inset:0; z-index:-2; overflow:hidden; }
+  .orb{ position:absolute; border-radius:50%; filter:blur(110px); opacity:0.14; }
+  .orb.o1{ width:520px; height:520px; background:var(--violet); top:-160px; left:-120px; animation: drift1 22s ease-in-out infinite; }
+  .orb.o2{ width:460px; height:460px; background:var(--blue); top:20%; right:-160px; opacity:0.11; animation: drift2 26s ease-in-out infinite; }
+  .orb.o3{ width:400px; height:400px; background:var(--cyan); bottom:-140px; left:30%; opacity:0.08; animation: drift1 30s ease-in-out infinite reverse; }
+  .vignette{ position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(ellipse 90% 70% at 50% 0%, transparent 30%, rgba(0,0,0,0.75) 100%); }
+  @keyframes drift1{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(60px,40px); } }
+  @keyframes drift2{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(-50px,60px); } }
+  .grain-grid{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 26px 26px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 20%, black 30%, transparent 85%);
+  }
 
+  /* nav */
+  header{ position:fixed; top:0; left:0; right:0; z-index:100; }
+  nav{
+    max-width:var(--maxw); margin:18px auto 0; padding:12px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(4,4,8,0.72); backdrop-filter:blur(16px);
+    border:1px solid var(--panel-border); border-radius:100px;
+  }
+  .brand{ font-family:'Sora',sans-serif; font-weight:700; font-size:16px; padding-left:8px; }
+  .brand span{ background:linear-gradient(120deg,var(--violet),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .nav-links{ display:flex; align-items:center; gap:6px; }
+  .nav-links a{
+    font-size:14px; color:var(--muted); padding:9px 16px; border-radius:100px; transition:all .25s;
+  }
+  .nav-links a:hover{ color:var(--text); background:rgba(255,255,255,0.06); }
+  .nav-links a.cta{
+    background:linear-gradient(120deg,var(--violet),var(--blue)); color:#fff; font-weight:500; margin-left:6px;
+  }
+  .nav-links a.cta:hover{ filter:brightness(1.1); }
+  .menu-toggle{ display:none; background:none; border:none; color:var(--text); font-size:18px; cursor:pointer; padding:6px 10px; }
 
-<div class="arrow"> 
-    <a href="#projects">
-        More About Me
-    <i class="fa-solid fa-angles-down"></i>
-    </a> 
-</div>
-{% include projects.html%}
-{% include skills.html%}
-{% include contact.html%}
+  /* HERO */
+  .hero{ min-height:100vh; display:flex; align-items:center; padding:140px 0 80px; position:relative; }
+  .hero .wrap{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:18px; }
+  .kicker{
+    display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:12.5px;
+    color:var(--cyan); background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.25);
+    padding:6px 14px; border-radius:100px; margin-bottom:26px;
+  }
+  .kicker .pulse-dot{ width:6px; height:6px; border-radius:50%; background:var(--cyan); animation:pulse 2s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+  .hero h1{
+    font-size:clamp(2.6rem,6vw,4.4rem); font-weight:700; line-height:1.05; color:var(--text);
+  }
+  .hero h1 .grad{
+    background:linear-gradient(120deg,var(--violet) 10%, var(--blue) 50%, var(--cyan) 90%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero .sub{ color:var(--muted); font-size:16.5px; max-width:52ch; margin-top:10px; }
+  .hero .cta-row{ display:flex; gap:14px; margin-top:12px; flex-wrap:wrap; justify-content:center; }
+  .btn{
+    font-family:'Inter',sans-serif; font-size:14.5px; font-weight:500; padding:13px 22px; border-radius:100px;
+    display:inline-flex; align-items:center; gap:9px; transition:all .25s; border:1px solid transparent;
+  }
+  .btn.primary{ background:linear-gradient(120deg,var(--violet),var(--blue)); color:#fff; box-shadow:0 8px 30px -8px rgba(139,92,246,0.6); }
+  .btn.primary:hover{ transform:translateY(-2px); box-shadow:0 12px 34px -8px rgba(139,92,246,0.8); }
+  .btn.ghost{ color:var(--text); border-color:var(--panel-border); background:rgba(255,255,255,0.02); }
+  .btn.ghost:hover{ border-color:rgba(255,255,255,0.25); background:rgba(255,255,255,0.06); }
+
+  .robot-scene{
+    position:relative; width:340px; height:360px;
+  }
+  .robot-glow{
+    position:absolute; inset:30px; border-radius:50%;
+    background:radial-gradient(circle, rgba(139,92,246,0.28), transparent 70%);
+    filter:blur(24px); animation:glowpulse 3s ease-in-out infinite; pointer-events:none;
+  }
+  @keyframes glowpulse{ 0%,100%{ opacity:0.55; transform:scale(1); } 50%{ opacity:0.9; transform:scale(1.08); } }
+  #duckCanvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  @media (max-width: 860px){
+    .robot-scene{ width:240px; height:260px; }
+  }
+
+  .scroll-cue{
+    position:absolute; bottom:34px; left:50%; transform:translateX(-50%);
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted-2);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .scroll-cue .line{ width:1px; height:32px; background:linear-gradient(var(--muted-2),transparent); animation:scrollline 2s ease-in-out infinite; }
+  @keyframes scrollline{ 0%{ opacity:0; transform:scaleY(0.4); } 50%{ opacity:1; } 100%{ opacity:0; transform:scaleY(1);} }
+
+  /* SECTION */
+  section{ padding:110px 0; position:relative; }
+  .sec-label{ font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--violet); letter-spacing:0.02em; margin-bottom:14px; display:block; }
+  .sec-title{ font-size:clamp(1.8rem,3.4vw,2.4rem); font-weight:700; max-width:16ch; }
+  .sec-sub{ color:var(--muted); max-width:60ch; margin-top:16px; font-size:15.5px; }
+
+  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ABOUT */
+  .about-grid{ display:grid; grid-template-columns:1fr 1fr; gap:60px; margin-top:50px; align-items:start; }
+  .about-grid p{ color:var(--muted); font-size:15.5px; margin-bottom:16px; }
+  .about-grid strong{ color:var(--text); font-weight:600; }
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--panel-border); border:1px solid var(--panel-border); border-radius:var(--radius); overflow:hidden; }
+  .stat{ background:var(--bg-2); padding:26px; }
+  .stat .num{ font-family:'Sora',sans-serif; font-size:2rem; font-weight:700;
+    background:linear-gradient(120deg,var(--violet),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .stat .lbl{ color:var(--muted); font-size:13px; margin-top:6px; }
+  @media (max-width:860px){ .about-grid{ grid-template-columns:1fr; } }
+
+  /* SKILLS */
+  .skills-wrap{ display:flex; flex-wrap:wrap; gap:12px; margin-top:44px; }
+  .skill-pill{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:100px;
+    padding:10px 18px; display:flex; align-items:center; gap:10px; transition:all .25s;
+  }
+  .skill-pill:hover{ border-color:rgba(139,92,246,0.5); background:rgba(139,92,246,0.08); transform:translateY(-2px); }
+  .skill-pill .cat{ font-size:13.5px; font-weight:500; }
+  .skill-pill .count{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted-2); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:100px; }
+
+  .skill-detail{ margin-top:36px; display:none; }
+  .skill-detail.active{ display:block; }
+  .skill-detail .tag-list{ display:flex; flex-wrap:wrap; gap:9px; }
+  .skill-detail .tag{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted);
+    border:1px solid var(--panel-border); padding:6px 12px; border-radius:8px; background:var(--panel);
+  }
+
+  /* PROJECTS */
+  .projects-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:26px; margin-top:48px; }
+  .proj-card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius);
+    overflow:hidden; transition:all .35s; position:relative;
+  }
+  .proj-card:hover{ transform:translateY(-6px); border-color:rgba(139,92,246,0.4); box-shadow:0 20px 50px -20px rgba(139,92,246,0.35); }
+  .proj-thumb{ height:200px; overflow:hidden; position:relative; }
+  .proj-thumb img{ width:100%; height:100%; object-fit:cover; transition:transform .5s; }
+  .proj-card:hover .proj-thumb img{ transform:scale(1.06); }
+  .proj-thumb::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg,transparent 50%, rgba(10,10,18,0.85) 100%); }
+  .proj-body{ padding:26px 26px 28px; }
+  .proj-body h3{ font-size:1.15rem; font-weight:600; margin-bottom:10px; }
+  .proj-body p{ color:var(--muted); font-size:14px; margin-bottom:18px; }
+  .proj-tags{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+  .proj-tags span{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--cyan); background:rgba(34,211,238,0.08); padding:4px 10px; border-radius:6px; }
+  .proj-links{ display:flex; gap:20px; }
+  .proj-links a{ font-size:13.5px; font-weight:500; color:var(--text); display:inline-flex; align-items:center; gap:6px; }
+  .proj-links a:hover{ color:var(--violet); }
+  @media (max-width:860px){ .projects-grid{ grid-template-columns:1fr; } }
+
+  /* CONTACT */
+  .contact-panel{
+    margin-top:50px; background:var(--panel); border:1px solid var(--panel-border); border-radius:24px;
+    padding:56px; display:grid; grid-template-columns:1fr 1fr; gap:56px; position:relative; overflow:hidden;
+  }
+  .contact-panel::before{
+    content:''; position:absolute; width:400px; height:400px; background:var(--violet); opacity:0.15; filter:blur(100px);
+    top:-150px; right:-150px; border-radius:50%;
+  }
+  .contact-left h3{ font-size:1.6rem; margin-bottom:14px; }
+  .contact-left p{ color:var(--muted); font-size:15px; max-width:44ch; }
+  .contact-links{ margin-top:26px; display:flex; flex-direction:column; gap:14px; }
+  .contact-links a{ display:flex; align-items:center; gap:12px; color:var(--muted); font-size:14.5px; transition:color .2s; }
+  .contact-links a:hover{ color:var(--cyan); }
+  .contact-links i{ width:18px; }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; color:var(--muted); margin-bottom:7px; font-family:'JetBrains Mono',monospace; }
+  .field input, .field textarea{
+    width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--panel-border); color:var(--text);
+    padding:12px 14px; font-family:'Inter',sans-serif; font-size:14px; border-radius:10px; transition:border-color .2s;
+  }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--violet); }
+  .field textarea{ min-height:96px; resize:vertical; }
+  .contact-panel form .btn.primary{ width:100%; justify-content:center; border:none; cursor:pointer; }
+  @media (max-width:860px){ .contact-panel{ grid-template-columns:1fr; padding:32px; } }
+
+  footer{ padding:40px 0; border-top:1px solid var(--panel-border); margin-top:20px; }
+  footer .wrap{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; }
+  footer .fname{ font-size:13px; color:var(--muted-2); }
+  .foot-socials{ display:flex; gap:18px; }
+  .foot-socials a{ color:var(--muted); font-size:16px; transition:color .2s; }
+  .foot-socials a:hover{ color:var(--violet); }
+
+  @media (max-width:720px){
+    .nav-links{
+      position:fixed; top:76px; right:20px; left:20px; flex-direction:column; align-items:stretch;
+      background:rgba(14,14,26,0.95); border:1px solid var(--panel-border); border-radius:18px; padding:14px;
+      display:none; backdrop-filter:blur(16px);
+    }
+    .nav-links.open{ display:flex; }
+    .nav-links a{ text-align:center; }
+    .menu-toggle{ display:block; }
+  }
+
+  .cursor-dot, .cursor-ring{
+    position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:9999;
+    transform:translate(-50%,-50%); will-change:transform;
+  }
+  .cursor-dot{ width:6px; height:6px; background:var(--cyan); box-shadow:0 0 8px var(--cyan); }
+  .cursor-ring{
+    width:34px; height:34px; border:1.5px solid rgba(139,92,246,0.6);
+    transition:width .25s, height .25s, border-color .25s, background .25s;
+  }
+  .cursor-ring.hover{ width:54px; height:54px; background:rgba(139,92,246,0.12); border-color:var(--violet); }
+  @media (pointer: coarse){ .cursor-dot, .cursor-ring{ display:none; } }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="glow-field"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div class="grain-grid"></div>
+<div class="vignette"></div>
+
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<header>
+  <nav>
+    <a href="#top" class="brand">Soham <span>Banerjee</span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+      <a href="assets/resume/Resume.pdf" target="_blank" rel="noopener noreferrer" class="cta">Resume</a>
+    </div>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="robot-scene">
+      <div class="robot-glow"></div>
+      <canvas id="duckCanvas"></canvas>
+    </div>
+
+    <div>
+      <span class="kicker"><span class="pulse-dot"></span> Available for robotics research & internships</span>
+      <h1>Turning complex math<br>into <span class="grad">physical movement.</span></h1>
+      <p class="sub">I'm Soham — a Robotics &amp; Control Engineer blending mechanical foundations, control theory, and deep learning to build intelligent physical systems and 3D simulations. Driven by curiosity, building what excites me.</p>
+      <div class="cta-row">
+        <a href="#projects" class="btn primary"><i class="fa-solid fa-diagram-project"></i> View Projects</a>
+        <a href="#contact" class="btn ghost"><i class="fa-regular fa-envelope"></i> Get in Touch</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>SCROLL</span><span class="line"></span></div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <span class="sec-label reveal">01 — About</span>
+    <h2 class="sec-title reveal">Where control theory meets real hardware.</h2>
+    <div class="about-grid reveal">
+      <div>
+        <img src="assets/images/profile-image/Profile.jpeg" alt="Soham Banerjee" style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid var(--panel-border);margin-bottom:24px;">
+        <p>I work at the intersection of <strong>control theory</strong>, <strong>robotics</strong>, and <strong>reinforcement learning</strong> — designing systems that don't just simulate well, but move, balance, and navigate in the real world.</p>
+        <p>My recent research at <strong>IIT Bombay</strong>, under Prof. Arpita Sinha and Prof. Vivek Sangwan, focuses on underactuated bipedal locomotion with pneumatic ankle push-off — bridging low-level continuous control models with high-level trajectory optimization, validated through both simulation and hardware-in-the-loop testing.</p>
+        <p>From drones navigating fire-affected environments to mapless mobile robots trained entirely in simulation and deployed on real hardware, I care about building systems that survive contact with reality.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="num">5+</div><div class="lbl">Robotics research projects</div></div>
+        <div class="stat"><div class="num">6</div><div class="lbl">Technical domains covered</div></div>
+        <div class="stat"><div class="num">IIT-B</div><div class="lbl">Current research base</div></div>
+        <div class="stat"><div class="num">Sim→Real</div><div class="lbl">Core research focus</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <span class="sec-label reveal">02 — Skills</span>
+    <h2 class="sec-title reveal">Technical toolkit.</h2>
+    <p class="sec-sub reveal">Click a category to see the tools underneath.</p>
+
+    <div class="skills-wrap reveal" id="skillPills">
+      <div class="skill-pill" data-target="sd-1"><span class="cat">Control Systems &amp; Dynamics</span><span class="count">12</span></div>
+      <div class="skill-pill" data-target="sd-2"><span class="cat">Robotics &amp; Autonomous Systems</span><span class="count">15</span></div>
+      <div class="skill-pill" data-target="sd-3"><span class="cat">AI, ML &amp; Reinforcement Learning</span><span class="count">17</span></div>
+      <div class="skill-pill" data-target="sd-4"><span class="cat">Embedded Systems &amp; Hardware</span><span class="count">12</span></div>
+      <div class="skill-pill" data-target="sd-5"><span class="cat">Software &amp; DevOps</span><span class="count">7</span></div>
+      <div class="skill-pill" data-target="sd-6"><span class="cat">CAD &amp; Engineering Simulation</span><span class="count">8</span></div>
+    </div>
+
+    <div class="skill-detail" id="sd-1">
+      <div class="tag-list">
+        <span class="tag">System Identification</span><span class="tag">System Modeling &amp; Dynamics</span>
+        <span class="tag">Linear &amp; Nonlinear Control</span><span class="tag">Feedback &amp; Feedforward Control</span>
+        <span class="tag">Model Predictive Control (MPC)</span><span class="tag">Computed Torque Control</span>
+        <span class="tag">LMI &amp; BMI Based Control</span><span class="tag">Regional Pole Placement</span>
+        <span class="tag">Lyapunov-Based Control Design</span><span class="tag">State Estimator &amp; Filter Design</span>
+        <span class="tag">MATLAB / Simulink / Simscape</span><span class="tag">dSPACE</span>
+      </div>
+    </div>
+    <div class="skill-detail" id="sd-2">
+      <div class="tag-list">
+        <span class="tag">Robot Kinematics &amp; Dynamics</span><span class="tag">Forward &amp; Inverse Kinematics</span>
+        <span class="tag">Denavit-Hartenberg Modeling</span><span class="tag">Motion &amp; Path Planning</span>
+        <span class="tag">Trajectory Generation</span><span class="tag">SLAM &amp; Localization</span>
+        <span class="tag">Mobile Robot Navigation</span><span class="tag">Drone / Quadrotor Navigation</span>
+        <span class="tag">ROS / ROS2</span><span class="tag">Gazebo</span><span class="tag">Webots</span>
+        <span class="tag">MuJoCo</span><span class="tag">CoppeliaSim</span><span class="tag">Underactuated Systems</span>
+        <span class="tag">Bipedal Locomotion</span>
+      </div>
+    </div>
+    <div class="skill-detail" id="sd-3">
+      <div class="tag-list">
+        <span class="tag">Regression &amp; Classification</span><span class="tag">Clustering &amp; Anomaly Detection</span>
+        <span class="tag">Feature Extraction</span><span class="tag">PCA &amp; LDA</span>
+        <span class="tag">Deep Neural Networks</span><span class="tag">CNN &amp; RNN</span>
+        <span class="tag">Transformer Architecture</span><span class="tag">Gaussian Mixture Models</span>
+        <span class="tag">VAE &amp; Diffusion Architecture</span><span class="tag">Keras</span><span class="tag">PyTorch</span>
+        <span class="tag">TensorFlow</span><span class="tag">Multi-Armed Bandits &amp; MDP</span>
+        <span class="tag">Single &amp; Multi-Agent RL</span><span class="tag">Actor-Critic (A2C, DDPG, PPO, TD3)</span>
+        <span class="tag">POMDP</span><span class="tag">PyBullet &amp; Gymnasium</span>
+      </div>
+    </div>
+    <div class="skill-detail" id="sd-4">
+      <div class="tag-list">
+        <span class="tag">Arduino Uno / Nano / Giga</span><span class="tag">ESP32</span><span class="tag">STM32</span>
+        <span class="tag">Teensy</span><span class="tag">Jetson Nano</span><span class="tag">Raspberry Pi</span>
+        <span class="tag">Embedded Control</span><span class="tag">Motor Control</span><span class="tag">Sensor Integration</span>
+        <span class="tag">Hardware Testing &amp; Validation</span><span class="tag">PlatformIO</span><span class="tag">Arduino IDE</span>
+      </div>
+    </div>
+    <div class="skill-detail" id="sd-5">
+      <div class="tag-list">
+        <span class="tag">C++</span><span class="tag">Python</span><span class="tag">Linux</span>
+        <span class="tag">Git / GitHub</span><span class="tag">Docker</span><span class="tag">Kubernetes</span><span class="tag">LaTeX</span>
+      </div>
+    </div>
+    <div class="skill-detail" id="sd-6">
+      <div class="tag-list">
+        <span class="tag">SolidWorks</span><span class="tag">Fusion 360</span><span class="tag">ANSYS</span>
+        <span class="tag">COMSOL</span><span class="tag">PyroSim / FDS</span><span class="tag">3D Printing</span>
+        <span class="tag">Bambu Studio</span><span class="tag">Ultimaker Cura</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <span class="sec-label reveal">03 — Projects</span>
+    <h2 class="sec-title reveal">Selected work.</h2>
+    <p class="sec-sub reveal">Five projects spanning aerial robotics, bipedal locomotion, motion planning, and reinforcement learning. More coming soon.</p>
+
+    <div class="projects-grid reveal">
+      <div class="proj-card">
+        <div class="proj-thumb"><img src="_projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/fire_drone_main.jpeg" alt="Drone navigating a simulated fire environment"></div>
+        <div class="proj-body">
+          <h3>Autonomous Navigation in Fire Environments using Drone</h3>
+          <p>Reinforcement-learning navigation for a Crazyflie 2.1 micro-UAV using only local temperature feedback, evaluated across single- and multi-source thermal fields in Webots.</p>
+          <div class="proj-tags"><span>Reinforcement Learning</span><span>ROS2</span><span>Webots</span></div>
+          <div class="proj-links">
+            <a href="projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/">Read more <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-thumb"><img src="_projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/biped_hardware_front.jpeg" alt="Bipedal robot hardware setup"></div>
+        <div class="proj-body">
+          <h3>Underactuated Bipedal Locomotion with Ankle Push-Off</h3>
+          <p>Open- and closed-loop control for a planar bipedal robot with pneumatic ankle actuation, comparing PID and MPC across simulation and hardware-in-the-loop tests.</p>
+          <div class="proj-tags"><span>MPC</span><span>PID</span><span>dSPACE HIL</span></div>
+          <div class="proj-links">
+            <a href="projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/">Read more <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-thumb"><img src="_projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/mapless_navigation_front.jpg" alt="Mobile robot mapless navigation"></div>
+        <div class="proj-body">
+          <h3>Virtual-to-Real Mapless Navigation via Deep RL</h3>
+          <p>An asynchronous actor-critic (ADDPG) framework trained entirely in PyBullet and transferred to a physical TurtleBot without fine-tuning.</p>
+          <div class="proj-tags"><span>ADDPG</span><span>Sim-to-Real</span><span>PyTorch</span></div>
+          <div class="proj-links">
+            <a href="projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/">Read more <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-thumb"><img src="_projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/turtlebot_main.jpeg" alt="TurtleBot motion planning"></div>
+        <div class="proj-body">
+          <h3>Motion Planning &amp; Coordination for Autonomous Vehicles</h3>
+          <p>C-space modeling, A* and RRT planning for a nonholonomic TurtleBot, deployed to hardware with AMCL localization and Pure Pursuit tracking.</p>
+          <div class="proj-tags"><span>A* / RRT</span><span>AMCL</span><span>ROS</span></div>
+          <div class="proj-links">
+            <a href="projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/">Read more <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-thumb"><img src="_projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/drone_2d_main.jpg" alt="2D drone trajectory optimization"></div>
+        <div class="proj-body">
+          <h3>Receding Horizon Control for Crazyflie Navigation</h3>
+          <p>An open-loop 2D drone trajectory optimizer with double-integrator dynamics and a smooth Softplus obstacle penalty, solved via L-BFGS-B.</p>
+          <div class="proj-tags"><span>Trajectory Opt.</span><span>L-BFGS-B</span><span>RK4</span></div>
+          <div class="proj-links">
+            <a href="projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/">Read more <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <span class="sec-label reveal">04 — Contact</span>
+    <h2 class="sec-title reveal">Let's build something.</h2>
+
+    <div class="contact-panel reveal">
+      <div class="contact-left">
+        <h3>Say hello.</h3>
+        <p>Open to research collaborations, robotics internships, and interesting control-systems problems. Reach out directly or send a message.</p>
+        <div class="contact-links">
+          <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i> linkedin.com/in/soham-banerjee</a>
+          <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> github.com/SohamBanerjeeRobotics</a>
+          <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-medium"></i> medium.com/@banerjeesohamrobotics</a>
+        </div>
+      </div>
+      <form action="https://formspree.io/f/xzepvzao" method="POST">
+        <div class="field"><label for="name">NAME</label><input type="text" id="name" name="name" required placeholder="Your name"></div>
+        <div class="field"><label for="email">EMAIL</label><input type="email" id="email" name="email" required placeholder="you@example.com"></div>
+        <div class="field"><label for="message">MESSAGE</label><textarea id="message" name="message" required placeholder="What would you like to talk about?"></textarea></div>
+        <button type="submit" class="btn primary">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="fname">© <span id="year"></span> Soham Banerjee</span>
+    <div class="foot-socials">
+      <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i></a>
+      <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i></a>
+      <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-medium"></i></a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // 3D duck-bot mascot (Three.js — real geometry, not an image/sprite)
+  (function initDuckBot(){
+    const canvas = document.getElementById('duckCanvas');
+    const scene_el = document.querySelector('.robot-scene');
+    if (!canvas || typeof THREE === 'undefined') return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+    camera.position.set(0, 0.6, 8);
+
+    function sizeToContainer(){
+      const w = scene_el.clientWidth, h = scene_el.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    sizeToContainer();
+    window.addEventListener('resize', sizeToContainer);
+
+    // lighting
+    scene.add(new THREE.AmbientLight(0x554e7a, 0.9));
+    const keyLight = new THREE.DirectionalLight(0x8b5cf6, 1.4);
+    keyLight.position.set(3, 5, 4);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    keyLight.shadow.camera.near = 1;
+    keyLight.shadow.camera.far = 15;
+    scene.add(keyLight);
+    const rimLight = new THREE.PointLight(0x22d3ee, 2.2, 12);
+    rimLight.position.set(-3, 1.5, -3);
+    scene.add(rimLight);
+    const fillLight = new THREE.PointLight(0x3b82f6, 0.8, 12);
+    fillLight.position.set(0, -2, 3);
+    scene.add(fillLight);
+
+    // materials
+    const bodyMat = new THREE.MeshStandardMaterial({ color:0x2b2748, roughness:0.35, metalness:0.55 });
+    const headMat = new THREE.MeshStandardMaterial({ color:0x342f5c, roughness:0.3, metalness:0.55 });
+    const billMat = new THREE.MeshStandardMaterial({ color:0xf59a30, roughness:0.4, metalness:0.15 });
+    const panelMat = new THREE.MeshStandardMaterial({ color:0x0a0912, roughness:0.6, metalness:0.2 });
+    const eyeWhiteMat = new THREE.MeshStandardMaterial({ color:0xf4f4fa, roughness:0.2, metalness:0.05 });
+    const pupilMat = new THREE.MeshStandardMaterial({ color:0x0e0c1a, roughness:0.3 });
+    const cyanGlow = new THREE.MeshStandardMaterial({ color:0x22d3ee, emissive:0x22d3ee, emissiveIntensity:1.4, roughness:0.3 });
+    const violetGlow = new THREE.MeshStandardMaterial({ color:0x8b5cf6, emissive:0x8b5cf6, emissiveIntensity:1.4, roughness:0.3 });
+    const antennaMat = new THREE.MeshStandardMaterial({ color:0x544e80, roughness:0.5, metalness:0.6 });
+
+    const duck = new THREE.Group();
+
+    // body
+    const body = new THREE.Mesh(new THREE.SphereGeometry(1.15, 32, 32), bodyMat);
+    body.scale.set(1, 0.82, 0.92);
+    body.position.y = -0.55;
+    body.castShadow = true; body.receiveShadow = true;
+    duck.add(body);
+
+    // wings
+    [-1, 1].forEach(side => {
+      const wing = new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 20), bodyMat);
+      wing.scale.set(0.5, 1, 0.6);
+      wing.position.set(side * 1.05, -0.6, 0);
+      wing.castShadow = true;
+      duck.add(wing);
+    });
+
+    // chest panel
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.55, 0.15), panelMat);
+    panel.position.set(0, -0.35, 1.0);
+    duck.add(panel);
+    const chestDot1 = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), cyanGlow);
+    chestDot1.position.set(-0.2, -0.35, 1.1);
+    duck.add(chestDot1);
+    const chestDot2 = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), violetGlow);
+    chestDot2.position.set(0.2, -0.35, 1.1);
+    duck.add(chestDot2);
+
+    // head
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.92, 32, 32), headMat);
+    head.position.y = 0.75;
+    head.castShadow = true;
+    duck.add(head);
+
+    // bill — real extruded 3D geometry, not a flat path
+    const billShape = new THREE.Shape();
+    billShape.moveTo(0, 0.1);
+    billShape.quadraticCurveTo(-0.55, 0.05, -0.6, -0.28);
+    billShape.quadraticCurveTo(-0.6, -0.5, -0.05, -0.48);
+    billShape.quadraticCurveTo(0.05, -0.2, 0, 0.1);
+    const billGeo = new THREE.ExtrudeGeometry(billShape, { depth:0.42, bevelEnabled:true, bevelThickness:0.03, bevelSize:0.03, bevelSegments:2 });
+    billGeo.center();
+    const bill = new THREE.Mesh(billGeo, billMat);
+    bill.rotation.y = Math.PI / 2;
+    bill.position.set(0, 0.62, 0.78);
+    bill.castShadow = true;
+    duck.add(bill);
+
+    // eyes
+    [-0.32, 0.32].forEach(x => {
+      const eyeGroup = new THREE.Group();
+      const white = new THREE.Mesh(new THREE.SphereGeometry(0.22, 20, 20), eyeWhiteMat);
+      eyeGroup.add(white);
+      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 16), pupilMat);
+      pupil.position.z = 0.16;
+      eyeGroup.add(pupil);
+      eyeGroup.position.set(x, 0.85, 0.78);
+      eyeGroup.name = 'eye';
+      duck.add(eyeGroup);
+    });
+
+    // antenna
+    const antennaStem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.55, 8), antennaMat);
+    antennaStem.position.set(0, 1.72, 0);
+    duck.add(antennaStem);
+    const antennaTip = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 16), cyanGlow);
+    antennaTip.position.set(0, 2.02, 0);
+    antennaTip.name = 'antennaTip';
+    duck.add(antennaTip);
+
+    duck.rotation.x = 0.08;
+    scene.add(duck);
+
+    // soft contact shadow catcher
+    const shadowGeo = new THREE.CircleGeometry(1.5, 32);
+    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.35 });
+    const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
+    shadowPlane.rotation.x = -Math.PI / 2;
+    shadowPlane.position.y = -1.42;
+    shadowPlane.receiveShadow = true;
+    scene.add(shadowPlane);
+
+    const eyes = duck.children.filter(c => c.name === 'eye');
+    const clock = new THREE.Clock();
+    let nextBlink = 2 + Math.random() * 3;
+
+    function animate(){
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      if (!reduceMotion){
+        duck.rotation.y = t * 0.5;
+        duck.position.y = Math.sin(t * 1.2) * 0.12;
+      }
+
+      // antenna pulse
+      const pulse = 0.9 + Math.sin(t * 3.2) * 0.6;
+      antennaTip.material.emissiveIntensity = Math.max(0.3, pulse);
+
+      // blink
+      if (t > nextBlink){
+        eyes.forEach(e => e.scale.y = 0.12);
+        if (t > nextBlink + 0.12){
+          eyes.forEach(e => e.scale.y = 1);
+          nextBlink = t + 2.5 + Math.random() * 3;
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+  })();
+
+  // custom cursor
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+  if (isFinePointer){
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    window.addEventListener('mousemove', (e) => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+    });
+    function tick(){
+      rx += (mx - rx) * 0.16;
+      ry += (my - ry) * 0.16;
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+      requestAnimationFrame(tick);
+    }
+    tick();
+    document.querySelectorAll('a, button, .proj-card, .skill-pill, input, textarea').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+    });
+  }
+
+  const toggle = document.getElementById('menuToggle');
+  const links = document.getElementById('navLinks');
+  toggle.addEventListener('click', () => links.classList.toggle('open'));
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+
+  // skill pill toggle
+  const pills = document.querySelectorAll('.skill-pill');
+  const details = document.querySelectorAll('.skill-detail');
+  function showDetail(id){
+    details.forEach(d => d.classList.toggle('active', d.id === id));
+    pills.forEach(p => p.style.borderColor = (p.dataset.target === id) ? 'rgba(139,92,246,0.6)' : '');
+  }
+  pills.forEach(p => p.addEventListener('click', () => showDetail(p.dataset.target)));
+  showDetail('sd-1');
+
+  // scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
