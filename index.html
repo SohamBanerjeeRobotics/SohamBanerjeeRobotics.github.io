@@ -141,7 +141,13 @@
 
   .skills-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
   .skill-card{ background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:20px; }
-  .skill-card .icon{ width:32px; height:32px; border-radius:8px; background:rgba(140,108,255,0.12); color:var(--violet); display:flex; align-items:center; justify-content:center; font-size:14px; margin-bottom:12px; }
+  .skill-card .icon{ font-size:26px; margin-bottom:16px; display:block; width:fit-content; }
+  .skill-card .icon.c-violet{ color:#a78bfa; }
+  .skill-card .icon.c-cyan{ color:#22d3ee; }
+  .skill-card .icon.c-pink{ color:#ec4899; }
+  .skill-card .icon.c-green{ color:#4ade80; }
+  .skill-card .icon.c-blue{ color:#60a5fa; }
+  .skill-card .icon.c-amber{ color:#fbbf24; }
   .skill-card h4{ font-size:14px; font-weight:600; margin-bottom:12px; }
   .skill-card .tags{ display:flex; flex-wrap:wrap; gap:6px; }
   .skill-card .tags span{ font-size:11px; color:var(--mid); background:rgba(255,255,255,0.04); border:1px solid var(--border); padding:4px 9px; border-radius:6px; }
@@ -208,6 +214,18 @@
   .footer-socials a:hover{ color:var(--violet); border-color:var(--violet-dim); }
   .footer-copy{ font-size:12px; color:var(--dim); }
 
+  .cursor-dot, .cursor-ring{
+    position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:9999;
+    transform:translate(-50%,-50%); will-change:transform;
+  }
+  .cursor-dot{ width:6px; height:6px; background:var(--violet); box-shadow:0 0 8px var(--violet); }
+  .cursor-ring{
+    width:32px; height:32px; border:1.5px solid rgba(140,108,255,0.55);
+    transition:width .25s, height .25s, border-color .25s, background .25s;
+  }
+  .cursor-ring.hover{ width:52px; height:52px; background:rgba(140,108,255,0.1); border-color:var(--violet); }
+  @media (pointer: coarse){ .cursor-dot, .cursor-ring{ display:none; } }
+
   @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
 </style>
 </head>
@@ -268,32 +286,32 @@
 
       <div class="skills-grid">
         <div class="skill-card">
-          <div class="icon"><i class="fa-solid fa-sliders"></i></div>
+          <div class="icon c-violet"><i class="fa-solid fa-sliders"></i></div>
           <h4>Control Systems &amp; Dynamics</h4>
           <div class="tags"><span>MPC</span><span>Lyapunov Design</span><span>LMI/BMI Control</span><span>MATLAB/Simulink</span><span>dSPACE</span></div>
         </div>
         <div class="skill-card">
-          <div class="icon"><i class="fa-solid fa-robot"></i></div>
+          <div class="icon c-cyan"><i class="fa-solid fa-robot"></i></div>
           <h4>Robotics &amp; Autonomous Systems</h4>
           <div class="tags"><span>SLAM</span><span>ROS/ROS2</span><span>Motion Planning</span><span>Webots</span><span>MuJoCo</span></div>
         </div>
         <div class="skill-card">
-          <div class="icon"><i class="fa-solid fa-brain"></i></div>
+          <div class="icon c-pink"><i class="fa-solid fa-brain"></i></div>
           <h4>AI, ML &amp; Reinforcement Learning</h4>
           <div class="tags"><span>PyTorch</span><span>Actor-Critic (PPO/TD3)</span><span>CNN/RNN</span><span>Gymnasium</span></div>
         </div>
         <div class="skill-card">
-          <div class="icon"><i class="fa-solid fa-microchip"></i></div>
+          <div class="icon c-green"><i class="fa-solid fa-microchip"></i></div>
           <h4>Embedded Systems &amp; Hardware</h4>
           <div class="tags"><span>ESP32</span><span>STM32</span><span>Jetson Nano</span><span>Raspberry Pi</span><span>Arduino</span></div>
         </div>
         <div class="skill-card">
-          <div class="icon"><i class="fa-solid fa-code"></i></div>
+          <div class="icon c-blue"><i class="fa-solid fa-code"></i></div>
           <h4>Software &amp; DevOps</h4>
           <div class="tags"><span>C++</span><span>Python</span><span>Docker</span><span>Git</span><span>Linux</span></div>
         </div>
         <div class="skill-card">
-          <div class="icon"><i class="fa-solid fa-cubes"></i></div>
+          <div class="icon c-amber"><i class="fa-solid fa-cubes"></i></div>
           <h4>CAD &amp; Engineering Simulation</h4>
           <div class="tags"><span>SolidWorks</span><span>Fusion 360</span><span>ANSYS</span><span>3D Printing</span></div>
         </div>
@@ -425,7 +443,14 @@
   </div>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -495,21 +520,30 @@
     svg.appendChild(shape);
   })();
 
-  // Procedural rotating PCB (original geometry — not a copy of any specific
-  // manufacturer's board or logo, styled to evoke a single-board computer)
-  (function initPCB(){
-    const canvas = document.getElementById('pcbCanvas');
-    const hero = document.querySelector('.hero');
-    if (!canvas || typeof THREE === 'undefined') return;
+  // Real Microduck robot (Pollen Robotics / Hugging Face, Apache-2.0) —
+  // torso + head assembled from the project's own official CAD shell meshes,
+  // positioned using the exact body transforms from their published MJCF rig.
+  // Source: github.com/pollen-robotics/microduck_rl
+</script>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+
+  const canvas = document.getElementById('pcbCanvas');
+  const hero = document.querySelector('.hero');
+
+  if (canvas && hero){
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(0, 1.4, 7.5);
-    camera.lookAt(0, 0, 0);
+    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+    camera.position.set(0, 0.4, 8.5);
+    camera.lookAt(0, 0.2, 0);
 
     function sizeToContainer(){
       const w = hero.clientWidth, h = hero.clientHeight;
@@ -520,100 +554,138 @@
     sizeToContainer();
     window.addEventListener('resize', sizeToContainer);
 
-    scene.add(new THREE.AmbientLight(0x8888aa, 0.7));
-    const key = new THREE.DirectionalLight(0xffffff, 1.1);
+    scene.add(new THREE.AmbientLight(0xaaaaee, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 1.6);
     key.position.set(4, 6, 5);
     scene.add(key);
-    const rim = new THREE.PointLight(0x8c6cff, 2.4, 20);
+    const rim = new THREE.PointLight(0x8c6cff, 3.0, 24);
     rim.position.set(-4, 2, -3);
     scene.add(rim);
-    const fill = new THREE.PointLight(0x22d3ee, 0.9, 20);
+    const fill = new THREE.PointLight(0x22d3ee, 1.1, 24);
     fill.position.set(0, -2, 4);
     scene.add(fill);
 
-    const boardMat = new THREE.MeshStandardMaterial({ color:0x1c6b3e, roughness:0.55, metalness:0.25 });
-    const metalMat = new THREE.MeshStandardMaterial({ color:0xb9bcc4, roughness:0.35, metalness:0.85 });
-    const darkMat = new THREE.MeshStandardMaterial({ color:0x151515, roughness:0.5, metalness:0.4 });
-    const goldMat = new THREE.MeshStandardMaterial({ color:0xd4af6a, roughness:0.4, metalness:0.9 });
-    const chipMat = new THREE.MeshStandardMaterial({ color:0x0c0c0f, roughness:0.35, metalness:0.5 });
+    // Body tree mirrors the official MJCF kinematic chain exactly
+    // (trunk_base -> neck -> neck_pitch -> yaw_roll_motion -> jaw_soft),
+    // scaled up from meters for display, with the real per-part colors.
+    const SCALE = 13;
+    const MODEL_BASE = 'assets/models/microduck/';
 
-    const board = new THREE.Group();
+    const bodyDefs = [
+      { name:'trunk_base', parent:null, pos:[0,0,0], quat:[1,0,0,0], meshes:[
+        { file:'trunk_base.stl', pos:[0.004,-0,-0.0175], quat:[0.707107,-0,-0,0.707107], color:0x212623 },
+        { file:'right_shell.stl', pos:[0.004,-0.0005,-0.0175], quat:[0.707107,0,0,0.707107], color:0xd9d9d6 },
+        { file:'left_shell.stl', pos:[0.004,-0,-0.0175785], quat:[0.707107,-0,-0,0.707107], color:0xcccccc }
+      ]},
+      { name:'neck', parent:'trunk_base', pos:[0.026,0.0145,0.0324215], quat:[0,0,0.707107,-0.707107], meshes:[
+        { file:'neck.stl', pos:[0.022,0.05,0.028], quat:[0.5,0.5,0.5,-0.5], color:0xacaa9a }
+      ]},
+      { name:'neck_pitch', parent:'neck', pos:[-0,-0.05,0], quat:[0,1,-0,-0], meshes:[
+        { file:'neck_pitch.stl', pos:[-0,0.0287931,-0.0145], quat:[0.5,-0.5,-0.5,-0.5], color:0x596066 }
+      ]},
+      { name:'yaw_roll_motion', parent:'neck_pitch', pos:[-0,0.0186931,-0.0145], quat:[0,-0,-0.707107,-0.707107], meshes:[
+        { file:'yaw_roll_motion.stl', pos:[0,0,0.01], quat:[0.707107,0,0,0.707107], color:0x212623 }
+      ]},
+      { name:'jaw_soft', parent:'yaw_roll_motion', pos:[-0.0179,0,0.0145], quat:[0.707107,0,-0.707107,-0], meshes:[
+        { file:'face_part.stl', pos:[-0.0045,-9.13778e-05,-0.0178], quat:[0.5,0.5,0.5,0.5], color:0xacaa9a },
+        { file:'top_head_shell.stl', pos:[-0.0045,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xd9d9d6 },
+        { file:'bottom_head_shell.stl', pos:[-0.0043,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 },
+        { file:'jaw.stl', pos:[-0.0045,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 }
+      ]}
+    ];
 
-    // main PCB
-    const base = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.09, 3.0), boardMat);
-    board.add(base);
-
-    // mounting holes
-    [[-2.1,1.25],[2.1,1.25],[-2.1,-1.25],[2.1,-1.25]].forEach(([x,z]) => {
-      const hole = new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.1,16), darkMat);
-      hole.position.set(x, 0.05, z);
-      board.add(hole);
-    });
-
-    // USB ports (stacked pair)
-    [-0.55, 0.05].forEach((z) => {
-      const usb = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.32, 0.5), metalMat);
-      usb.position.set(-2.35, 0.2, z);
-      board.add(usb);
-    });
-
-    // Ethernet port
-    const eth = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.38, 0.62), darkMat);
-    eth.position.set(-2.35, 0.24, 0.85);
-    board.add(eth);
-
-    // HDMI ports
-    [0.9, 1.35].forEach((x) => {
-      const hdmi = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.16, 0.42), darkMat);
-      hdmi.position.set(x, 0.13, -1.35);
-      board.add(hdmi);
-    });
-
-    // audio jack
-    const jack = new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.3,16), metalMat);
-    jack.rotation.z = Math.PI/2;
-    jack.position.set(2.05, 0.1, -1.35);
-    board.add(jack);
-
-    // SoC chip
-    const soc = new THREE.Mesh(new THREE.BoxGeometry(0.9,0.14,0.9), chipMat);
-    soc.position.set(0.1, 0.11, 0.35);
-    board.add(soc);
-
-    // small capacitors
-    [[1.6,0.3],[1.8,0.55],[1.9,0.05]].forEach(([x,z]) => {
-      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.14,12), metalMat);
-      cap.position.set(x, 0.11, z);
-      board.add(cap);
-    });
-
-    // GPIO header pins (2x20 grid)
-    const pinGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.18, 6);
-    for (let row = 0; row < 2; row++){
-      for (let col = 0; col < 20; col++){
-        const pin = new THREE.Mesh(pinGeo, goldMat);
-        pin.position.set(-1.9 + col * 0.115, 0.13, -1.05 + row * 0.11);
-        board.add(pin);
-      }
+    function toQuat(wxyz){
+      const [w,x,y,z] = wxyz;
+      return new THREE.Quaternion(x,y,z,w);
     }
 
-    board.rotation.x = -0.32;
-    board.rotation.y = 0.5;
-    scene.add(board);
+    const rig = new THREE.Group();
+    const groupsByName = {};
+    const loader = new STLLoader();
+    let loaded = 0;
+
+    bodyDefs.forEach(def => {
+      const group = new THREE.Group();
+      group.position.set(...def.pos.map(v => v * SCALE));
+      group.quaternion.copy(toQuat(def.quat));
+      groupsByName[def.name] = group;
+      (def.parent ? groupsByName[def.parent] : rig).add(group);
+
+      def.meshes.forEach(m => {
+        loader.load(
+          MODEL_BASE + m.file,
+          (geometry) => {
+            geometry.scale(SCALE, SCALE, SCALE);
+            const material = new THREE.MeshStandardMaterial({ color:m.color, roughness:0.55, metalness:0.15 });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(m.pos[0]*SCALE, m.pos[1]*SCALE, m.pos[2]*SCALE);
+            mesh.quaternion.copy(toQuat(m.quat));
+            group.add(mesh);
+            loaded++;
+          },
+          undefined,
+          (err) => { console.warn('Microduck mesh failed to load:', m.file, err); }
+        );
+      });
+    });
+
+    rig.rotation.x = -0.15;
+    rig.position.y = -0.9;
+    scene.add(rig);
+
+    setTimeout(() => {
+      if (loaded === 0){
+        const note = document.createElement('div');
+        note.style.cssText = 'margin-top:20px;font-family:JetBrains Mono,monospace;font-size:11px;color:#8d8d97;';
+        note.textContent = '3D model assets not found — copy assets/models/microduck/ into your repo (see deployment notes).';
+        hero.querySelector('.hero-content').appendChild(note);
+      }
+    }, 8000);
 
     const clock = new THREE.Clock();
     function animate(){
       requestAnimationFrame(animate);
       if (!reduceMotion){
         const t = clock.getElapsedTime();
-        board.rotation.y = 0.5 + t * 0.25;
-        board.position.y = Math.sin(t * 0.8) * 0.15;
+        rig.rotation.y = 0.6 + t * 0.3;
+        rig.position.y = -0.9 + Math.sin(t * 0.8) * 0.12;
       }
       renderer.render(scene, camera);
     }
     animate();
+  }
+</script>
+
+<script>
+  // custom cursor
+  (function initCursor(){
+    const dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    const ring = document.createElement('div');
+    ring.className = 'cursor-ring';
+    document.body.append(dot, ring);
+
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    window.addEventListener('mousemove', (e) => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+    });
+    function tick(){
+      rx += (mx - rx) * 0.16;
+      ry += (my - ry) * 0.16;
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+      requestAnimationFrame(tick);
+    }
+    tick();
+    document.querySelectorAll('a, button, .skill-card, .work-row, input, textarea').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+    });
   })();
 </script>
+
 
 </body>
 </html>
