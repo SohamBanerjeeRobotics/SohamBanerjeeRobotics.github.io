@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soham Banerjee | Robotics & Control Engineer</title>
+<meta name="description" content="Portfolio of Soham Banerjee — Robotics & Control Engineer working on autonomous systems, control theory, and deep reinforcement learning.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+  :root{
+    --bg:#000000;
+    --bg-panel:#0a0a0c;
+    --border: rgba(255,255,255,0.09);
+    --violet:#8c6cff;
+    --violet-dim: rgba(140,108,255,0.35);
+    --text:#ffffff;
+    --dim:#8d8d97;
+    --mid:#c7c7cf;
+    --maxw:1200px;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Inter',sans-serif; line-height:1.65; overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--violet-dim); color:#fff; }
+  h1,h2,h3,h4{ font-family:'Sora',sans-serif; margin:0; letter-spacing:-0.01em; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 32px; }
+  img{ max-width:100%; display:block; }
+
+  /* section title pattern: "My <bold>Word</bold>" */
+  .sec-eyebrow{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .sec-eyebrow .dot{ width:7px; height:7px; border-radius:50%; background:var(--violet); box-shadow:0 0 8px var(--violet); animation:pulse 2.2s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+  .sec-title{ font-size:clamp(1.9rem,3.6vw,2.6rem); font-weight:600; }
+  .sec-title .light{ color:var(--dim); font-weight:400; }
+  .sec-title .bold{ color:var(--text); font-weight:800; }
+
+  /* NAV */
+  header{
+    position:sticky; top:0; z-index:100;
+    background:rgba(0,0,0,0.75); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  nav{
+    max-width:var(--maxw); margin:0 auto; padding:18px 32px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:'Sora',sans-serif; font-weight:700; font-size:16.5px; white-space:nowrap; }
+  .brand .avatar-dot{ width:26px; height:26px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #c9b9ff, var(--violet)); flex-shrink:0; }
+  .nav-links{ display:flex; align-items:center; gap:30px; }
+  .nav-links a{
+    font-size:13px; font-weight:600; letter-spacing:0.06em; color:var(--mid); transition:color .2s;
+  }
+  .nav-links a:hover{ color:var(--text); }
+  .resume-pill{
+    border:1px solid var(--violet-dim); color:var(--violet); border-radius:100px;
+    padding:9px 18px; font-size:12.5px; font-weight:600; letter-spacing:0.05em;
+    display:flex; align-items:center; gap:8px; transition:all .2s; white-space:nowrap;
+  }
+  .resume-pill:hover{ background:rgba(140,108,255,0.1); }
+  .nav-right{ display:flex; align-items:center; gap:20px; }
+  .nav-email{ font-size:13px; color:var(--dim); white-space:nowrap; }
+  .menu-toggle{ display:none; background:none; border:none; color:var(--text); font-size:18px; cursor:pointer; }
+  @media (max-width: 980px){
+    .nav-links, .nav-email{ display:none; }
+    .menu-toggle{ display:block; }
+  }
+
+  /* HERO */
+  .hero{ position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #pcbCanvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .hero-content{ position:relative; z-index:2; text-align:center; padding:0 20px; pointer-events:none; }
+  .hero-content a, .hero-content button{ pointer-events:auto; }
+  .hero h1{
+    font-size:clamp(2.6rem, 8vw, 6rem); font-weight:800; letter-spacing:-0.02em;
+    text-shadow: 0 4px 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.6);
+  }
+  .hero .role{
+    margin-top:14px; font-family:'Sora',sans-serif; font-weight:600; font-size:clamp(0.85rem,2vw,1.25rem);
+    letter-spacing:0.16em; color:var(--violet); text-transform:uppercase;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+  }
+  .hero .cta-row{ display:flex; gap:16px; justify-content:center; margin-top:34px; flex-wrap:wrap; }
+  .btn{
+    font-family:'Inter',sans-serif; font-size:13.5px; font-weight:700; letter-spacing:0.04em;
+    padding:14px 26px; border-radius:100px; transition:all .25s; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn.outline{ color:var(--text); background:rgba(255,255,255,0.06); border:1px solid var(--border); }
+  .btn.outline:hover{ background:rgba(255,255,255,0.12); }
+  .btn.solid{ background:linear-gradient(120deg,var(--violet), #6b4fe0); color:#fff; box-shadow:0 10px 30px -10px rgba(140,108,255,0.7); }
+  .btn.solid:hover{ transform:translateY(-2px); }
+
+  .hero-socials{
+    position:absolute; left:28px; bottom:36px; z-index:3; display:flex; flex-direction:column; gap:22px;
+  }
+  .hero-socials a{ color:var(--dim); font-size:17px; transition:color .2s; }
+  .hero-socials a:hover{ color:var(--violet); }
+
+  .scroll-cue{
+    position:absolute; left:50%; bottom:34px; transform:translateX(-50%); z-index:3;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    font-size:10.5px; letter-spacing:0.18em; color:var(--dim);
+  }
+  .scroll-cue .mouse{ width:20px; height:32px; border:1.5px solid var(--dim); border-radius:12px; position:relative; }
+  .scroll-cue .mouse::before{
+    content:''; position:absolute; top:6px; left:50%; width:3px; height:6px; margin-left:-1.5px;
+    background:var(--violet); border-radius:2px; animation:scrolldot 1.6s ease-in-out infinite;
+  }
+  @keyframes scrolldot{ 0%{ transform:translateY(0); opacity:1; } 70%{ transform:translateY(10px); opacity:0; } 100%{ opacity:0; } }
+
+  .hero-tag-vert{
+    position:absolute; right:22px; top:50%; transform:translateY(-50%) rotate(180deg); z-index:3;
+    writing-mode:vertical-rl; font-size:11px; letter-spacing:0.22em; color:var(--dim);
+  }
+
+  /* SECTIONS */
+  section{ padding:110px 0; }
+  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ABOUT / ARSENAL */
+  .about-layout{ display:grid; grid-template-columns:300px 1fr; gap:40px; margin-top:44px; align-items:start; }
+  .about-card{ background:var(--bg-panel); border:1px solid var(--border); border-radius:16px; padding:26px; }
+  .about-card img{ width:100%; border-radius:12px; margin-bottom:20px; aspect-ratio:1; object-fit:cover; }
+  .about-card p{ color:var(--mid); font-size:14px; }
+  .status-line{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--violet); margin-top:16px; }
+  .status-line .dot{ width:6px; height:6px; border-radius:50%; background:var(--violet); animation:pulse 1.6s infinite; }
+  .stat-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-top:22px; }
+  .stat-row .stat{ background:var(--bg-panel); padding:14px 8px; text-align:center; }
+  .stat-row .num{ font-family:'Sora',sans-serif; font-weight:700; color:var(--violet); font-size:1.3rem; }
+  .stat-row .lbl{ font-size:10px; color:var(--dim); letter-spacing:0.04em; margin-top:2px; }
+
+  .skills-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+  .skill-card{ background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:20px; }
+  .skill-card .icon{ font-size:26px; margin-bottom:16px; display:block; width:fit-content; }
+  .skill-card .icon.c-violet{ color:#a78bfa; }
+  .skill-card .icon.c-cyan{ color:#22d3ee; }
+  .skill-card .icon.c-pink{ color:#ec4899; }
+  .skill-card .icon.c-green{ color:#4ade80; }
+  .skill-card .icon.c-blue{ color:#60a5fa; }
+  .skill-card .icon.c-amber{ color:#fbbf24; }
+  .skill-card h4{ font-size:14px; font-weight:600; margin-bottom:12px; }
+  .skill-card .tags{ display:flex; flex-wrap:wrap; gap:6px; }
+  .skill-card .tags span{ font-size:11px; color:var(--mid); background:rgba(255,255,255,0.04); border:1px solid var(--border); padding:4px 9px; border-radius:6px; }
+  @media (max-width: 760px){ .about-layout{ grid-template-columns:1fr; } .skills-grid{ grid-template-columns:1fr; } }
+
+  .analytics-row{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:26px; }
+  .analytics-panel{ background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:22px; }
+  .analytics-panel h4{ font-size:13px; color:var(--dim); font-weight:600; letter-spacing:0.05em; margin-bottom:16px; text-transform:uppercase; }
+  .gh-stats-img{ width:100%; border-radius:8px; display:block; }
+  .radar-wrap{ display:flex; justify-content:center; }
+  @media (max-width:760px){ .analytics-row{ grid-template-columns:1fr; } }
+
+  .placeholder-note{ font-size:11.5px; color:var(--dim); font-style:italic; margin-top:10px; }
+
+  /* WORK — zigzag */
+  .work-list{ display:flex; flex-direction:column; gap:70px; margin-top:50px; }
+  .work-row{ display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:center; }
+  .work-row.reverse .work-media{ order:2; }
+  .work-row.reverse .work-info{ order:1; }
+  .work-media{ border-radius:16px; overflow:hidden; border:1px solid var(--border); aspect-ratio:16/10; }
+  .work-media img{ width:100%; height:100%; object-fit:cover; }
+  .work-info h3{ font-size:1.4rem; font-weight:700; margin-bottom:10px; }
+  .work-info .category{ color:var(--violet); font-size:12.5px; font-weight:600; letter-spacing:0.03em; margin-bottom:14px; }
+  .work-info p{ color:var(--mid); font-size:14.5px; margin-bottom:16px; }
+  .work-tags{ display:flex; flex-wrap:wrap; gap:8px; }
+  .work-tags span{ font-size:11.5px; color:var(--mid); background:rgba(255,255,255,0.04); border:1px solid var(--border); padding:5px 11px; border-radius:100px; }
+  .work-links{ margin-top:18px; }
+  .work-links a{ font-size:13px; font-weight:600; color:var(--violet); }
+  @media (max-width:760px){
+    .work-row, .work-row.reverse{ grid-template-columns:1fr; }
+    .work-row.reverse .work-media, .work-row.reverse .work-info{ order:unset; }
+  }
+
+  /* TIMELINE */
+  .exp-card{ background:var(--bg-panel); border:1px solid var(--border); border-radius:16px; padding:28px 30px; margin-top:44px; }
+  .exp-head{ display:flex; align-items:center; gap:10px; font-size:13px; font-weight:600; color:var(--violet); margin-bottom:18px; text-transform:uppercase; letter-spacing:0.04em; }
+  .exp-item{ padding-left:20px; border-left:2px solid var(--border); margin-bottom:22px; position:relative; }
+  .exp-item::before{ content:''; position:absolute; left:-6px; top:2px; width:10px; height:10px; border-radius:50%; background:var(--violet); }
+  .exp-item h4{ font-size:15px; font-weight:600; }
+  .exp-item .meta{ font-size:12px; color:var(--dim); margin-top:2px; margin-bottom:8px; }
+  .exp-item ul{ margin:0; padding-left:18px; color:var(--mid); font-size:13.5px; }
+  .exp-item ul li{ margin-bottom:4px; }
+
+  .edu-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:26px; }
+  .edu-card{ background:var(--bg-panel); border:1px dashed var(--border); border-radius:14px; padding:20px; min-height:110px; display:flex; flex-direction:column; justify-content:center; }
+  .edu-card h5{ font-size:13.5px; font-weight:600; color:var(--dim); }
+  .edu-card .meta{ font-size:11.5px; color:var(--dim); margin-top:6px; }
+  @media (max-width:760px){ .edu-grid{ grid-template-columns:1fr; } }
+
+  .ach-panel{ background:var(--bg-panel); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:26px; }
+  .ach-panel h4{ font-size:13px; color:var(--dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:14px; }
+
+  /* FOOTER */
+  footer{ text-align:center; padding:100px 0 50px; border-top:1px solid var(--border); }
+  footer h2{ font-size:clamp(2rem,5vw,3rem); font-weight:800; margin-bottom:26px; }
+  .footer-contact{ display:flex; justify-content:center; gap:36px; flex-wrap:wrap; color:var(--mid); font-size:14.5px; margin-bottom:26px; }
+  .footer-contact a{ display:flex; align-items:center; gap:8px; transition:color .2s; }
+  .footer-contact a:hover{ color:var(--violet); }
+  .footer-socials{ display:flex; justify-content:center; gap:20px; margin-bottom:30px; }
+  .footer-socials a{
+    width:38px; height:38px; border:1px solid var(--border); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color:var(--mid); transition:all .2s;
+  }
+  .footer-socials a:hover{ color:var(--violet); border-color:var(--violet-dim); }
+  .footer-copy{ font-size:12px; color:var(--dim); }
+
+  .cursor-dot, .cursor-ring{
+    position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:9999;
+    transform:translate(-50%,-50%); will-change:transform;
+  }
+  .cursor-dot{ width:6px; height:6px; background:var(--violet); box-shadow:0 0 8px var(--violet); }
+  .cursor-ring{
+    width:32px; height:32px; border:1.5px solid rgba(140,108,255,0.55);
+    transition:width .25s, height .25s, border-color .25s, background .25s;
+  }
+  .cursor-ring.hover{ width:52px; height:52px; background:rgba(140,108,255,0.1); border-color:var(--violet); }
+  @media (pointer: coarse){ .cursor-dot, .cursor-ring{ display:none; } }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="#top" class="brand"><span class="avatar-dot"></span>Soham Banerjee</a>
+    <div class="nav-links">
+      <a href="#about">ABOUT</a>
+      <a href="#skills">ARSENAL</a>
+      <a href="#work">WORK</a>
+      <a href="#timeline">TIMELINE</a>
+      <a href="#contact">CONTACT</a>
+    </div>
+    <div class="nav-right">
+      <a href="assets/resume/Resume.pdf" target="_blank" rel="noopener noreferrer" class="resume-pill"><i class="fa-regular fa-file-lines"></i> RESUME</a>
+      <button class="menu-toggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <canvas id="pcbCanvas"></canvas>
+  <div class="hero-content">
+    <h1>SOHAM BANERJEE</h1>
+    <div class="role">Robotics &amp; Control Engineer</div>
+    <div class="cta-row">
+      <a href="assets/resume/Resume.pdf" target="_blank" rel="noopener noreferrer" class="btn outline">RESUME</a>
+      <a href="#work" class="btn solid">VIEW PROJECTS</a>
+    </div>
+  </div>
+  <div class="hero-socials">
+    <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i></a>
+    <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i></a>
+    <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-medium"></i></a>
+  </div>
+  <div class="scroll-cue"><span>SCROLL DOWN</span><div class="mouse"></div></div>
+  <div class="hero-tag-vert">RESUME</div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal"><span class="dot"></span></div>
+    <h2 class="sec-title reveal">My <span class="bold">Arsenal</span></h2>
+
+    <div class="about-layout reveal">
+      <div class="about-card">
+        <img src="assets/images/profile-image/Profile.jpeg" alt="Soham Banerjee">
+        <p>I'm Soham, a Robotics &amp; Control Engineer with a mechanical foundations background and a deep interest in control theory and deep learning. I build intelligent physical systems and 3D simulations — driven by curiosity, building what excites me.</p>
+        <div class="status-line"><span class="dot"></span> Currently researching underactuated bipedal locomotion at IIT Bombay</div>
+        <div class="stat-row">
+          <div class="stat"><div class="num">5+</div><div class="lbl">PROJECTS</div></div>
+          <div class="stat"><div class="num">6</div><div class="lbl">DOMAINS</div></div>
+          <div class="stat"><div class="num">IIT-B</div><div class="lbl">CURRENT LAB</div></div>
+        </div>
+      </div>
+
+      <div class="skills-grid">
+        <div class="skill-card">
+          <div class="icon c-violet"><i class="fa-solid fa-sliders"></i></div>
+          <h4>Control Systems &amp; Dynamics</h4>
+          <div class="tags"><span>MPC</span><span>Lyapunov Design</span><span>LMI/BMI Control</span><span>MATLAB/Simulink</span><span>dSPACE</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="icon c-cyan"><i class="fa-solid fa-robot"></i></div>
+          <h4>Robotics &amp; Autonomous Systems</h4>
+          <div class="tags"><span>SLAM</span><span>ROS/ROS2</span><span>Motion Planning</span><span>Webots</span><span>MuJoCo</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="icon c-pink"><i class="fa-solid fa-brain"></i></div>
+          <h4>AI, ML &amp; Reinforcement Learning</h4>
+          <div class="tags"><span>PyTorch</span><span>Actor-Critic (PPO/TD3)</span><span>CNN/RNN</span><span>Gymnasium</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="icon c-green"><i class="fa-solid fa-microchip"></i></div>
+          <h4>Embedded Systems &amp; Hardware</h4>
+          <div class="tags"><span>ESP32</span><span>STM32</span><span>Jetson Nano</span><span>Raspberry Pi</span><span>Arduino</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="icon c-blue"><i class="fa-solid fa-code"></i></div>
+          <h4>Software &amp; DevOps</h4>
+          <div class="tags"><span>C++</span><span>Python</span><span>Docker</span><span>Git</span><span>Linux</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="icon c-amber"><i class="fa-solid fa-cubes"></i></div>
+          <h4>CAD &amp; Engineering Simulation</h4>
+          <div class="tags"><span>SolidWorks</span><span>Fusion 360</span><span>ANSYS</span><span>3D Printing</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analytics-row reveal">
+      <div class="analytics-panel">
+        <h4>Live GitHub Statistics</h4>
+        <img class="gh-stats-img" src="https://github-readme-stats.vercel.app/api?username=SohamBanerjeeRobotics&show_icons=true&theme=dark&bg_color=0a0a0c&border_color=222226&title_color=8c6cff&text_color=c7c7cf&icon_color=8c6cff&hide_border=true" alt="Soham Banerjee GitHub stats" loading="lazy">
+      </div>
+      <div class="analytics-panel">
+        <h4>Core Capabilities</h4>
+        <div class="radar-wrap"><svg id="radarChart" width="260" height="230" viewBox="0 0 260 230"></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal"><span class="dot"></span></div>
+    <h2 class="sec-title reveal">My <span class="bold">Work</span></h2>
+
+    <div class="work-list">
+      <div class="work-row reveal">
+        <div class="work-media"><img src="_projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/fire_drone_main.jpeg" alt="Drone navigating a simulated fire environment"></div>
+        <div class="work-info">
+          <h3>Autonomous Navigation in Fire Environments using Drone</h3>
+          <div class="category">Reinforcement Learning / Aerial Robotics</div>
+          <p>Autonomous navigation for a Crazyflie 2.1 micro-UAV using only local temperature feedback, evaluating Greedy, Epsilon-Greedy, and UCB strategies across thermal fields simulated in Webots with PyroSim/FDS.</p>
+          <div class="work-tags"><span>ROS2</span><span>Webots</span><span>Thermal Modeling</span><span>RL</span></div>
+          <div class="work-links"><a href="projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/">Read case study →</a></div>
+        </div>
+      </div>
+
+      <div class="work-row reverse reveal">
+        <div class="work-media"><img src="_projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/biped_hardware_front.jpeg" alt="Bipedal robot hardware setup"></div>
+        <div class="work-info">
+          <h3>Underactuated Bipedal Locomotion with Ankle Push-Off</h3>
+          <div class="category">Control Theory / IIT Bombay Research</div>
+          <p>Open- and closed-loop control for a planar bipedal robot with pneumatic ankle push-off actuation, comparing PID and Model Predictive Control across simulation and hardware-in-the-loop testing.</p>
+          <div class="work-tags"><span>MPC</span><span>PID</span><span>dSPACE HIL</span></div>
+          <div class="work-links"><a href="projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/">Read case study →</a></div>
+        </div>
+      </div>
+
+      <div class="work-row reveal">
+        <div class="work-media"><img src="_projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/mapless_navigation_front.jpg" alt="Mobile robot mapless navigation"></div>
+        <div class="work-info">
+          <h3>Virtual-to-Real Mapless Navigation via Deep RL</h3>
+          <div class="category">Deep Reinforcement Learning / Sim-to-Real</div>
+          <p>An asynchronous actor-critic (ADDPG) framework for continuous control of differential-drive mobile robots, trained entirely in PyBullet and transferred to a physical TurtleBot without fine-tuning.</p>
+          <div class="work-tags"><span>ADDPG</span><span>PyTorch</span><span>Sim-to-Real</span></div>
+          <div class="work-links"><a href="projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/">Read case study →</a></div>
+        </div>
+      </div>
+
+      <div class="work-row reverse reveal">
+        <div class="work-media"><img src="_projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/turtlebot_main.jpeg" alt="TurtleBot motion planning"></div>
+        <div class="work-info">
+          <h3>Motion Planning &amp; Coordination for Autonomous Vehicles</h3>
+          <div class="category">Path Planning / Mobile Robotics</div>
+          <p>Configuration-space modeling, A* grid search, and RRT sampling-based planning for a nonholonomic TurtleBot, deployed to hardware with AMCL localization and Pure Pursuit tracking.</p>
+          <div class="work-tags"><span>A* / RRT</span><span>AMCL</span><span>ROS</span></div>
+          <div class="work-links"><a href="projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/">Read case study →</a></div>
+        </div>
+      </div>
+
+      <div class="work-row reveal">
+        <div class="work-media"><img src="_projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/drone_2d_main.jpg" alt="2D drone trajectory optimization"></div>
+        <div class="work-info">
+          <h3>Receding Horizon Control for Crazyflie Navigation</h3>
+          <div class="category">Optimal Control / Trajectory Optimization</div>
+          <p>An open-loop 2D drone trajectory optimizer with double-integrator dynamics and RK4 discretization, using a smooth Softplus obstacle penalty solved via L-BFGS-B.</p>
+          <div class="work-tags"><span>L-BFGS-B</span><span>RK4</span><span>Optimal Control</span></div>
+          <div class="work-links"><a href="projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/">Read case study →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="timeline">
+  <div class="wrap">
+    <div class="sec-eyebrow reveal"><span class="dot"></span></div>
+    <h2 class="sec-title reveal">My <span class="bold">Timeline</span></h2>
+
+    <div class="exp-card reveal">
+      <div class="exp-head"><i class="fa-solid fa-briefcase"></i> Experience</div>
+      <div class="exp-item">
+        <h4>Robotics Research — Underactuated Bipedal Locomotion</h4>
+        <div class="meta">IIT Bombay · Guided by Prof. Arpita Sinha &amp; Prof. Vivek Sangwan</div>
+        <ul>
+          <li>Designing PID and Model Predictive Control strategies for a planar bipedal robot with pneumatic ankle push-off actuation</li>
+          <li>Validating control models through simulation and hardware-in-the-loop testing on dSPACE</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="edu-grid reveal">
+      <div class="edu-card"><h5>[ Add education entry ]</h5><div class="meta">Degree · Institution · Year</div></div>
+      <div class="edu-card"><h5>[ Add education entry ]</h5><div class="meta">Degree · Institution · Year</div></div>
+      <div class="edu-card"><h5>[ Add education entry ]</h5><div class="meta">Degree · Institution · Year</div></div>
+    </div>
+    <div class="placeholder-note reveal">Education history isn't in your current site content — send me your degree/institution/CGPA details and I'll fill these in.</div>
+
+    <div class="ach-panel reveal">
+      <h4>Achievements</h4>
+      <div class="placeholder-note">No achievements listed yet — send me hackathon wins, publications, or awards and I'll add them here in the same style as the reference.</div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <h2>Let's connect</h2>
+    <div class="footer-contact">
+      <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+      <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
+      <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-medium"></i> Medium</a>
+    </div>
+    <div class="footer-socials">
+      <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i></a>
+      <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i></a>
+      <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-medium"></i></a>
+    </div>
+    <div class="footer-copy">© <span id="year"></span> Soham Banerjee. Built with HTML, CSS, JS &amp; Three.js.</div>
+  </div>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // radar / capability chart — built from real category tag counts, not fabricated data
+  (function drawRadar(){
+    const data = [
+      { label:'Control', value: 12 },
+      { label:'Robotics', value: 15 },
+      { label:'AI/RL', value: 17 },
+      { label:'Embedded', value: 12 },
+      { label:'Software', value: 7 },
+      { label:'CAD', value: 8 }
+    ];
+    const svg = document.getElementById('radarChart');
+    const cx = 130, cy = 110, r = 80;
+    const max = Math.max(...data.map(d => d.value));
+    const n = data.length;
+    const ns = "http://www.w3.org/2000/svg";
+
+    function point(i, frac){
+      const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      return [cx + Math.cos(angle) * r * frac, cy + Math.sin(angle) * r * frac];
+    }
+
+    // rings
+    [0.25, 0.5, 0.75, 1].forEach(f => {
+      const pts = data.map((_, i) => point(i, f).join(',')).join(' ');
+      const poly = document.createElementNS(ns, 'polygon');
+      poly.setAttribute('points', pts);
+      poly.setAttribute('fill', 'none');
+      poly.setAttribute('stroke', 'rgba(255,255,255,0.08)');
+      svg.appendChild(poly);
+    });
+
+    // axes + labels
+    data.forEach((d, i) => {
+      const [x, y] = point(i, 1);
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+      line.setAttribute('x2', x); line.setAttribute('y2', y);
+      line.setAttribute('stroke', 'rgba(255,255,255,0.08)');
+      svg.appendChild(line);
+
+      const [lx, ly] = point(i, 1.22);
+      const text = document.createElementNS(ns, 'text');
+      text.setAttribute('x', lx); text.setAttribute('y', ly);
+      text.setAttribute('fill', '#8d8d97'); text.setAttribute('font-size', '10');
+      text.setAttribute('font-family', 'Inter, sans-serif');
+      text.setAttribute('text-anchor', 'middle');
+      text.textContent = d.label;
+      svg.appendChild(text);
+    });
+
+    // data polygon
+    const dataPts = data.map((d, i) => point(i, d.value / max).join(',')).join(' ');
+    const shape = document.createElementNS(ns, 'polygon');
+    shape.setAttribute('points', dataPts);
+    shape.setAttribute('fill', 'rgba(140,108,255,0.35)');
+    shape.setAttribute('stroke', '#8c6cff');
+    shape.setAttribute('stroke-width', '2');
+    svg.appendChild(shape);
+  })();
+
+  // Real Microduck robot (Pollen Robotics / Hugging Face, Apache-2.0) —
+  // torso + head assembled from the project's own official CAD shell meshes,
+  // positioned using the exact body transforms from their published MJCF rig.
+  // Source: github.com/pollen-robotics/microduck_rl
+</script>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+
+  const canvas = document.getElementById('pcbCanvas');
+  const hero = document.querySelector('.hero');
+
+  if (canvas && hero){
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+    camera.position.set(0, 0.4, 8.5);
+    camera.lookAt(0, 0.2, 0);
+
+    function sizeToContainer(){
+      const w = hero.clientWidth, h = hero.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    sizeToContainer();
+    window.addEventListener('resize', sizeToContainer);
+
+    scene.add(new THREE.AmbientLight(0xaaaaee, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 1.6);
+    key.position.set(4, 6, 5);
+    scene.add(key);
+    const rim = new THREE.PointLight(0x8c6cff, 3.0, 24);
+    rim.position.set(-4, 2, -3);
+    scene.add(rim);
+    const fill = new THREE.PointLight(0x22d3ee, 1.1, 24);
+    fill.position.set(0, -2, 4);
+    scene.add(fill);
+
+    // Body tree mirrors the official MJCF kinematic chain exactly
+    // (trunk_base -> neck -> neck_pitch -> yaw_roll_motion -> jaw_soft),
+    // scaled up from meters for display, with the real per-part colors.
+    const SCALE = 13;
+    const MODEL_BASE = 'assets/models/microduck/';
+
+    const bodyDefs = [
+      { name:'trunk_base', parent:null, pos:[0,0,0], quat:[1,0,0,0], meshes:[
+        { file:'trunk_base.stl', pos:[0.004,-0,-0.0175], quat:[0.707107,-0,-0,0.707107], color:0x212623 },
+        { file:'right_shell.stl', pos:[0.004,-0.0005,-0.0175], quat:[0.707107,0,0,0.707107], color:0xd9d9d6 },
+        { file:'left_shell.stl', pos:[0.004,-0,-0.0175785], quat:[0.707107,-0,-0,0.707107], color:0xcccccc }
+      ]},
+      { name:'neck', parent:'trunk_base', pos:[0.026,0.0145,0.0324215], quat:[0,0,0.707107,-0.707107], meshes:[
+        { file:'neck.stl', pos:[0.022,0.05,0.028], quat:[0.5,0.5,0.5,-0.5], color:0xacaa9a }
+      ]},
+      { name:'neck_pitch', parent:'neck', pos:[-0,-0.05,0], quat:[0,1,-0,-0], meshes:[
+        { file:'neck_pitch.stl', pos:[-0,0.0287931,-0.0145], quat:[0.5,-0.5,-0.5,-0.5], color:0x596066 }
+      ]},
+      { name:'yaw_roll_motion', parent:'neck_pitch', pos:[-0,0.0186931,-0.0145], quat:[0,-0,-0.707107,-0.707107], meshes:[
+        { file:'yaw_roll_motion.stl', pos:[0,0,0.01], quat:[0.707107,0,0,0.707107], color:0x212623 }
+      ]},
+      { name:'jaw_soft', parent:'yaw_roll_motion', pos:[-0.0179,0,0.0145], quat:[0.707107,0,-0.707107,-0], meshes:[
+        { file:'face_part.stl', pos:[-0.0045,-9.13778e-05,-0.0178], quat:[0.5,0.5,0.5,0.5], color:0xacaa9a },
+        { file:'top_head_shell.stl', pos:[-0.0045,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xd9d9d6 },
+        { file:'bottom_head_shell.stl', pos:[-0.0043,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 },
+        { file:'jaw.stl', pos:[-0.0045,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 }
+      ]}
+    ];
+
+    function toQuat(wxyz){
+      const [w,x,y,z] = wxyz;
+      return new THREE.Quaternion(x,y,z,w);
+    }
+
+    const rig = new THREE.Group();
+    const groupsByName = {};
+    const loader = new STLLoader();
+    let loaded = 0;
+
+    bodyDefs.forEach(def => {
+      const group = new THREE.Group();
+      group.position.set(...def.pos.map(v => v * SCALE));
+      group.quaternion.copy(toQuat(def.quat));
+      groupsByName[def.name] = group;
+      (def.parent ? groupsByName[def.parent] : rig).add(group);
+
+      def.meshes.forEach(m => {
+        loader.load(
+          MODEL_BASE + m.file,
+          (geometry) => {
+            geometry.scale(SCALE, SCALE, SCALE);
+            const material = new THREE.MeshStandardMaterial({ color:m.color, roughness:0.55, metalness:0.15 });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(m.pos[0]*SCALE, m.pos[1]*SCALE, m.pos[2]*SCALE);
+            mesh.quaternion.copy(toQuat(m.quat));
+            group.add(mesh);
+            loaded++;
+          },
+          undefined,
+          (err) => { console.warn('Microduck mesh failed to load:', m.file, err); }
+        );
+      });
+    });
+
+    rig.rotation.x = -0.15;
+    rig.position.y = -0.9;
+    scene.add(rig);
+
+    setTimeout(() => {
+      if (loaded === 0){
+        const note = document.createElement('div');
+        note.style.cssText = 'margin-top:20px;font-family:JetBrains Mono,monospace;font-size:11px;color:#8d8d97;';
+        note.textContent = '3D model assets not found — copy assets/models/microduck/ into your repo (see deployment notes).';
+        hero.querySelector('.hero-content').appendChild(note);
+      }
+    }, 8000);
+
+    const clock = new THREE.Clock();
+    function animate(){
+      requestAnimationFrame(animate);
+      if (!reduceMotion){
+        const t = clock.getElapsedTime();
+        rig.rotation.y = 0.6 + t * 0.3;
+        rig.position.y = -0.9 + Math.sin(t * 0.8) * 0.12;
+      }
+      renderer.render(scene, camera);
+    }
+    animate();
+  }
+</script>
+
+<script>
+  // custom cursor
+  (function initCursor(){
+    const dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    const ring = document.createElement('div');
+    ring.className = 'cursor-ring';
+    document.body.append(dot, ring);
+
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    window.addEventListener('mousemove', (e) => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+    });
+    function tick(){
+      rx += (mx - rx) * 0.16;
+      ry += (my - ry) * 0.16;
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+      requestAnimationFrame(tick);
+    }
+    tick();
+    document.querySelectorAll('a, button, .skill-card, .work-row, input, textarea').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+    });
+  })();
+</script>
+
+
+</body>
+</html>
