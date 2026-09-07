@@ -122,6 +122,28 @@
     writing-mode:vertical-rl; font-size:11px; letter-spacing:0.22em; color:var(--dim);
   }
 
+  /* DUCK companion UI */
+  .duck-hint{
+    position:absolute; z-index:3; right:6%; bottom:26%; display:flex; align-items:center; gap:8px;
+    font-size:10.5px; letter-spacing:0.12em; color:var(--dim); text-transform:uppercase;
+    opacity:0; transition:opacity .6s ease; pointer-events:none;
+  }
+  .duck-hint.show{ opacity:1; }
+  .duck-hint .dot{ width:6px; height:6px; border-radius:50%; background:var(--violet); box-shadow:0 0 8px var(--violet); animation:pulse 1.8s infinite; }
+  .duck-speech{
+    position:absolute; z-index:3; right:5%; bottom:24%; max-width:230px;
+    background:rgba(10,10,14,0.88); border:1px solid var(--border); border-radius:14px;
+    padding:12px 14px; font-size:12.5px; line-height:1.5; color:var(--mid);
+    opacity:0; transform:translateY(8px) scale(0.97); transition:opacity .35s ease, transform .35s ease;
+    backdrop-filter:blur(6px); pointer-events:none;
+  }
+  .duck-speech.show{ opacity:1; transform:translateY(0) scale(1); }
+  .duck-speech .emoji{ font-size:15px; margin-right:5px; }
+  @media (max-width:760px){
+    .duck-hint, .duck-speech{ right:auto; left:50%; transform:translateX(-50%); bottom:14%; max-width:78vw; text-align:center; }
+    .duck-speech.show{ transform:translateX(-50%) translateY(0) scale(1); }
+  }
+
   /* SECTIONS */
   section{ padding:110px 0; }
   .reveal{ opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
@@ -191,9 +213,9 @@
   .exp-item ul{ margin:0; padding-left:18px; color:var(--mid); font-size:13.5px; }
   .exp-item ul li{ margin-bottom:4px; }
 
-  .edu-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:26px; }
-  .edu-card{ background:var(--bg-panel); border:1px dashed var(--border); border-radius:14px; padding:20px; min-height:110px; display:flex; flex-direction:column; justify-content:center; }
-  .edu-card h5{ font-size:13.5px; font-weight:600; color:var(--dim); }
+  .edu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; margin-top:26px; }
+  .edu-card{ background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:20px; min-height:110px; display:flex; flex-direction:column; justify-content:center; }
+  .edu-card h5{ font-size:13.5px; font-weight:600; color:var(--text); }
   .edu-card .meta{ font-size:11.5px; color:var(--dim); margin-top:6px; }
   @media (max-width:760px){ .edu-grid{ grid-template-columns:1fr; } }
 
@@ -265,6 +287,8 @@
   </div>
   <div class="scroll-cue"><span>SCROLL DOWN</span><div class="mouse"></div></div>
   <div class="hero-tag-vert">RESUME</div>
+  <div class="duck-hint" id="duckHint"><span class="dot"></span><span>click the duck</span></div>
+  <div class="duck-speech" id="duckSpeech"><span class="emoji" id="duckEmoji">🦆</span><span id="duckText"></span></div>
 </section>
 
 <section id="about">
@@ -403,25 +427,53 @@
     <div class="exp-card reveal">
       <div class="exp-head"><i class="fa-solid fa-briefcase"></i> Experience</div>
       <div class="exp-item">
-        <h4>Robotics Research — Underactuated Bipedal Locomotion</h4>
-        <div class="meta">IIT Bombay · Guided by Prof. Arpita Sinha &amp; Prof. Vivek Sangwan</div>
+        <h4>M.Tech Thesis — Control of Underactuated Bipedal Locomotion with Ankle Push-Off</h4>
+        <div class="meta">IIT Bombay · Guide: Prof. Arpita Sinha (Systems &amp; Control) · Co-Guide: Prof. Vivek Sangwan (Mechanical Engg.) · May 2026 – Ongoing</div>
         <ul>
-          <li>Designing PID and Model Predictive Control strategies for a planar bipedal robot with pneumatic ankle push-off actuation</li>
-          <li>Validating control models through simulation and hardware-in-the-loop testing on dSPACE</li>
+          <li>Built an open-loop simulation framework for an underactuated planar biped with pneumatic push-off actuation and no knee joint; implemented and evaluated PID and Model Predictive Control for target step sizes and stable walking</li>
+          <li>Modified the biped hardware, electronics, and actuation system, and characterized the mechanical model and motor dynamics using dSPACE</li>
+          <li>Now designing a foot mechanism and continuous-time control model, and extending toward MPC-based and vision-based trajectory generation with Vision-Language-Action (VLA) models for higher-level autonomous control</li>
+        </ul>
+      </div>
+      <div class="exp-item">
+        <h4>Mechanical Engineering Intern — Vibration Energy Harvesting Control Lab (VEHC)</h4>
+        <div class="meta">Indian Institute of Technology Madras, Chennai · May 2024 – Jul 2024</div>
+        <ul>
+          <li>Investigated the nonlinear dynamics of a vertical cantilever beam under inclined base excitations, with a focus on piezoelectric energy harvesting</li>
+          <li>Modeled and simulated the nonlinear dynamic response in Wolfram Mathematica, MATLAB, and Simulink across varying excitation conditions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-card reveal">
+      <div class="exp-head"><i class="fa-solid fa-users"></i> Leadership</div>
+      <div class="exp-item">
+        <h4>Vice Chairman, IMechE Student Chapter</h4>
+        <div class="meta">IIEST Shibpur · Jul 2024 – Jul 2025</div>
+        <ul>
+          <li>Led and coordinated technical, outreach, and industrial initiatives, including CAD 2.0 and star-gazing sessions</li>
+          <li>Organizing Lead for the SOFE Eastern Region Finals (Oct 2023), overseeing event execution and logistics</li>
         </ul>
       </div>
     </div>
 
     <div class="edu-grid reveal">
-      <div class="edu-card"><h5>[ Add education entry ]</h5><div class="meta">Degree · Institution · Year</div></div>
-      <div class="edu-card"><h5>[ Add education entry ]</h5><div class="meta">Degree · Institution · Year</div></div>
-      <div class="edu-card"><h5>[ Add education entry ]</h5><div class="meta">Degree · Institution · Year</div></div>
+      <div class="edu-card"><h5>M.Tech, Systems &amp; Control Engineering</h5><div class="meta">IIT Bombay · CPI 9.52 · 2027</div></div>
+      <div class="edu-card"><h5>B.Tech, Mechanical Engineering</h5><div class="meta">IIEST Shibpur · CPI 9.8 · 2025</div></div>
+      <div class="edu-card"><h5>Intermediate (WBCHSE)</h5><div class="meta">Kagram A.N.M High School · 95.20% · 2021</div></div>
+      <div class="edu-card"><h5>Matriculation (WBBSE)</h5><div class="meta">Kagram A.N.M High School · 92.57% · 2019</div></div>
     </div>
-    <div class="placeholder-note reveal">Education history isn't in your current site content — send me your degree/institution/CGPA details and I'll fill these in.</div>
 
     <div class="ach-panel reveal">
       <h4>Achievements</h4>
-      <div class="placeholder-note">No achievements listed yet — send me hackathon wins, publications, or awards and I'll add them here in the same style as the reference.</div>
+      <div class="exp-item">
+        <ul>
+          <li>Gold Medal for outstanding academic performance in B.Tech, Mechanical Engineering, IIEST Shibpur</li>
+          <li>Published <em>Nonlinear Dynamics of a Vertical Cantilever Beam Under Biaxial Base Excitation</em> in the <em>Journal of Computational and Nonlinear Dynamics</em>, on piezoelectric energy harvesting potential</li>
+          <li>Co-authored <em>Design of Computed Torque Control with LMI-Based Regional Pole Placement for Two-Link Robotic Manipulator</em>, ICSTCC 2025 (indexed in IEEE Xplore)</li>
+          <li>Co-authored a book chapter on <em>Modeling and Numerical Study of Thermoelectric Generators</em>, Springer, presented at ICEEGT 2025 (NITTTR Kolkata)</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -542,8 +594,11 @@
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
-    camera.position.set(0, 0.4, 8.5);
-    camera.lookAt(0, 0.2, 0);
+    // Framed by measuring the assembled rig's actual bounding box at its resting
+    // spin angle (0.55rad) so the head+body sit centered and legible in frame,
+    // instead of the far-away/off-center shot this started from.
+    camera.position.set(9.2, -1.3, 12.6);
+    camera.lookAt(1.6, -1.3, 0.7);
 
     function sizeToContainer(){
       const w = hero.clientWidth, h = hero.clientHeight;
@@ -633,6 +688,13 @@
     rig.position.y = -0.9;
     scene.add(rig);
 
+    // Rest-pose quaternions for the three articulated joints, captured right away
+    // (group transforms exist synchronously; only their STL geometry streams in async).
+    const restQuat = {};
+    ['neck_pitch', 'yaw_roll_motion', 'jaw_soft'].forEach(n => {
+      if (groupsByName[n]) restQuat[n] = groupsByName[n].quaternion.clone();
+    });
+
     setTimeout(() => {
       if (loaded === 0){
         const note = document.createElement('div');
@@ -642,13 +704,220 @@
       }
     }, 8000);
 
+    // ---------------------------------------------------------------------
+    // Gesture engine — tweens the three real joints (neck_pitch, yaw_roll_motion,
+    // jaw_soft) around their rest pose. Axes below were picked by rendering the
+    // actual STL rig from several test angles: rotating neck_pitch about its local
+    // X axis reads as a nod, and yaw_roll_motion / jaw_soft about local Z read as a
+    // clean turn/wobble without exposing the mounting bracket inside the head shell.
+    // ---------------------------------------------------------------------
+    function easeInOutQuad(t){ return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2; }
+
+    function playTrack(track){
+      return new Promise(resolve => {
+        const group = groupsByName[track.joint];
+        const base = restQuat[track.joint];
+        if (!group || !base){ resolve(); return; }
+        const axis = new THREE.Vector3(...track.axis).normalize();
+        let i = 0;
+        function next(){
+          if (i >= track.steps.length){ group.quaternion.copy(base); resolve(); return; }
+          const step = track.steps[i++];
+          const from = group.quaternion.clone();
+          const to = base.clone().multiply(new THREE.Quaternion().setFromAxisAngle(axis, step.angle));
+          const start = performance.now();
+          function tick(now){
+            const t = Math.min(1, (now - start) / step.dur);
+            group.quaternion.slerpQuaternions(from, to, easeInOutQuad(t));
+            if (t < 1) requestAnimationFrame(tick); else next();
+          }
+          requestAnimationFrame(tick);
+        }
+        next();
+      });
+    }
+
+    const GESTURES = {
+      nod: {
+        emoji: '🙂', tint: 0xffb37a,
+        tracks: [{ joint:'neck_pitch', axis:[1,0,0], steps:[
+          { angle:0.22, dur:200 }, { angle:-0.10, dur:200 }, { angle:0.16, dur:180 }, { angle:0, dur:220 }
+        ]}]
+      },
+      lookAround: {
+        emoji: '🧐', tint: 0x8c6cff,
+        tracks: [{ joint:'yaw_roll_motion', axis:[0,0,1], steps:[
+          { angle:0.38, dur:420 }, { angle:0.38, dur:380 }, { angle:-0.34, dur:520 }, { angle:0, dur:380 }
+        ]}]
+      },
+      shake: {
+        emoji: '😅', tint: 0xff6b9d,
+        tracks: [{ joint:'yaw_roll_motion', axis:[0,0,1], steps:[
+          { angle:0.28, dur:150 }, { angle:-0.28, dur:190 }, { angle:0.2, dur:170 }, { angle:0, dur:180 }
+        ]}]
+      },
+      wobble: {
+        emoji: '🤩', tint: 0x22d3ee, bounce: true,
+        tracks: [
+          { joint:'jaw_soft', axis:[0,0,1], steps:[
+            { angle:0.18, dur:90 }, { angle:-0.14, dur:90 }, { angle:0.12, dur:90 }, { angle:0, dur:120 }
+          ]},
+          { joint:'yaw_roll_motion', axis:[0,0,1], steps:[
+            { angle:0.1, dur:90 }, { angle:-0.08, dur:90 }, { angle:0, dur:150 }
+          ]}
+        ]
+      },
+      curiousTilt: {
+        emoji: '💭', tint: 0xa78bfa,
+        tracks: [
+          { joint:'yaw_roll_motion', axis:[0,0,1], steps:[ { angle:0.2, dur:400 }, { angle:0.2, dur:800 }, { angle:0, dur:400 } ]},
+          { joint:'neck_pitch', axis:[1,0,0], steps:[ { angle:0.1, dur:400 }, { angle:0.1, dur:800 }, { angle:0, dur:400 } ]}
+        ]
+      }
+    };
+
+    // ---------------------------------------------------------------------
+    // Speech bubble — a mix of real facts about the actual open-source Microduck
+    // (Pollen Robotics x Hugging Face) and a few about Soham's own robotics work,
+    // plus one live stat fetched from the public GitHub API at load (falls back
+    // silently to the static facts if that request is blocked or offline).
+    // ---------------------------------------------------------------------
+    const DUCK_FACTS_REAL = [
+      { emoji:'🦆', text:"Fun fact: my full-size cousin is Pollen Robotics' open-source Microduck — 25cm tall, 800g, 15 servos, and it can walk, kick, and quack." },
+      { emoji:'🧠', text:'My walking gaits are trained with PPO in MuJoCo simulation, then deployed straight to real hardware — sim-to-real, no fine-tuning.' },
+      { emoji:'📷', text:"The full-size me carries a camera, dual IMUs, and a depth sensor to see where it's waddling." },
+      { emoji:'🌐', text:'The whole Microduck project is Apache-2.0 licensed and open on GitHub — anyone can retrain or remix its moves.' },
+      { emoji:'🥋', text:'It can get knocked over and stand right back up — recovery is one of its trained policies too.' }
+    ];
+    const DUCK_FACTS_SOHAM = [
+      { emoji:'🤖', text:'My human, Soham, is designing pneumatic ankle push-off actuation for bipedal robots at IIT Bombay.' },
+      { emoji:'📐', text:'Soham blends control theory — MPC, Lyapunov design — with deep RL to make legged robots move naturally.' },
+      { emoji:'🛩️', text:'He flew a Crazyflie using receding-horizon control and trajectory optimization — tiny drone, big math.' },
+      { emoji:'🎓', text:'Systems & Control Engineering, IIT Bombay, CPI 9.52 — he probably wants you to know that.' }
+    ];
+
+    const speechEl = document.getElementById('duckSpeech');
+    const speechEmoji = document.getElementById('duckEmoji');
+    const speechText = document.getElementById('duckText');
+    const hintEl = document.getElementById('duckHint');
+    let speechTimer = null;
+
+    function sayLine(line, holdMs){
+      if (!speechEl) return;
+      speechEmoji.textContent = line.emoji;
+      speechText.textContent = line.text;
+      speechEl.classList.add('show');
+      clearTimeout(speechTimer);
+      speechTimer = setTimeout(() => speechEl.classList.remove('show'), holdMs || 4600);
+    }
+    function pickLineFor(gesture){
+      const pool = DUCK_FACTS_REAL.concat(DUCK_FACTS_SOHAM);
+      const line = pool[Math.floor(Math.random() * pool.length)];
+      return { emoji: gesture.emoji || line.emoji, text: line.text };
+    }
+
+    if (!reduceMotion){
+      fetch('https://api.github.com/repos/pollen-robotics/microduck')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (!data || !data.stargazers_count) return;
+          DUCK_FACTS_REAL.push({
+            emoji: '⭐',
+            text: `As of right now, ${data.stargazers_count.toLocaleString()} people have starred my open-source family on GitHub` +
+                  (data.forks_count ? ` (and ${data.forks_count.toLocaleString()} forked it).` : '.')
+          });
+        })
+        .catch(() => { /* offline or blocked — the static facts above cover it */ });
+    }
+
+    // ---------------------------------------------------------------------
+    // Mood tint (rim light) + gentle idle bounce, driven from the render loop.
+    // ---------------------------------------------------------------------
+    const BASE_TINT = 0x8c6cff;
+    const tintTarget = new THREE.Color(BASE_TINT);
+    const tintCurrent = new THREE.Color(BASE_TINT);
+    let bounceBoost = 0;
+    let isGesturePlaying = false;
+
+    function pulseBounce(){
+      const start = performance.now(), dur = 500, amp = 0.14;
+      function tick(now){
+        const t = Math.min(1, (now - start) / dur);
+        bounceBoost = Math.sin(Math.PI * t) * amp;
+        if (t < 1) requestAnimationFrame(tick); else bounceBoost = 0;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function playGesture(name){
+      if (reduceMotion || isGesturePlaying) return;
+      const g = GESTURES[name];
+      if (!g) return;
+      isGesturePlaying = true;
+      tintTarget.set(g.tint);
+      sayLine(pickLineFor(g));
+      if (g.bounce) pulseBounce();
+      Promise.all(g.tracks.map(playTrack)).then(() => {
+        isGesturePlaying = false;
+        tintTarget.set(BASE_TINT);
+      });
+    }
+
+    // Idle: the duck reacts on its own every so often, unprompted.
+    function scheduleIdleGesture(){
+      const delay = 7000 + Math.random() * 6000;
+      setTimeout(() => {
+        if (!document.hidden){
+          const names = Object.keys(GESTURES);
+          playGesture(names[Math.floor(Math.random() * names.length)]);
+        }
+        scheduleIdleGesture();
+      }, delay);
+    }
+
+    // Hover: a quick curious glance the first time the cursor arrives.
+    // Click: anywhere in the hero triggers a punchier, randomly-picked reaction.
+    let hovered = false, hasInteracted = false;
+    try { hasInteracted = !!localStorage.getItem('duckHintSeen'); } catch (e) {}
+
+    canvas.style.cursor = 'pointer';
+    canvas.addEventListener('pointerenter', () => {
+      if (reduceMotion || hovered) return;
+      hovered = true;
+      playGesture('curiousTilt');
+    });
+    canvas.addEventListener('pointerleave', () => { hovered = false; });
+    canvas.addEventListener('click', () => {
+      const names = ['nod', 'lookAround', 'shake', 'wobble'];
+      playGesture(names[Math.floor(Math.random() * names.length)]);
+      hasInteracted = true;
+      if (hintEl) hintEl.classList.remove('show');
+      try { localStorage.setItem('duckHintSeen', '1'); } catch (e) {}
+    });
+
+    if (!reduceMotion){
+      scheduleIdleGesture();
+      setTimeout(() => {
+        if (!hasInteracted && hintEl) hintEl.classList.add('show');
+        sayLine({ emoji:'👋', text:"Hi, I'm the office mascot — click me, or just watch, I'll do my own thing." }, 4200);
+      }, 3200);
+    }
+
+    // ---------------------------------------------------------------------
+    // Render loop — gentle idle sway instead of a constant spin (the duck now
+    // settles at a 3/4 angle and glances side to side, rather than turning like
+    // a display turntable), plus the gesture bounce and mood-tint lerp.
+    // ---------------------------------------------------------------------
+    const BASE_ANGLE = 0.55;
     const clock = new THREE.Clock();
     function animate(){
       requestAnimationFrame(animate);
       if (!reduceMotion){
         const t = clock.getElapsedTime();
-        rig.rotation.y = 0.6 + t * 0.3;
-        rig.position.y = -0.9 + Math.sin(t * 0.8) * 0.12;
+        rig.rotation.y = BASE_ANGLE + Math.sin(t * 0.35) * 0.14;
+        rig.position.y = -0.9 + Math.sin(t * 0.9) * 0.05 + bounceBoost;
+        tintCurrent.lerp(tintTarget, 0.06);
+        rim.color.copy(tintCurrent);
       }
       renderer.render(scene, camera);
     }

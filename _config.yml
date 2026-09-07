@@ -123,14 +123,14 @@ skills:
 # Contact Form Setup
 formspree-key: "xzepvzao"
 
-# Active Theme Colors (Light Rich Creamy Yellow)
+# Active Theme Colors (Dark Violet — matches the index.html hero design)
 colors:
-  text: "#2D2A26"          # Deep charcoal for crisp reading contrast
-  border: "#EADDA6"        # Subtle creamy border
-  link: "#9E7B00"          # Warm amber link color
-  highlight: "#F3E39E"     # Creamy accent highlight
-  background: "#FAF0CA"    # Light, rich cream background
-  light_background: "#FFF9E6" # Soft off-white cream container fill
+  text: "#e4e4ec"          # Near-white for headings and body copy on black
+  border: "#232329"        # Subtle light-on-dark panel border
+  link: "#8c6cff"          # Violet accent link color
+  highlight: "#8c6cff"     # Violet accent highlight
+  background: "#000000"    # Black page background
+  light_background: "#0a0a0c" # Dark panel fill (matches --bg-panel on the homepage)
 
 
 #########################################################################################################
