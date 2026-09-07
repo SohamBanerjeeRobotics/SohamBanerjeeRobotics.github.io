@@ -1,8 +1,13 @@
 .highlight table td { padding: 5px; }
 .highlight table pre { margin: 0;  padding:0}
 .highlight, .highlight .w {
-  color: #24292f;
-  background-color: #f6f8fa;
+  color: #e4e4ec;
+  background-color: #0e0e13;
+  border-radius: 10px;
+}
+.highlight, .highlight pre {
+  padding: 12px 14px;
+  overflow-x: auto;
 }
 .highlight .k, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt, .highlight .kv {
   color: #cf222e;
