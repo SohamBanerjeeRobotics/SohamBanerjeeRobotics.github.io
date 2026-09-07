@@ -8,6 +8,25 @@
   --highlight-color: {{ site.colors.highlight }};
   --background-color: {{ site.colors.background }};
   --light-background-color: {{ site.colors.light_background }};
+  --nav-bg: rgba(0,0,0,0.75);
+  --card-border-color: rgba(255,255,255,0.08);
+  --card-shadow-color: rgba(0,0,0,0.4);
+  --divider-color: rgba(255,255,255,0.08);
+}
+
+/* Light mode — toggled via the switch in the navbar (data-theme="light" on <html>,
+   persisted in localStorage). Dark, above, stays the default look. */
+:root[data-theme="light"] {
+  --text-color: #1c1c24;
+  --border-color: #e4e0f0;
+  --link-color: #6d4fe0;
+  --highlight-color: #6d4fe0;
+  --background-color: #ffffff;
+  --light-background-color: #f5f3fb;
+  --nav-bg: rgba(255,255,255,0.8);
+  --card-border-color: rgba(0,0,0,0.06);
+  --card-shadow-color: rgba(0,0,0,0.1);
+  --divider-color: rgba(0,0,0,0.08);
 }
 
 * {
@@ -76,9 +95,10 @@ nav {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(0,0,0,0.75);
+    background: var(--nav-bg);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
+    transition: background-color .25s ease;
     margin: 0 -50px;
     padding-left: 50px;
     padding-right: 50px;
@@ -138,6 +158,17 @@ nav .mobile-nav a.resume-pill-link:hover {
     background-color: rgba(140,108,255,0.12);
     border-radius: 100px;
 }
+
+.theme-toggle {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--border-color);
+    background:transparent; color:var(--text-color); cursor:pointer; font-size:14px;
+    transition:border-color .2s ease, background-color .2s ease; flex-shrink:0; margin-left:20px;
+}
+.theme-toggle:hover { border-color:var(--link-color); background-color:rgba(140,108,255,0.12); }
+.theme-toggle .fa-sun { display:none; }
+:root[data-theme="light"] .theme-toggle .fa-moon { display:none; }
+:root[data-theme="light"] .theme-toggle .fa-sun { display:inline; }
 
 /* Navbar Mobile Menu Button */
 nav .menu-toggle {
@@ -446,9 +477,9 @@ nav .mobile-nav {
     margin-bottom: 15px;
     padding: 15px;
     border-radius: 15px;
-    border: 1px solid rgba(0, 0, 0, 0.05);    
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
-                  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--card-border-color);
+    box-shadow: 0 4px 6px -1px var(--card-shadow-color),
+                  0 2px 4px -1px var(--card-shadow-color);
    }
 
 .skills-section .skill-categories .category-label {
@@ -555,7 +586,7 @@ footer::before {
     left: 0;
     width: 100%;
     height: 1px; 
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+    background: linear-gradient(to bottom, var(--divider-color), transparent);
 }
 
 footer .footer-content {
