@@ -125,12 +125,12 @@ formspree-key: "xzepvzao"
 
 # Active Theme Colors (Dark Violet — matches the index.html hero design)
 colors:
-  text: "#e4e4ec"          # Near-white for headings and body copy on black
-  border: "#232329"        # Subtle light-on-dark panel border
-  link: "#8c6cff"          # Violet accent link color
-  highlight: "#8c6cff"     # Violet accent highlight
-  background: "#000000"    # Black page background
-  light_background: "#0a0a0c" # Dark panel fill (matches --bg-panel on the homepage)
+  text: "#ffffff"                       # White headings and body copy, as on the reference site
+  border: "rgba(255,255,255,0.1)"       # Hairline white border, matches the homepage
+  link: "#a78bfa"                       # Violet-400 accent link color
+  highlight: "#a78bfa"                  # Violet-400 accent highlight
+  background: "#050505"                 # Near-black page ground (not pure black)
+  light_background: "rgba(255,255,255,0.05)" # Translucent glass card fill
 
 
 #########################################################################################################
