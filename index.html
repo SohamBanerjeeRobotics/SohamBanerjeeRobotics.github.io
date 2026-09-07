@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Soham Banerjee | Robotics & Control Engineer</title>
 <meta name="description" content="Portfolio of Soham Banerjee — Robotics & Control Engineer working on autonomous systems, control theory, and deep reinforcement learning.">
+<script>
+  // Applied before first paint so the page never flashes the wrong theme.
+  try {
+    var savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  } catch (e) {}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +29,29 @@
     --dim:#8d8d97;
     --mid:#c7c7cf;
     --maxw:1200px;
+    --nav-bg: rgba(0,0,0,0.75);
+    --panel-translucent: rgba(10,10,14,0.88);
+    --name-shadow-1: 0 4px 40px rgba(0,0,0,0.9);
+    --name-shadow-2: 0 0 80px rgba(0,0,0,0.6);
+    --role-shadow: 0 2px 20px rgba(0,0,0,0.8);
+  }
+  /* Light mode — toggled from the navbar switch, persisted in localStorage.
+     Everything below reads these same custom properties, so one override
+     block re-themes the whole homepage (hero, cards, timeline, footer). */
+  :root[data-theme="light"]{
+    --bg:#ffffff;
+    --bg-panel:#f5f3fb;
+    --border: rgba(0,0,0,0.08);
+    --violet:#6d4fe0;
+    --violet-dim: rgba(109,79,224,0.18);
+    --text:#141419;
+    --dim:#6b6b76;
+    --mid:#39394a;
+    --nav-bg: rgba(255,255,255,0.82);
+    --panel-translucent: rgba(255,255,255,0.92);
+    --name-shadow-1: 0 4px 40px rgba(255,255,255,0.85);
+    --name-shadow-2: 0 0 80px rgba(255,255,255,0.55);
+    --role-shadow: 0 2px 16px rgba(255,255,255,0.75);
   }
   *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
@@ -29,7 +59,18 @@
     margin:0; background:var(--bg); color:var(--text);
     font-family:'Inter',sans-serif; line-height:1.65; overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease, color .25s ease;
   }
+  .theme-toggle{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--border);
+    background:transparent; color:var(--text); cursor:pointer; font-size:15px;
+    transition:border-color .2s ease, background-color .2s ease; flex-shrink:0;
+  }
+  .theme-toggle:hover{ border-color:var(--violet); background:var(--violet-dim); }
+  .theme-toggle .fa-sun{ display:none; }
+  :root[data-theme="light"] .theme-toggle .fa-moon{ display:none; }
+  :root[data-theme="light"] .theme-toggle .fa-sun{ display:inline; }
   ::selection{ background:var(--violet-dim); color:#fff; }
   h1,h2,h3,h4{ font-family:'Sora',sans-serif; margin:0; letter-spacing:-0.01em; }
   a{ color:inherit; text-decoration:none; }
@@ -47,8 +88,9 @@
   /* NAV */
   header{
     position:sticky; top:0; z-index:100;
-    background:rgba(0,0,0,0.75); backdrop-filter:blur(10px);
+    background:var(--nav-bg); backdrop-filter:blur(10px);
     border-bottom:1px solid var(--border);
+    transition:background-color .25s ease;
   }
   nav{
     max-width:var(--maxw); margin:0 auto; padding:18px 32px;
@@ -82,12 +124,12 @@
   .hero-content a, .hero-content button{ pointer-events:auto; }
   .hero h1{
     font-size:clamp(2.6rem, 8vw, 6rem); font-weight:800; letter-spacing:-0.02em;
-    text-shadow: 0 4px 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.6);
+    text-shadow: var(--name-shadow-1), var(--name-shadow-2);
   }
   .hero .role{
     margin-top:14px; font-family:'Sora',sans-serif; font-weight:600; font-size:clamp(0.85rem,2vw,1.25rem);
     letter-spacing:0.16em; color:var(--violet); text-transform:uppercase;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+    text-shadow: var(--role-shadow);
   }
   .hero .cta-row{ display:flex; gap:16px; justify-content:center; margin-top:34px; flex-wrap:wrap; }
   .btn{
@@ -132,7 +174,7 @@
   .duck-hint .dot{ width:6px; height:6px; border-radius:50%; background:var(--violet); box-shadow:0 0 8px var(--violet); animation:pulse 1.8s infinite; }
   .duck-speech{
     position:absolute; z-index:3; right:5%; bottom:24%; max-width:230px;
-    background:rgba(10,10,14,0.88); border:1px solid var(--border); border-radius:14px;
+    background:var(--panel-translucent); border:1px solid var(--border); border-radius:14px;
     padding:12px 14px; font-size:12.5px; line-height:1.5; color:var(--mid);
     opacity:0; transform:translateY(8px) scale(0.97); transition:opacity .35s ease, transform .35s ease;
     backdrop-filter:blur(6px); pointer-events:none;
@@ -264,6 +306,9 @@
       <a href="#contact">CONTACT</a>
     </div>
     <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle light/dark theme">
+        <i class="fa-solid fa-moon"></i><i class="fa-solid fa-sun"></i>
+      </button>
       <a href="assets/resume/Resume.pdf" target="_blank" rel="noopener noreferrer" class="resume-pill"><i class="fa-regular fa-file-lines"></i> RESUME</a>
       <button class="menu-toggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
     </div>
@@ -594,20 +639,20 @@
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
-    // Framed by measuring the assembled rig's actual bounding box at its resting
-    // spin angle (0.55rad) so the head+body sit centered and legible in frame,
-    // instead of the far-away/off-center shot this started from.
-    camera.position.set(9.2, -1.3, 12.6);
-    camera.lookAt(1.6, -1.3, 0.7);
 
+    // The camera position below is NOT hand-tuned to one screen size — that was
+    // the earlier bug (looked right on one test viewport, showed up as a tiny
+    // off-center blob on every other window width). Instead computeFit()/applyFit()
+    // below measure the assembled rig's real bounding box once it's loaded and
+    // solve for a distance that frames it correctly at whatever the current
+    // aspect ratio actually is, then redo just the distance math on every resize.
     function sizeToContainer(){
       const w = hero.clientWidth, h = hero.clientHeight;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      applyFit();
     }
-    sizeToContainer();
-    window.addEventListener('resize', sizeToContainer);
 
     scene.add(new THREE.AmbientLight(0xaaaaee, 1.0));
     const key = new THREE.DirectionalLight(0xffffff, 1.6);
@@ -620,32 +665,75 @@
     fill.position.set(0, -2, 4);
     scene.add(fill);
 
-    // Body tree mirrors the official MJCF kinematic chain exactly
-    // (trunk_base -> neck -> neck_pitch -> yaw_roll_motion -> jaw_soft),
-    // scaled up from meters for display, with the real per-part colors.
+    // Body tree mirrors the official MJCF kinematic chain of the real, full-size
+    // Microduck (pollen-robotics/microduck_rl) exactly — both legs (hip yaw -> hip
+    // roll -> hip pitch -> knee -> ankle -> foot) plus the head/neck chain — scaled
+    // up from meters for display, with the real per-part colors from the CAD asset.
     const SCALE = 13;
     const MODEL_BASE = 'assets/models/microduck/';
 
     const bodyDefs = [
       { name:'trunk_base', parent:null, pos:[0,0,0], quat:[1,0,0,0], meshes:[
-        { file:'trunk_base.stl', pos:[0.004,-0,-0.0175], quat:[0.707107,-0,-0,0.707107], color:0x212623 },
         { file:'right_shell.stl', pos:[0.004,-0.0005,-0.0175], quat:[0.707107,0,0,0.707107], color:0xd9d9d6 },
-        { file:'left_shell.stl', pos:[0.004,-0,-0.0175785], quat:[0.707107,-0,-0,0.707107], color:0xcccccc }
+        { file:'trunk_base.stl', pos:[0.004,0,-0.0175], quat:[0.707107,0,0,0.707107], color:0x212623 },
+        { file:'left_shell.stl', pos:[0.004,0,-0.0175785], quat:[0.707107,0,0,0.707107], color:0xcccccc }
+      ]},
+      { name:'yaw2roll', parent:'trunk_base', pos:[0.006,0.0175,-0.005], quat:[0,-0.707107,-0.707107,0], meshes:[
+        { file:'yaw2roll.stl', pos:[-0.0175,-0.002,0.0125], quat:[0,1.0,0,0], color:0x8c8c8c },
+        { file:'bearing_roll.stl', pos:[-0.0175,-0.002,0.0125], quat:[0,-1.0,0,0], color:0x43474d }
+      ]},
+      { name:'hip_l', parent:'yaw2roll', pos:[0,0.0165,0.0125], quat:[0.707107,-0.707107,0,0], meshes:[
+        { file:'hip_l.stl', pos:[-0.0175,0,-0.0185], quat:[0.707107,-0.707107,0,0], color:0xe6e6e6 }
+      ]},
+      { name:'upper_leg_left', parent:'hip_l', pos:[0.025,0,-0.0185], quat:[0.5,-0.5,0.5,-0.5], jointAngle:-1.1, meshes:[
+        { file:'upper_leg_left.stl', pos:[0,0,-0.0425], quat:[0.5,-0.5,-0.5,-0.5], color:0xdedede }
+      ]},
+      { name:'leg', parent:'upper_leg_left', pos:[0.022,0.0357771,-0.004], quat:[0,0.707107,0.707107,0], jointAngle:-1.0, meshes:[
+        { file:'leg.stl', pos:[-0.022,0.0357771,0.0385], quat:[0.5,0.5,0.5,-0.5], color:0xcfd7dc }
+      ]},
+      { name:'ankle_left', parent:'leg', pos:[0,0.042,-0.026], quat:[0,1.0,0,0], jointAngle:-1.55, meshes:[
+        { file:'sole_left.stl', pos:[-0.022,0.0062229,-0.0647], quat:[0.5,-0.5,-0.5,-0.5], color:0x8fe0d6 },
+        { file:'foot_left.stl', pos:[-0.022,0.0062229,-0.0647], quat:[0.5,-0.5,-0.5,-0.5], color:0xff6720 },
+        { file:'ankle_left.stl', pos:[-0.022,0.0062229,-0.0647], quat:[0.5,-0.5,-0.5,-0.5], color:0xff6720 }
       ]},
       { name:'neck', parent:'trunk_base', pos:[0.026,0.0145,0.0324215], quat:[0,0,0.707107,-0.707107], meshes:[
-        { file:'neck.stl', pos:[0.022,0.05,0.028], quat:[0.5,0.5,0.5,-0.5], color:0xacaa9a }
+        { file:'neck.stl', pos:[0.022,0.05,0.028], quat:[0.5,0.5,0.5,-0.5], color:0xacaa9a },
+        { file:'neck.stl', pos:[0.022,0.05,0.003], quat:[0.5,0.5,0.5,-0.5], color:0xacaa9a }
       ]},
-      { name:'neck_pitch', parent:'neck', pos:[-0,-0.05,0], quat:[0,1,-0,-0], meshes:[
-        { file:'neck_pitch.stl', pos:[-0,0.0287931,-0.0145], quat:[0.5,-0.5,-0.5,-0.5], color:0x596066 }
+      { name:'neck_pitch', parent:'neck', pos:[0,-0.05,0], quat:[0,1.0,0,0], meshes:[
+        { file:'neck_pitch.stl', pos:[0,0.0287931,-0.0145], quat:[0.5,-0.5,-0.5,-0.5], color:0x596066 }
       ]},
-      { name:'yaw_roll_motion', parent:'neck_pitch', pos:[-0,0.0186931,-0.0145], quat:[0,-0,-0.707107,-0.707107], meshes:[
+      { name:'yaw_roll_motion', parent:'neck_pitch', pos:[0,0.0186931,-0.0145], quat:[0,0,-0.707107,-0.707107], meshes:[
         { file:'yaw_roll_motion.stl', pos:[0,0,0.01], quat:[0.707107,0,0,0.707107], color:0x212623 }
       ]},
-      { name:'jaw_soft', parent:'yaw_roll_motion', pos:[-0.0179,0,0.0145], quat:[0.707107,0,-0.707107,-0], meshes:[
-        { file:'face_part.stl', pos:[-0.0045,-9.13778e-05,-0.0178], quat:[0.5,0.5,0.5,0.5], color:0xacaa9a },
-        { file:'top_head_shell.stl', pos:[-0.0045,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xd9d9d6 },
-        { file:'bottom_head_shell.stl', pos:[-0.0043,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 },
-        { file:'jaw.stl', pos:[-0.0045,-0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 }
+      { name:'jaw_soft', parent:'yaw_roll_motion', pos:[-0.0179,0,0.0145], quat:[0.707107,0,-0.707107,0], meshes:[
+        { file:'lens.stl', pos:[0.0155,-9.14e-05,-0.05548], quat:[0.5,-0.5,0.5,-0.5], color:0x43474d },
+        { file:'face_part.stl', pos:[-0.0045,-9.14e-05,-0.0178], quat:[0.5,0.5,0.5,0.5], color:0xacaa9a },
+        { file:'jaw_soft.stl', pos:[-0.0046,0,-0.0179996], quat:[0.5,0.5,0.5,0.5], color:0xd9c1dd },
+        { file:'top_head_shell.stl', pos:[-0.0045,0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xd9d9d6 },
+        { file:'soft_mouth_top.stl', pos:[-0.0042007,0.0,-0.0180814], quat:[0.5,0.5,0.5,0.5], color:0xe0c3e6 },
+        { file:'noenoeil.stl', pos:[-0.0045,-9.14e-05,-0.0178], quat:[0.5,0.5,0.5,0.5], color:0x43474d },
+        { file:'jaw.stl', pos:[-0.0045,0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 },
+        { file:'bottom_head_shell.stl', pos:[-0.0043,0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 },
+        { file:'m12_lens_holder.stl', pos:[0.0155,-9.14e-05,-0.05558], quat:[0.5,-0.5,0.5,-0.5], color:0x43474d }
+      ]},
+      { name:'bearing_roll', parent:'trunk_base', pos:[0.006,-0.0175,-0.005], quat:[0,0.707107,0.707107,0], meshes:[
+        { file:'yaw2roll.stl', pos:[-0.0175,-0.002,0.0125], quat:[0,1.0,0,0], color:0x8c8c8c },
+        { file:'bearing_roll.stl', pos:[-0.0175,-0.002,0.0125], quat:[0,-1.0,0,0], color:0x43474d }
+      ]},
+      { name:'hip_l_2', parent:'bearing_roll', pos:[0,0.0165,0.0125], quat:[0,0,0.707107,0.707107], meshes:[
+        { file:'hip_l.stl', pos:[-0.0175,0,-0.0185], quat:[0.707107,-0.707107,0,0], color:0xe6e6e6 }
+      ]},
+      { name:'upper_leg_right', parent:'hip_l_2', pos:[0.025,0,-0.0185], quat:[0.5,-0.5,0.5,-0.5], jointAngle:1.1, meshes:[
+        { file:'upper_leg_right.stl', pos:[0,0,-0.0425], quat:[0.5,-0.5,0.5,0.5], color:0xdedede }
+      ]},
+      { name:'leg_2', parent:'upper_leg_right', pos:[-0.022,0.0357771,-0.004], quat:[0,1.0,0,0], jointAngle:1.0, meshes:[
+        { file:'leg.stl', pos:[-0.0357771,-0.022,0.0385], quat:[0.707107,0,0.707107,0], color:0xcfd7dc }
+      ]},
+      { name:'ankle_right', parent:'leg_2', pos:[-0.042,0,-0.026], quat:[0,-0.707107,-0.707107,0], jointAngle:-1.55, meshes:[
+        { file:'ankle_right.stl', pos:[0.022,0.0062229,-0.0647], quat:[0.5,-0.5,0.5,0.5], color:0xff6720 },
+        { file:'sole_right.stl', pos:[0.022,0.0062229,-0.0647], quat:[0.5,-0.5,0.5,0.5], color:0x8fe0d6 },
+        { file:'foot_right.stl', pos:[0.022,0.0062229,-0.0647], quat:[0.5,-0.5,0.5,0.5], color:0xff6720 }
       ]}
     ];
 
@@ -654,17 +742,42 @@
       return new THREE.Quaternion(x,y,z,w);
     }
 
+    // `rig` is the outer group the animation/camera code below sways, tilts and
+    // bobs. `rigModel` is a fixed child of it holding the actual body tree: the
+    // MJCF source is Z-up (MuJoCo's convention) but three.js is Y-up, so without
+    // this correction the legs project mostly into depth/sideways instead of
+    // hanging down (harmless-looking on the old head-only bust, but obviously
+    // wrong once full legs made the mismatch visible). A single -90° rotation
+    // about X on this one wrapper group re-bases the whole tree to Y-up without
+    // having to touch any of the individual body/mesh transforms above, which
+    // are copied straight from the official MJCF and stay correct relative to
+    // each other.
     const rig = new THREE.Group();
+    const rigModel = new THREE.Group();
+    rigModel.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+    rig.add(rigModel);
+
     const groupsByName = {};
     const loader = new STLLoader();
     let loaded = 0;
+    let totalMeshes = 0;
+    bodyDefs.forEach(d => { totalMeshes += d.meshes.length; });
 
     bodyDefs.forEach(def => {
       const group = new THREE.Group();
       group.position.set(...def.pos.map(v => v * SCALE));
       group.quaternion.copy(toQuat(def.quat));
+      if (def.jointAngle){
+        // Static rest-pose offset for the leg joints only: the MJCF's zero-angle
+        // configuration is a compact assembly/reference pose, not a standing
+        // pose (it's whatever angle the sim's own walking policy starts from) —
+        // these angles (found by solving for roughly-vertical hip-to-ankle
+        // extension within each joint's real range) straighten the legs into a
+        // natural standing stance for display. Joint axis is local Z per MJCF.
+        group.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), def.jointAngle));
+      }
       groupsByName[def.name] = group;
-      (def.parent ? groupsByName[def.parent] : rig).add(group);
+      (def.parent ? groupsByName[def.parent] : rigModel).add(group);
 
       def.meshes.forEach(m => {
         loader.load(
@@ -677,23 +790,67 @@
             mesh.quaternion.copy(toQuat(m.quat));
             group.add(mesh);
             loaded++;
+            if (loaded === totalMeshes) computeFit();
           },
           undefined,
-          (err) => { console.warn('Microduck mesh failed to load:', m.file, err); }
+          (err) => {
+            console.warn('Microduck mesh failed to load:', m.file, err);
+            loaded++;
+            if (loaded === totalMeshes) computeFit();
+          }
         );
       });
     });
 
+    const BASE_ANGLE = 0.55;
     rig.rotation.x = -0.15;
-    rig.position.y = -0.9;
+    rig.rotation.y = BASE_ANGLE;
     scene.add(rig);
 
-    // Rest-pose quaternions for the three articulated joints, captured right away
-    // (group transforms exist synchronously; only their STL geometry streams in async).
+    // Rest-pose quaternions for every joint, captured right away (group transforms
+    // exist synchronously; only their STL geometry streams in async). Used both by
+    // the gesture engine (tweens away from and back to this) and unaffected by fit.
     const restQuat = {};
-    ['neck_pitch', 'yaw_roll_motion', 'jaw_soft'].forEach(n => {
-      if (groupsByName[n]) restQuat[n] = groupsByName[n].quaternion.clone();
-    });
+    Object.keys(groupsByName).forEach(n => { restQuat[n] = groupsByName[n].quaternion.clone(); });
+
+    // ---------------------------------------------------------------------
+    // Dynamic camera framing — measures the assembled rig's real bounding
+    // SPHERE once its meshes are in, then solves camera distance from that
+    // sphere and the CURRENT aspect ratio (recomputed on every resize). This
+    // replaces a fixed, hand-typed camera position that only ever looked right
+    // at one window size. A sphere fit (rather than fitting height/width at a
+    // single flat depth) is what keeps this correct for a full standing biped:
+    // the model is nearly as deep front-to-back as it is wide, so a flat-plane
+    // fit put the camera too close and the head — nearest the lens — filled
+    // the frame in an exaggerated fisheye way while the legs vanished. Fitting
+    // the full 3D sphere accounts for that depth and keeps the whole body in
+    // frame with normal-looking perspective at every screen size.
+    // ---------------------------------------------------------------------
+    const FIT_VIEW_DIR = new THREE.Vector3(-0.5, 0.08, 0.86).normalize();
+    const FIT_MARGIN = 1.05;
+    let fit = null;
+
+    function computeFit(){
+      rig.updateMatrixWorld(true);
+      const box = new THREE.Box3().setFromObject(rig);
+      if (box.isEmpty()) return;
+      const sphere = box.getBoundingSphere(new THREE.Sphere());
+      fit = { radius: sphere.radius, target: sphere.center.clone() };
+      applyFit();
+    }
+
+    function applyFit(){
+      if (!fit) return;
+      const vFOV = camera.fov * Math.PI / 180;
+      const hFOV = 2 * Math.atan(Math.tan(vFOV / 2) * camera.aspect);
+      const limitFOV = Math.min(vFOV, hFOV);
+      const dist = (fit.radius / Math.sin(limitFOV / 2)) * FIT_MARGIN;
+      camera.position.copy(fit.target.clone().addScaledVector(FIT_VIEW_DIR, dist));
+      camera.lookAt(fit.target);
+    }
+
+    sizeToContainer();
+    window.addEventListener('resize', sizeToContainer);
 
     setTimeout(() => {
       if (loaded === 0){
@@ -772,6 +929,19 @@
         tracks: [
           { joint:'yaw_roll_motion', axis:[0,0,1], steps:[ { angle:0.2, dur:400 }, { angle:0.2, dur:800 }, { angle:0, dur:400 } ]},
           { joint:'neck_pitch', axis:[1,0,0], steps:[ { angle:0.1, dur:400 }, { angle:0.1, dur:800 }, { angle:0, dur:400 } ]}
+        ]
+      },
+      waddle: {
+        // A little duck-like side-to-side rock through the (now-present) hip
+        // roll joints — only possible once the legs were added.
+        emoji: '🦵', tint: 0xffd166,
+        tracks: [
+          { joint:'hip_l', axis:[0,0,1], steps:[
+            { angle:0.16, dur:220 }, { angle:-0.14, dur:260 }, { angle:0.1, dur:220 }, { angle:0, dur:220 }
+          ]},
+          { joint:'hip_l_2', axis:[0,0,1], steps:[
+            { angle:-0.16, dur:220 }, { angle:0.14, dur:260 }, { angle:-0.1, dur:220 }, { angle:0, dur:220 }
+          ]}
         ]
       }
     };
@@ -888,7 +1058,7 @@
     });
     canvas.addEventListener('pointerleave', () => { hovered = false; });
     canvas.addEventListener('click', () => {
-      const names = ['nod', 'lookAround', 'shake', 'wobble'];
+      const names = ['nod', 'lookAround', 'shake', 'wobble', 'waddle'];
       playGesture(names[Math.floor(Math.random() * names.length)]);
       hasInteracted = true;
       if (hintEl) hintEl.classList.remove('show');
@@ -908,14 +1078,13 @@
     // settles at a 3/4 angle and glances side to side, rather than turning like
     // a display turntable), plus the gesture bounce and mood-tint lerp.
     // ---------------------------------------------------------------------
-    const BASE_ANGLE = 0.55;
     const clock = new THREE.Clock();
     function animate(){
       requestAnimationFrame(animate);
       if (!reduceMotion){
         const t = clock.getElapsedTime();
         rig.rotation.y = BASE_ANGLE + Math.sin(t * 0.35) * 0.14;
-        rig.position.y = -0.9 + Math.sin(t * 0.9) * 0.05 + bounceBoost;
+        rig.position.y = Math.sin(t * 0.9) * 0.05 + bounceBoost;
         tintCurrent.lerp(tintTarget, 0.06);
         rim.color.copy(tintCurrent);
       }
@@ -923,6 +1092,22 @@
     }
     animate();
   }
+</script>
+
+<script>
+  // Light/dark theme toggle — flips data-theme on <html> and remembers the
+  // choice; the inline snippet in <head> applies it again on the next visit
+  // before anything paints, so there's no flash of the wrong theme.
+  (function initThemeToggle(){
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const root = document.documentElement;
+      const isLight = root.getAttribute('data-theme') === 'light';
+      if (isLight) { root.removeAttribute('data-theme'); } else { root.setAttribute('data-theme', 'light'); }
+      try { localStorage.setItem('theme', isLight ? 'dark' : 'light'); } catch (e) {}
+    });
+  })();
 </script>
 
 <script>
