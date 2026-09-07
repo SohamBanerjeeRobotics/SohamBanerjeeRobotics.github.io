@@ -56,10 +56,21 @@
   *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
   body{
-    margin:0; background:var(--bg); color:var(--text);
+    margin:0; color:var(--text);
     font-family:'Inter',sans-serif; line-height:1.65; overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
     transition:background-color .25s ease, color .25s ease;
+    /* Ambient glow, not tied to one section — these radial blobs are pinned to
+       the VIEWPORT (background-attachment:fixed), so a soft wash of light
+       stays visible behind whatever content is on screen as you scroll,
+       rather than only appearing once behind a single section. */
+    background:
+      radial-gradient(ellipse 900px 640px at 50% 0%, var(--violet-dim), transparent 62%),
+      radial-gradient(ellipse 820px 620px at 50% 55%, var(--violet-dim), transparent 65%),
+      radial-gradient(ellipse 760px 560px at 50% 100%, var(--violet-dim), transparent 62%),
+      var(--bg);
+    background-repeat:no-repeat;
+    background-attachment:fixed;
   }
   .theme-toggle{
     display:inline-flex; align-items:center; justify-content:center;
@@ -265,18 +276,19 @@
   .ach-panel h4{ font-size:13px; color:var(--dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:14px; }
 
   /* FOOTER */
-  footer{ text-align:center; padding:100px 0 50px; border-top:1px solid var(--border); }
-  footer h2{ font-size:clamp(2rem,5vw,3rem); font-weight:800; margin-bottom:26px; }
-  .footer-contact{ display:flex; justify-content:center; gap:36px; flex-wrap:wrap; color:var(--mid); font-size:14.5px; margin-bottom:26px; }
-  .footer-contact a{ display:flex; align-items:center; gap:8px; transition:color .2s; }
-  .footer-contact a:hover{ color:var(--violet); }
-  .footer-socials{ display:flex; justify-content:center; gap:20px; margin-bottom:30px; }
+  footer{ position:relative; text-align:center; padding:110px 0 56px; border-top:1px solid var(--border); }
+  footer h2{ font-size:clamp(2.3rem,5.6vw,3.4rem); font-weight:800; margin-bottom:30px; }
+  .footer-info{ display:flex; justify-content:center; gap:40px; flex-wrap:wrap; color:var(--mid); font-size:16px; margin-bottom:30px; }
+  .footer-info a{ display:flex; align-items:center; gap:9px; transition:color .2s; }
+  .footer-info a:hover{ color:var(--violet); }
+  .footer-info i{ color:var(--violet); font-size:15px; }
+  .footer-socials{ display:flex; justify-content:center; gap:22px; margin-bottom:32px; }
   .footer-socials a{
-    width:38px; height:38px; border:1px solid var(--border); border-radius:50%;
-    display:flex; align-items:center; justify-content:center; color:var(--mid); transition:all .2s;
+    width:42px; height:42px; border:1px solid var(--border); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color:var(--mid); font-size:16px; transition:all .2s;
   }
   .footer-socials a:hover{ color:var(--violet); border-color:var(--violet-dim); }
-  .footer-copy{ font-size:12px; color:var(--dim); }
+  .footer-copy{ font-size:13px; color:var(--dim); }
 
   .cursor-dot, .cursor-ring{
     position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:9999;
@@ -526,10 +538,9 @@
 <footer id="contact">
   <div class="wrap">
     <h2>Let's connect</h2>
-    <div class="footer-contact">
-      <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
-      <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
-      <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-medium"></i> Medium</a>
+    <div class="footer-info">
+      <a href="mailto:banerjeesoham111@gmail.com"><i class="fa-regular fa-envelope"></i> banerjeesoham111@gmail.com</a>
+      <a href="tel:+918101264621"><i class="fa-solid fa-phone"></i> +91 81012 64621</a>
     </div>
     <div class="footer-socials">
       <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i></a>
@@ -827,7 +838,15 @@
     // frame with normal-looking perspective at every screen size.
     // ---------------------------------------------------------------------
     const FIT_VIEW_DIR = new THREE.Vector3(-0.5, 0.08, 0.86).normalize();
-    const FIT_MARGIN = 1.05;
+    // Margin is intentionally generous now that the rig is a full standing
+    // biped (head to feet) rather than a head/trunk bust — a tight margin
+    // made the duck fill almost the entire hero and cover the name, the
+    // subtitle and the CTA buttons. The vertical bias then aims the camera
+    // slightly below the model's true center so the duck renders in the
+    // upper portion of the hero, like an avatar floating above the text,
+    // instead of dead-center through it.
+    const FIT_MARGIN = 2.3;
+    const FIT_VERTICAL_BIAS = 1.25;
     let fit = null;
 
     function computeFit(){
@@ -835,7 +854,7 @@
       const box = new THREE.Box3().setFromObject(rig);
       if (box.isEmpty()) return;
       const sphere = box.getBoundingSphere(new THREE.Sphere());
-      fit = { radius: sphere.radius, target: sphere.center.clone() };
+      fit = { radius: sphere.radius, center: sphere.center.clone() };
       applyFit();
     }
 
@@ -845,8 +864,10 @@
       const hFOV = 2 * Math.atan(Math.tan(vFOV / 2) * camera.aspect);
       const limitFOV = Math.min(vFOV, hFOV);
       const dist = (fit.radius / Math.sin(limitFOV / 2)) * FIT_MARGIN;
-      camera.position.copy(fit.target.clone().addScaledVector(FIT_VIEW_DIR, dist));
-      camera.lookAt(fit.target);
+      const lookTarget = fit.center.clone();
+      lookTarget.y -= fit.radius * FIT_VERTICAL_BIAS;
+      camera.position.copy(lookTarget.clone().addScaledVector(FIT_VIEW_DIR, dist));
+      camera.lookAt(lookTarget);
     }
 
     sizeToContainer();
