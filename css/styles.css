@@ -8,25 +8,27 @@
   --highlight-color: {{ site.colors.highlight }};
   --background-color: {{ site.colors.background }};
   --light-background-color: {{ site.colors.light_background }};
-  --nav-bg: rgba(0,0,0,0.75);
-  --card-border-color: rgba(255,255,255,0.08);
+  --body-text-color: rgba(255,255,255,0.7);
+  --nav-bg: rgba(5,5,5,0.8);
+  --card-border-color: rgba(255,255,255,0.1);
   --card-shadow-color: rgba(0,0,0,0.4);
-  --divider-color: rgba(255,255,255,0.08);
+  --divider-color: rgba(255,255,255,0.1);
 }
 
 /* Light mode — toggled via the switch in the navbar (data-theme="light" on <html>,
    persisted in localStorage). Dark, above, stays the default look. */
 :root[data-theme="light"] {
-  --text-color: #1c1c24;
-  --border-color: #e4e0f0;
-  --link-color: #6d4fe0;
-  --highlight-color: #6d4fe0;
-  --background-color: #ffffff;
-  --light-background-color: #f5f3fb;
-  --nav-bg: rgba(255,255,255,0.8);
-  --card-border-color: rgba(0,0,0,0.06);
+  --text-color: #111111;
+  --border-color: rgba(0,0,0,0.1);
+  --link-color: #7c3aed;
+  --highlight-color: #7c3aed;
+  --background-color: #f5f5f5;
+  --light-background-color: rgba(255,255,255,0.85);
+  --body-text-color: #444444;
+  --nav-bg: rgba(245,245,245,0.8);
+  --card-border-color: rgba(0,0,0,0.08);
   --card-shadow-color: rgba(0,0,0,0.1);
-  --divider-color: rgba(0,0,0,0.08);
+  --divider-color: rgba(0,0,0,0.1);
 }
 
 * {
@@ -56,21 +58,23 @@ a {
 
 h1 {
     color: var(--text-color);
-    font-family: 'Sora', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
-    font-size: calc(14px + 1.0vw); /* Base size of 20px, increases with viewport width */
+    letter-spacing: -0.03em;
+    font-size: clamp(2rem, 3.4vw, 3rem);
 }
 h2 {
     color: var(--text-color);
-    font-family: 'Sora', sans-serif;
-    font-weight: 600;
-    font-size: calc(11px + 0.8vw);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.5rem, 2.4vw, 1.875rem);
 }
 h3 {
     font-weight: 500;
-    font-family: 'Sora', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--text-color);
-    font-size: calc(9px + 0.6vw);
+    font-size: clamp(1.125rem, 1.5vw, 1.25rem);
 }
 
 span {
@@ -78,8 +82,9 @@ span {
   }
 
 p {
-    color: var(--text-color);
-    font-size: calc(9px + 0.5vw);
+    color: var(--body-text-color);
+    font-size: 17px;
+    line-height: 1.625;
     margin-bottom: 1em;
     padding: 0;
   }
@@ -109,16 +114,17 @@ nav .left a {
     align-items: center;
     gap: 10px;
     color: var(--text-color);
-    font-family: 'Sora', sans-serif;
-    font-size: 17px;
-    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
 }
 
 nav .left .avatar-dot {
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #c9b9ff, var(--link-color));
+    background: radial-gradient(circle at 35% 30%, #d5c8ff, var(--link-color));
     flex-shrink: 0;
     display: inline-block;
 }
@@ -131,9 +137,9 @@ nav .right {
 
 nav .right a {
     color: var(--text-color);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     margin-left: 30px;
     transition: color .2s;
