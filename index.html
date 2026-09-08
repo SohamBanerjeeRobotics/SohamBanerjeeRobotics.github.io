@@ -411,7 +411,7 @@
   </div>
   <div class="scroll-cue"><span>SCROLL DOWN</span><div class="mouse"></div></div>
   <div class="hero-tag-vert">RESUME</div>
-  <div class="duck-hint" id="duckHint"><span class="dot"></span><span>click the duck</span></div>
+  <div class="duck-hint" id="duckHint"><span class="dot"></span><span>click it &middot; drag to toss</span></div>
   <div class="duck-speech" id="duckSpeech"><span class="emoji" id="duckEmoji">🦆</span><span id="duckText"></span></div>
 </section>
 
@@ -695,10 +695,11 @@
     svg.appendChild(shape);
   })();
 
-  // Stylised bipedal mascot robot — a nod to Pollen Robotics' open-source
-  // Microduck, rebuilt from lightweight three.js primitives so it always
-  // renders in full, faces front, and can actually walk around, react to
-  // clicks / the cursor, and chatter about a cute robot future.
+  // Stylised bipedal mascot robot — a nod to Disney's BDX droid (the little
+  // bird-legged "duck" robot), rebuilt from lightweight three.js primitives so
+  // it always renders in full, faces front, wanders the stage on its own, and
+  // reacts: it watches the cursor, emotes when you click it, and can be picked
+  // up and tossed around the hero — then it stumbles, recovers, and carries on.
 </script>
 
 <script type="module">
@@ -730,10 +731,10 @@
       // at a lower world point tilts it down and lifts the robot up the frame;
       // narrow / short heroes need that plus a bit more distance so the robot
       // stays small and clear of the headline.
-      let camY = 1.5, camZ = 6.8, lookY = -0.15;
-      if (a < 1.5)  { camZ = 7.2;  lookY = -0.55; }
-      if (a < 1.2)  { camZ = 8.0;  lookY = -1.00; }
-      if (a < 0.9)  { camY = 1.4;  camZ = 9.2;  lookY = -1.60; }
+      let camY = 1.75, camZ = 7.2, lookY = -1.05;
+      if (a < 1.5)  { camZ = 7.7;  lookY = -1.35; }
+      if (a < 1.2)  { camZ = 8.5;  lookY = -1.75; }
+      if (a < 0.9)  { camY = 1.55; camZ = 9.7;  lookY = -2.25; }
       if (h < 640)  { const k = 1 - h / 640; lookY -= 0.7 * k; camZ += 1.3 * k; }
       camera.position.set(0, camY, camZ);
       camera.lookAt(0, lookY, 0);
@@ -761,88 +762,198 @@
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     // ---- Materials ----------------------------------------------------------
-    const matShell = new THREE.MeshStandardMaterial({ color: 0xebebf2, roughness: 0.42, metalness: 0.22 });
-    const matDark = new THREE.MeshStandardMaterial({ color: 0x24272d, roughness: 0.5, metalness: 0.4 });
-    const matAccent = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.35, metalness: 0.2, emissive: 0x5b3fc0, emissiveIntensity: 0.35 });
+    const matShell = new THREE.MeshStandardMaterial({ color: 0xf0f0f4, roughness: 0.38, metalness: 0.18 });
+    const matPanel = new THREE.MeshStandardMaterial({ color: 0xd7d8e0, roughness: 0.45, metalness: 0.25 });
+    const matDark = new THREE.MeshStandardMaterial({ color: 0x22242b, roughness: 0.5, metalness: 0.45 });
+    const matMetal = new THREE.MeshStandardMaterial({ color: 0x3a3d47, roughness: 0.35, metalness: 0.8 });
+    const matAccent = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.35, metalness: 0.2, emissive: 0x5b3fc0, emissiveIntensity: 0.4 });
     const matEye = new THREE.MeshBasicMaterial({ color: 0x9be7ff });
 
     const B = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    const CYL = (rt, rb, h, mat, seg = 16) => new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), mat);
+    const SPH = (r, mat, s = 20) => new THREE.Mesh(new THREE.SphereGeometry(r, s, Math.round(s * 0.7)), mat);
 
-    // ---- Build the robot ---------------------------------------------------
-    // root(heading) > bob(bob + sway) > torso(lean) > { neck > head, hipL.., hipR.. }
+    // ---- Build the robot — Disney BDX-style bird-legged droid --------------
+    // root(heading) > bob(bounce + sway) > body(squash/lean) > { neck > head, legL, legR }
     const root = new THREE.Group();
     const bob = new THREE.Group();
-    const torso = new THREE.Group();
-    root.add(bob); bob.add(torso);
+    const body = new THREE.Group();           // kept named `torso` too for the animator
+    const torso = body;
+    root.add(bob); bob.add(body);
     scene.add(root);
 
-    const bodyLower = B(0.60, 0.48, 0.48, matShell); torso.add(bodyLower);
-    const bodyUpper = B(0.70, 0.44, 0.56, matShell); bodyUpper.position.y = 0.44; torso.add(bodyUpper);
-    const chest = B(0.34, 0.24, 0.05, matAccent); chest.position.set(0, 0.44, 0.29); torso.add(chest);
-    const backpack = B(0.42, 0.52, 0.18, matDark); backpack.position.set(0, 0.30, -0.33); torso.add(backpack);
-    const collar = B(0.30, 0.10, 0.30, matDark); collar.position.y = 0.70; torso.add(collar);
+    // Egg-shaped shell — wider at the bottom, tucked at the top.
+    const shell = SPH(0.5, matShell, 32);
+    shell.scale.set(0.72, 0.82, 0.7);
+    shell.position.y = 0.16;
+    body.add(shell);
+    // Shoulder collar that the neck rises out of — closes the head/body gap.
+    const collar = SPH(0.32, matPanel, 24);
+    collar.scale.set(1, 0.5, 1);
+    collar.position.y = 0.5;
+    body.add(collar);
+    const bellyPlate = SPH(0.5, matAccent, 28);
+    bellyPlate.scale.set(0.4, 0.34, 0.16);
+    bellyPlate.position.set(0, 0.14, 0.32);
+    body.add(bellyPlate);
+    const seam = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.022, 10, 40), matDark);
+    seam.rotation.x = Math.PI / 2;
+    seam.position.y = 0.12;
+    seam.scale.set(1, 1, 0.62);
+    body.add(seam);
+    // Back battery / cooling pack.
+    const pack = B(0.34, 0.42, 0.2, matDark); pack.position.set(0, 0.06, -0.34); body.add(pack);
+    const vent = B(0.24, 0.26, 0.04, matMetal); vent.position.set(0, 0.06, -0.45); body.add(vent);
+    const tail = CYL(0.02, 0.05, 0.22, matMetal, 10); tail.rotation.x = 1.1; tail.position.set(0, -0.12, -0.42); body.add(tail);
 
-    const neck = new THREE.Group(); neck.position.set(0, 0.72, 0.02); torso.add(neck);
-    const head = new THREE.Group(); head.position.y = 0.16; neck.add(head);
-    const skull = B(0.56, 0.46, 0.54, matShell); skull.position.y = 0.15; head.add(skull);
-    const visor = B(0.46, 0.22, 0.06, matDark); visor.position.set(0, 0.17, 0.27); head.add(visor);
-    const eye = new THREE.Mesh(new THREE.CircleGeometry(0.075, 32), matEye);
-    eye.position.set(0, 0.17, 0.305); head.add(eye);
-    const eyeRing = new THREE.Mesh(new THREE.RingGeometry(0.085, 0.115, 32), matAccent);
-    eyeRing.position.set(0, 0.17, 0.302); head.add(eyeRing);
-    const earGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.09, 20);
-    const earL = new THREE.Mesh(earGeo, matDark); earL.rotation.z = Math.PI / 2; earL.position.set(-0.31, 0.16, -0.02); head.add(earL);
-    const earR = earL.clone(); earR.position.x = 0.31; head.add(earR);
-    const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.26, 8), matDark);
-    antenna.position.set(0.13, 0.46, -0.10); head.add(antenna);
-    const antTip = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 16), matAccent);
-    antTip.position.set(0.13, 0.60, -0.10); head.add(antTip);
+    // ---- Neck + head ------------------------------------------------------
+    const neck = new THREE.Group(); neck.position.set(0, 0.5, 0.03); body.add(neck);
+    const neckCol = CYL(0.1, 0.14, 0.16, matMetal, 14); neckCol.position.y = 0.03; neck.add(neckCol);
+    const neckRing = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.022, 8, 20), matAccent); neckRing.rotation.x = Math.PI / 2; neckRing.position.y = 0.11; neck.add(neckRing);
 
+    const head = new THREE.Group(); head.position.y = 0.12; neck.add(head);
+    // Domed skull, slightly forward-leaning like the BDX droid.
+    const skull = SPH(0.32, matShell, 32);
+    skull.scale.set(1.0, 0.94, 1.04);
+    skull.position.y = 0.06;
+    head.add(skull);
+    // Jaw / chin block so the head meets the neck cleanly.
+    const jaw = SPH(0.24, matShell, 20);
+    jaw.scale.set(1, 0.62, 0.9);
+    jaw.position.y = -0.08;
+    head.add(jaw);
+    const brow = new THREE.Mesh(new THREE.TorusGeometry(0.29, 0.026, 10, 32, Math.PI), matPanel);
+    brow.rotation.set(Math.PI / 2, 0, Math.PI);
+    brow.position.set(0, 0.21, 0.03);
+    head.add(brow);
+    // Dark recessed face plate the eyes sit proud of.
+    const face = SPH(0.3, matDark, 28);
+    face.scale.set(1.02, 0.68, 0.62);
+    face.position.set(0, 0.08, 0.02);
+    head.add(face);
+    // Two big camera eyes on stubby turret barrels that poke out past the dome.
+    function buildEye(side) {
+      const g = new THREE.Group();
+      g.position.set(0.132 * side, 0.11, 0.25);
+      g.rotation.y = side * -0.14;
+      head.add(g);
+      const barrel = CYL(0.1, 0.13, 0.14, matMetal, 20); barrel.rotation.x = Math.PI / 2; barrel.position.z = 0.05; g.add(barrel);
+      const lens = new THREE.Mesh(new THREE.CircleGeometry(0.108, 28), matEye); lens.position.z = 0.135; g.add(lens);
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.108, 0.13, 28), matAccent); ring.position.z = 0.138; g.add(ring);
+      return { g, lens };
+    }
+    const eyeL = buildEye(-1);
+    const eyeR = buildEye(1);
+    const eye = eyeL.lens;                     // animator dims/scales both via helpers below
+    const eyes = [eyeL.lens, eyeR.lens];
+    // Antenna "ears" swept back off the dome.
+    function buildEar(side) {
+      const e = new THREE.Group();
+      e.position.set(0.24 * side, 0.18, -0.04);
+      e.rotation.z = -0.5 * side;
+      e.rotation.x = 0.3;
+      head.add(e);
+      const stalk = CYL(0.015, 0.022, 0.22, matMetal, 10); stalk.position.y = 0.11; e.add(stalk);
+      const tip = SPH(0.035, matAccent, 14); tip.position.y = 0.23; e.add(tip);
+      return e;
+    }
+    const earL = buildEar(-1);
+    const earR = buildEar(1);
+    const antTip = earR.children[1];           // glow target for the animator
+
+    // ---- Bird legs (digitigrade, reverse knee) --------------------------
     function buildLeg(side) {
       const hip = new THREE.Group();
-      hip.position.set(0.19 * side, -0.22, 0);
-      torso.add(hip);
-      const thigh = B(0.17, 0.34, 0.17, matDark); thigh.position.y = -0.17; hip.add(thigh);
-      const thighAcc = B(0.10, 0.18, 0.18, matAccent); thighAcc.position.y = -0.15; hip.add(thighAcc);
-      const knee = new THREE.Group(); knee.position.y = -0.34; hip.add(knee);
-      const shin = B(0.14, 0.34, 0.14, matShell); shin.position.y = -0.17; knee.add(shin);
-      const ankle = new THREE.Group(); ankle.position.y = -0.34; knee.add(ankle);
-      const foot = B(0.22, 0.10, 0.36, matDark); foot.position.set(0, -0.05, 0.07); ankle.add(foot);
-      const toe = B(0.22, 0.06, 0.10, matAccent); toe.position.set(0, -0.04, 0.26); ankle.add(toe);
+      hip.position.set(0.17 * side, -0.16, 0);
+      body.add(hip);
+      const hipBall = SPH(0.09, matMetal, 16); hip.add(hipBall);
+      const thigh = CYL(0.05, 0.06, 0.3, matMetal, 12); thigh.position.y = -0.15; hip.add(thigh);
+      const thighAcc = SPH(0.055, matAccent, 12); thighAcc.position.y = -0.05; hip.add(thighAcc);
+
+      const knee = new THREE.Group(); knee.position.y = -0.3; hip.add(knee);
+      const kneeBall = SPH(0.07, matMetal, 16); knee.add(kneeBall);
+      const shin = CYL(0.04, 0.05, 0.32, matMetal, 12); shin.position.y = -0.16; knee.add(shin);
+
+      const ankle = new THREE.Group(); ankle.position.y = -0.32; knee.add(ankle);
+      const ankleBall = SPH(0.055, matMetal, 14); ankle.add(ankleBall);
+      const foot = B(0.16, 0.06, 0.26, matDark); foot.position.set(0, -0.03, 0.05); ankle.add(foot);
+      const heelSpur = B(0.1, 0.05, 0.09, matMetal); heelSpur.position.set(0, -0.02, -0.11); ankle.add(heelSpur);
+      const toeCap = B(0.16, 0.05, 0.07, matAccent); toeCap.position.set(0, -0.02, 0.18); ankle.add(toeCap);
       return { hip, knee, ankle };
     }
     const legL = buildLeg(-1);
     const legR = buildLeg(1);
 
-    const HIP_REST = -0.10, KNEE_REST = 0.30, ANKLE_REST = -0.20;
+    // Reverse-knee rest pose: thigh forward, shin swept back, foot flat.
+    const HIP_REST = 0.42, KNEE_REST = -0.95, ANKLE_REST = 0.52;
     legL.hip.rotation.x = legR.hip.rotation.x = HIP_REST;
     legL.knee.rotation.x = legR.knee.rotation.x = KNEE_REST;
     legL.ankle.rotation.x = legR.ankle.rotation.x = ANKLE_REST;
 
-    root.scale.setScalar(0.72);
-    const BOB_BASE = 1.02;              // lifts the feet down onto the y=0 floor
+    root.scale.setScalar(0.70);
+    const BOB_BASE = 0.78;              // lifts the feet down onto the y=0 floor
     bob.position.y = BOB_BASE;
 
     const shadow = new THREE.Mesh(
-      new THREE.CircleGeometry(0.55, 40),
+      new THREE.CircleGeometry(0.52, 40),
       new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.26, depthWrite: false })
     );
     shadow.rotation.x = -Math.PI / 2;
     shadow.position.y = 0.015;
     root.add(shadow);
 
-    // ---- Wander / walk state ---------------------------------------------
+    // Meshes that count as "the robot" for click / drag hit-testing
+    // (the body subtree only — not the ground shadow).
+    const pickTargets = [];
+    body.traverse((o) => { if (o.isMesh) pickTargets.push(o); });
+
+    // ---- Motion state ---------------------------------------------------
+    // mode: 'idle' | 'walk' | 'emote' | 'held' | 'toss' | 'recover'
     const BOUND_X = 2.05, MIN_Z = -1.05, MAX_Z = 0.30;
+    let mode = reduceMotion ? 'idle' : 'idle';
     let heading = 0, targetHeading = 0;
-    let walking = !reduceMotion;
     let phase = 0, speed = 0;
     let pauseUntil = 0, nextDecision = 0;
     let target = { x: 0, z: 0, set: false };
-    let hop = 0, hopV = 0;
-    let headYaw = 0, headPitch = 0, headYawT = 0, headPitchT = 0;
-    let lookHoldUntil = 0;
+    let hop = 0, hopV = 0, hopQueue = 0, hopQueueAt = 0;
+    let headYaw = 0, headPitch = 0, headRoll = 0;
+    let headYawT = 0, headPitchT = 0, headRollT = 0;
+    let lookHoldUntil = 0, cursorHoldUntil = 0;
     let eyePulse = 1, eyePulseT = 1;
     let blink = -1;
+    let squash = 1, squashT = 1;               // <1 = flattened, >1 = stretched
+    let leanT = 0, lean = 0;                    // extra torso pitch for emotes/toss
+    let earWiggle = 0;                          // decays; drives ear flutter
+    let spin = null;                            // { t, dur, from, to }
+    let modeUntil = 0;                          // when the current emote/recover ends
+    let dizzy = 0;                              // decays through 'recover'
+
+    // Airborne bookkeeping — root.position.y is the foot height above the floor
+    // (0 = grounded); vel carries the robot while thrown.
+    const vel = new THREE.Vector3();
+    const heldWorld = new THREE.Vector3();
+    const heldVel = new THREE.Vector3();
+    const _p = new THREE.Vector3();
+    let lastMoveT = 0;
+
+    // Pointer → world helpers (raycast against a ground plane / the robot).
+    const ray = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    const gplane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    function setNDC(e) {
+      const r = hero.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    }
+    function groundAt(planeY, out) {
+      gplane.constant = -planeY;
+      ray.setFromCamera(ndc, camera);
+      return ray.ray.intersectPlane(gplane, out);
+    }
+    function pointerOnRobot(e) {
+      setNDC(e);
+      ray.setFromCamera(ndc, camera);
+      return ray.intersectObjects(pickTargets, false).length > 0;
+    }
 
     function newTarget(now) {
       target.x = (Math.random() * 2 - 1) * BOUND_X * 0.85;
@@ -860,11 +971,13 @@
       { emoji: '🌱', text: "Soon, palm-sized robots will tend window gardens while I supervise, slightly clumsily, from the sill." },
       { emoji: '☕', text: "One day I'll bring you coffee without spilling it. Today I can waddle in a tidy circle. Progress!" },
       { emoji: '✨', text: "The good future isn't robots replacing people — it's robots deleting the boring parts so you get to build cool things." },
-      { emoji: '🦆', text: "I'm modelled on Pollen Robotics' open-source Microduck: 25 cm tall, 800 g, and absurdly determined to walk." },
+      { emoji: '🦆', text: "I'm styled after Disney's BDX droid — bird legs, big eyes, and an unreasonable amount of bounce for my size." },
       { emoji: '🧠', text: "Soham trains walking gaits with reinforcement learning in simulation, then ships them straight to real legs." },
       { emoji: '📐', text: "Control theory plus deep RL is how you get a robot to walk like it means it, instead of falling over politely." },
       { emoji: '🛰️', text: "Future me: exploring a crater on Mars. Present me: exploring the left edge of this hero section." },
-      { emoji: '👋', text: "Click me and I'll react — I get restless just standing here looking adorable." }
+      { emoji: '👋', text: "Click me and I'll emote — or grab me and toss me. I bounce, I promise it's fine." },
+      { emoji: '😵‍💫', text: "Okay, that throw was further than expected. Recalibrating my dignity..." },
+      { emoji: '👀', text: "I can see your cursor, you know. I'm watching it right now. Hello up there." }
     ];
     const speechEl = document.getElementById('duckSpeech');
     const speechEmoji = document.getElementById('duckEmoji');
@@ -890,29 +1003,105 @@
       try { localStorage.setItem('duckHintSeen', '1'); } catch (e) {}
     }
 
-    // ---- Interaction ---------------------------------------------------
-    function react() {
+    // ---- Interaction: cursor-watch, click-to-emote, drag-to-toss -------
+    const cursorWorld = new THREE.Vector3();
+
+    // Emotes: short scripted reactions when you click the droid.
+    const EMOTES = ['hop', 'tilt', 'spin', 'peek'];
+    function emote(name) {
       markInteracted();
-      hopV = 3.6;
-      eyePulseT = 2.6;
-      headYawT = (Math.random() * 2 - 1) * 0.5;
-      headPitchT = -0.16;
-      lookHoldUntil = performance.now() + 1600;
-      walking = false;
+      if (name === 'random') name = EMOTES[(Math.random() * EMOTES.length) | 0];
+      mode = 'emote';
+      target.set = false;
       speed = 0;
-      pauseUntil = performance.now() + 1700;
+      const now = performance.now();
+      eyePulseT = 2.4;
+      earWiggle = 1;
+      if (name === 'hop') {
+        hopV = 4.4; hopQueue = 1; hopQueueAt = now + 260;
+        squashT = 0.82; headPitchT = -0.18; modeUntil = now + 1100;
+      } else if (name === 'tilt') {
+        headRollT = (Math.random() < 0.5 ? 1 : -1) * 0.62;
+        headPitchT = 0.16; eyePulseT = 3.0; modeUntil = now + 1500;
+      } else if (name === 'spin') {
+        spin = { t: 0, dur: 0.85, from: heading, to: heading + Math.PI * 2 * (Math.random() < 0.5 ? 1 : -1) };
+        hopV = 2.6; modeUntil = now + 950;
+      } else { // 'peek' — lean back, eyes go wide
+        leanT = -0.4; headPitchT = -0.3; squashT = 1.12; eyePulseT = 3.6; modeUntil = now + 1300;
+      }
       say(null);
     }
-    canvas.style.cursor = 'pointer';
-    canvas.addEventListener('click', react);
+
+    // Pointer tracking / drag state.
+    let grab = null;   // { id, t0, moved, lastX, lastY }
+    canvas.style.cursor = 'grab';
+
+    function updateLook(e) {
+      setNDC(e);
+      if (groundAt(1.15, cursorWorld)) { /* cursorWorld updated in place */ }
+      cursorHoldUntil = performance.now() + 2400;
+      if (mode === 'emote' || mode === 'recover' || mode === 'toss') return;
+      // Head aim straight from the pointer ray; body-turn target (in the loop)
+      // uses cursorWorld so the droid can pivot to face the cursor when idle.
+      headYawT = THREE.MathUtils.clamp(ndc.x * 0.72, -0.8, 0.8);
+      headPitchT = THREE.MathUtils.clamp(-ndc.y * 0.34, -0.32, 0.42);
+      lookHoldUntil = performance.now() + 2400;
+    }
+
     hero.addEventListener('pointermove', (e) => {
-      const r = hero.getBoundingClientRect();
-      const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
-      const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
-      headYawT = THREE.MathUtils.clamp(nx * 0.6, -0.7, 0.7);
-      headPitchT = THREE.MathUtils.clamp(ny * 0.32, -0.28, 0.4);
-      lookHoldUntil = performance.now() + 2200;
+      if (!grab) { if (!reduceMotion) updateLook(e); return; }
+      grab.moved += Math.abs(e.clientX - grab.lastX) + Math.abs(e.clientY - grab.lastY);
+      grab.lastX = e.clientX; grab.lastY = e.clientY;
+      if (mode !== 'held' && (grab.moved > 7 || performance.now() - grab.t0 > 150)) {
+        mode = 'held'; markInteracted(); spin = null; target.set = false;
+        canvas.style.cursor = 'grabbing';
+        setNDC(e); if (groundAt(0, _p)) heldWorld.copy(_p);
+        heldVel.set(0, 0, 0); lastMoveT = performance.now();
+      }
+      if (mode === 'held') {
+        setNDC(e);
+        if (groundAt(0, _p)) {
+          _p.x = THREE.MathUtils.clamp(_p.x, -BOUND_X - 0.6, BOUND_X + 0.6);
+          _p.z = THREE.MathUtils.clamp(_p.z, MIN_Z - 0.4, MAX_Z + 0.6);
+          const tp = performance.now();
+          const dtm = Math.min(0.1, Math.max(0.008, (tp - lastMoveT) / 1000));
+          heldVel.x += ((_p.x - heldWorld.x) / dtm - heldVel.x) * 0.6;
+          heldVel.z += ((_p.z - heldWorld.z) / dtm - heldVel.z) * 0.6;
+          heldWorld.copy(_p);
+          lastMoveT = tp;
+        }
+      }
     });
+
+    hero.addEventListener('pointerdown', (e) => {
+      if (reduceMotion || e.button !== 0) return;
+      if (!pointerOnRobot(e)) return;
+      grab = { id: e.pointerId, t0: performance.now(), moved: 0, lastX: e.clientX, lastY: e.clientY };
+      try { hero.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+    });
+
+    function endGrab(e) {
+      if (!grab) return;
+      try { hero.releasePointerCapture(grab.id); } catch (err) {}
+      canvas.style.cursor = 'grab';
+      if (mode === 'held') {
+        // Launch: carry the drag velocity, add a predictable upward pop.
+        const pop = 2.6 + Math.min(2, Math.hypot(heldVel.x, heldVel.z) * 0.16);
+        vel.set(
+          THREE.MathUtils.clamp(heldVel.x * 0.9, -7, 7),
+          pop,
+          THREE.MathUtils.clamp(heldVel.z * 0.9, -5, 5)
+        );
+        mode = 'toss';
+        earWiggle = 1.2;
+      } else {
+        emote('random');   // it was a tap, not a drag
+      }
+      grab = null;
+    }
+    hero.addEventListener('pointerup', endGrab);
+    hero.addEventListener('pointercancel', endGrab);
 
     // ---- Reduced motion: a still, front-facing pose --------------------
     if (reduceMotion) {
@@ -925,90 +1114,222 @@
         if (!hasInteracted && hintEl) hintEl.classList.add('show');
       }, 3200);
       setInterval(() => {
-        if (!document.hidden && speechEl && !speechEl.classList.contains('show')) say(null);
+        if (!document.hidden && mode === 'idle' && speechEl && !speechEl.classList.contains('show')) say(null);
       }, 12000 + Math.random() * 5000);
 
       resize();
       window.addEventListener('resize', resize);
-      // Stand facing front for a moment before wandering off.
-      walking = false;
+      // Stand facing front for a beat before wandering off.
       pauseUntil = performance.now() + 2400;
 
       const clock = new THREE.Clock();
+      const GRAV = 9.2;
+
       function frame() {
         requestAnimationFrame(frame);
         const dt = Math.min(clock.getDelta(), 0.05);
         const now = performance.now();
+        const t = clock.elapsedTime;
 
-        if (walking && now > nextDecision) newTarget(now);
-        if (!walking && now > pauseUntil) { walking = true; newTarget(now); }
+        // ================= MODE: held (dragged by the pointer) =========
+        if (mode === 'held') {
+          const k = Math.min(1, dt * 16);
+          root.position.x += (heldWorld.x - root.position.x) * k;
+          root.position.z += (heldWorld.z - root.position.z) * k;
+          root.position.y += (1.5 - root.position.y) * Math.min(1, dt * 10);
+          heldVel.multiplyScalar(Math.max(0, 1 - dt * 3));   // bleed off if the pointer stops
+          speed = 0; squashT = 1.06;
+          leanT = THREE.MathUtils.clamp(-heldVel.z * 0.04, -0.35, 0.35);
+          const fl = Math.sin(t * 12) * 0.22 + heldVel.x * 0.02;
+          legL.hip.rotation.x = 0.9 + fl; legR.hip.rotation.x = 0.9 - fl;
+          legL.knee.rotation.x = legR.knee.rotation.x = -1.4;
+          legL.ankle.rotation.x = legR.ankle.rotation.x = 0.7;
+          headRollT = THREE.MathUtils.clamp(heldVel.x * 0.03, -0.4, 0.4);
+        }
 
-        // turn toward the target heading by the short way
-        let dh = targetHeading - heading;
-        while (dh > Math.PI) dh -= Math.PI * 2;
-        while (dh < -Math.PI) dh += Math.PI * 2;
-        heading += THREE.MathUtils.clamp(dh, -2.6 * dt, 2.6 * dt);
-        root.rotation.y = heading;
-
-        const aligned = Math.abs(dh) < 0.55;
-        const wantSpeed = walking && aligned ? 0.95 : 0;
-        speed += (wantSpeed - speed) * Math.min(1, dt * 3.5);
-
-        root.position.x += Math.sin(heading) * speed * dt;
-        root.position.z += Math.cos(heading) * speed * dt;
-        if (Math.abs(root.position.x) > BOUND_X) { root.position.x = Math.sign(root.position.x) * BOUND_X; newTarget(now); }
-        if (root.position.z < MIN_Z) { root.position.z = MIN_Z; newTarget(now); }
-        if (root.position.z > MAX_Z) { root.position.z = MAX_Z; newTarget(now); }
-
-        if (target.set) {
-          const dx = target.x - root.position.x, dz = target.z - root.position.z;
-          if (dx * dx + dz * dz < 0.10) {
-            target.set = false;
-            walking = false; speed = 0;
-            pauseUntil = now + 1500 + Math.random() * 2800;
-            if (Math.random() < 0.55) say(null);
-            headYawT = (Math.random() * 2 - 1) * 0.6;
-            lookHoldUntil = now + 1800;
+        // ================= MODE: toss (free flight) ====================
+        else if (mode === 'toss') {
+          vel.y -= GRAV * dt;
+          root.position.x += vel.x * dt;
+          root.position.y += vel.y * dt;
+          root.position.z += vel.z * dt;
+          heading += vel.x * dt * 1.4; root.rotation.y = heading;
+          headRollT = 0.5; leanT = -0.5; squashT = 1.14; eyePulseT = 2.2;
+          const sf = t * 16;
+          legL.hip.rotation.x = 0.6 + Math.sin(sf) * 0.5;
+          legR.hip.rotation.x = 0.6 - Math.sin(sf) * 0.5;
+          legL.knee.rotation.x = legR.knee.rotation.x = -1.2;
+          legL.ankle.rotation.x = legR.ankle.rotation.x = 0.4;
+          if (Math.abs(root.position.x) > BOUND_X + 0.4) {
+            root.position.x = Math.sign(root.position.x) * (BOUND_X + 0.4);
+            vel.x *= -0.45; earWiggle = 1;
+          }
+          root.position.z = THREE.MathUtils.clamp(root.position.z, MIN_Z - 0.3, MAX_Z + 0.3);
+          if (root.position.y <= 0) {
+            root.position.y = 0; mode = 'recover'; modeUntil = now + 1500; dizzy = 1;
+            squashT = 0.6; hopV = Math.min(2.2, Math.abs(vel.y) * 0.15); earWiggle = 1.4;
+            vel.set(0, 0, 0); say(10, 4200);
           }
         }
 
-        // gait
-        const stride = THREE.MathUtils.clamp(speed / 0.95, 0, 1);
-        phase += dt * 7.0 * stride;
-        const s = Math.sin(phase), s2 = Math.sin(phase + Math.PI);
-        legL.hip.rotation.x = HIP_REST + s * 0.55 * stride;
-        legR.hip.rotation.x = HIP_REST + s2 * 0.55 * stride;
-        legL.knee.rotation.x = KNEE_REST + Math.max(0, -s) * 0.95 * stride;
-        legR.knee.rotation.x = KNEE_REST + Math.max(0, -s2) * 0.95 * stride;
-        legL.ankle.rotation.x = ANKLE_REST - legL.hip.rotation.x * 0.3 - (legL.knee.rotation.x - KNEE_REST) * 0.4;
-        legR.ankle.rotation.x = ANKLE_REST - legR.hip.rotation.x * 0.3 - (legR.knee.rotation.x - KNEE_REST) * 0.4;
+        // ================= MODE: recover (stumble upright) =============
+        else if (mode === 'recover') {
+          dizzy = Math.max(0, dizzy - dt / 1.5);
+          heading += Math.sin(t * 9) * dizzy * dt * 2.2; root.rotation.y = heading;
+          speed = 0; squashT = 1 - dizzy * 0.12;
+          leanT = Math.sin(t * 7) * dizzy * 0.15;
+          headRollT = Math.sin(t * 8) * dizzy * 0.5;
+          headPitchT = 0.1 * dizzy;
+          legL.hip.rotation.x = HIP_REST + Math.sin(t * 6) * dizzy * 0.2;
+          legR.hip.rotation.x = HIP_REST - Math.sin(t * 6) * dizzy * 0.2;
+          legL.knee.rotation.x = legR.knee.rotation.x = KNEE_REST;
+          legL.ankle.rotation.x = legR.ankle.rotation.x = ANKLE_REST;
+          if (now > modeUntil) { mode = 'idle'; pauseUntil = now + 900; headRollT = 0; leanT = 0; }
+        }
 
-        // body bob, sway, lean, plus a soft hop and idle breathing
-        const t = clock.elapsedTime;
-        hopV -= 13 * dt; hop = Math.max(0, hop + hopV * dt); if (hop === 0) hopV = 0;
-        bob.position.y = BOB_BASE + Math.abs(Math.sin(phase)) * 0.055 * stride + hop * 0.11 + (1 - stride) * Math.sin(t * 1.7) * 0.012;
-        bob.rotation.z = Math.sin(phase) * 0.05 * stride;
-        torso.rotation.x = 0.04 + 0.10 * stride;
+        // ================= MODE: emote (click reaction) ===============
+        else if (mode === 'emote') {
+          speed = 0;
+          if (spin) {
+            spin.t += dt;
+            const p = Math.min(1, spin.t / spin.dur);
+            const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+            heading = spin.from + (spin.to - spin.from) * e; root.rotation.y = heading;
+            if (p >= 1) spin = null;
+          }
+          const kL = Math.min(1, dt * 8);
+          legL.hip.rotation.x += (HIP_REST - legL.hip.rotation.x) * kL;
+          legR.hip.rotation.x += (HIP_REST - legR.hip.rotation.x) * kL;
+          legL.knee.rotation.x += (KNEE_REST - legL.knee.rotation.x) * kL;
+          legR.knee.rotation.x += (KNEE_REST - legR.knee.rotation.x) * kL;
+          legL.ankle.rotation.x += (ANKLE_REST - legL.ankle.rotation.x) * kL;
+          legR.ankle.rotation.x += (ANKLE_REST - legR.ankle.rotation.x) * kL;
+          if (now > modeUntil && !spin) {
+            mode = 'idle'; pauseUntil = now + 700 + Math.random() * 1400;
+            headRollT = 0; headPitchT = 0; leanT = 0; squashT = 1;
+          }
+        }
+
+        // ================= MODE: idle / walk (autonomous wander) ======
+        else {
+          if (mode === 'walk' && now > nextDecision) newTarget(now);
+          if (mode === 'idle' && now > pauseUntil) { mode = 'walk'; newTarget(now); }
+
+          if (mode === 'idle' && now < cursorHoldUntil) {
+            const dx = cursorWorld.x - root.position.x, dz = cursorWorld.z - root.position.z;
+            if (dx * dx + dz * dz > 0.06) targetHeading = Math.atan2(dx, dz);
+          }
+
+          let dh = targetHeading - heading;
+          while (dh > Math.PI) dh -= Math.PI * 2;
+          while (dh < -Math.PI) dh += Math.PI * 2;
+          heading += THREE.MathUtils.clamp(dh, -2.6 * dt, 2.6 * dt);
+          root.rotation.y = heading;
+
+          const aligned = Math.abs(dh) < 0.55;
+          const wantSpeed = mode === 'walk' && aligned ? 0.95 : 0;
+          speed += (wantSpeed - speed) * Math.min(1, dt * 3.5);
+
+          root.position.x += Math.sin(heading) * speed * dt;
+          root.position.z += Math.cos(heading) * speed * dt;
+          root.position.y += (0 - root.position.y) * Math.min(1, dt * 8);
+          if (Math.abs(root.position.x) > BOUND_X) { root.position.x = Math.sign(root.position.x) * BOUND_X; newTarget(now); }
+          if (root.position.z < MIN_Z) { root.position.z = MIN_Z; newTarget(now); }
+          if (root.position.z > MAX_Z) { root.position.z = MAX_Z; newTarget(now); }
+
+          if (target.set) {
+            const dx = target.x - root.position.x, dz = target.z - root.position.z;
+            if (dx * dx + dz * dz < 0.10) {
+              target.set = false; mode = 'idle'; speed = 0;
+              pauseUntil = now + 1500 + Math.random() * 2800;
+              if (Math.random() < 0.4) say(null);
+              headYawT = (Math.random() * 2 - 1) * 0.6; lookHoldUntil = now + 1800;
+            }
+          }
+          if (mode === 'idle' && Math.random() < 0.0016) emote('random');
+
+          leanT += (0 - leanT) * Math.min(1, dt * 4);
+          squashT += (1 - squashT) * Math.min(1, dt * 4);
+          headRollT += (0 - headRollT) * Math.min(1, dt * 4);
+        }
+
+        // ================= Shared: gait, bounce, head, ears ===========
+        const stride = (mode === 'idle' || mode === 'walk') ? THREE.MathUtils.clamp(speed / 0.95, 0, 1) : 0;
+        if (stride > 0.001) {
+          phase += dt * 8.5 * stride;   // brisk BDX-style step rate
+          const s = Math.sin(phase), s2 = Math.sin(phase + Math.PI);
+          legL.hip.rotation.x = HIP_REST + s * 0.5 * stride;
+          legR.hip.rotation.x = HIP_REST + s2 * 0.5 * stride;
+          legL.knee.rotation.x = KNEE_REST - Math.max(0, s) * 0.7 * stride;
+          legR.knee.rotation.x = KNEE_REST - Math.max(0, s2) * 0.7 * stride;
+          legL.ankle.rotation.x = ANKLE_REST + legL.hip.rotation.x * 0.25 - (legL.knee.rotation.x - KNEE_REST) * 0.35;
+          legR.ankle.rotation.x = ANKLE_REST + legR.hip.rotation.x * 0.25 - (legR.knee.rotation.x - KNEE_REST) * 0.35;
+        } else if (mode === 'idle') {
+          const kL = Math.min(1, dt * 6);
+          legL.hip.rotation.x += (HIP_REST - legL.hip.rotation.x) * kL;
+          legR.hip.rotation.x += (HIP_REST - legR.hip.rotation.x) * kL;
+          legL.knee.rotation.x += (KNEE_REST - legL.knee.rotation.x) * kL;
+          legR.knee.rotation.x += (KNEE_REST - legR.knee.rotation.x) * kL;
+          legL.ankle.rotation.x += (ANKLE_REST - legL.ankle.rotation.x) * kL;
+          legR.ankle.rotation.x += (ANKLE_REST - legR.ankle.rotation.x) * kL;
+        }
+
+        hopV -= 13 * dt;
+        hop = Math.max(0, hop + hopV * dt);
+        if (hop === 0 && hopV < 0) hopV = 0;
+        if (hopQueue && now >= hopQueueAt) { hopQueue = 0; hopV = 3.4; }
+
+        squash += (squashT - squash) * Math.min(1, dt * 12);
+        const breathe = mode === 'idle' ? Math.sin(t * 1.8) * 0.02 : 0;
+        const walkBounce = Math.abs(Math.sin(phase)) * 0.06 * stride;
+        if (root.position.y < 0) root.position.y = 0;
+        bob.position.y = BOB_BASE + walkBounce + hop * 0.12 + breathe + root.position.y;
+        bob.rotation.z = Math.sin(phase) * 0.05 * stride + (mode === 'toss' ? Math.sin(t * 6) * 0.15 : 0);
+
+        // squash-stretch, volume-preserving, on the body group
+        body.scale.set(1 / Math.sqrt(squash), squash, 1 / Math.sqrt(squash));
+
+        lean += (leanT - lean) * Math.min(1, dt * 8);
+        torso.rotation.x = 0.05 + 0.12 * stride + lean;
         torso.rotation.y = Math.sin(phase) * 0.04 * stride;
 
-        // head: track cursor/look target briefly, otherwise face travel direction
-        if (now > lookHoldUntil && speed > 0.25) { headYawT += (0 - headYawT) * Math.min(1, dt * 2); headPitchT = -0.02; }
-        headYaw += (headYawT - headYaw) * Math.min(1, dt * 6);
-        headPitch += (headPitchT - headPitch) * Math.min(1, dt * 6);
+        // head: pigeon-style counter-bob + look target + tilt
+        if (now > lookHoldUntil && speed > 0.25 && mode === 'walk') {
+          headYawT += (0 - headYawT) * Math.min(1, dt * 2);
+          headPitchT += (-0.03 - headPitchT) * Math.min(1, dt * 2);
+        }
+        const headBob = Math.sin(phase * 2) * 0.05 * stride;
+        headYaw += (headYawT - headYaw) * Math.min(1, dt * 7);
+        headPitch += (headPitchT - headPitch) * Math.min(1, dt * 7);
+        headRoll += (headRollT - headRoll) * Math.min(1, dt * 7);
         head.rotation.y = headYaw;
-        head.rotation.x = headPitch;
-        neck.rotation.x = headPitch * 0.3;
+        head.rotation.x = headPitch + headBob + (mode === 'toss' ? 0.3 : 0);
+        head.rotation.z = headRoll;
+        neck.rotation.x = (headPitch + headBob) * 0.35;
 
-        // blink
+        // ears / antenna flutter
+        earWiggle = Math.max(0, earWiggle - dt * 1.6);
+        const ew = (Math.sin(t * 22) * 0.4 + Math.sin(phase * 2) * 0.15 * stride) * (0.22 + earWiggle);
+        earL.rotation.x = 0.3 + ew;
+        earR.rotation.x = 0.3 - ew;
+
+        // blink + eye / antenna glow (flickers while dizzy)
         blink -= dt;
-        if (blink < -0.10 && Math.random() < 0.010) blink = 0.12;
-        eye.scale.y = blink > 0 ? Math.max(0.06, 1 - blink * 12) : 1;
-
-        // eye / antenna glow
+        if (blink < -0.10 && Math.random() < 0.012) blink = 0.12;
+        const bs = blink > 0 ? Math.max(0.06, 1 - blink * 12) : 1;
+        eyes.forEach((ln) => { ln.scale.y = bs; });
+        const flick = dizzy > 0.05 ? (0.55 + 0.45 * Math.sin(t * 40)) : 1;
         eyePulseT += (1 - eyePulseT) * Math.min(1, dt * 1.6);
         eyePulse += (eyePulseT - eyePulse) * Math.min(1, dt * 7);
-        matEye.color.setRGB(0.60 * eyePulse, 0.90 * eyePulse, Math.min(1, 1.0 * eyePulse));
-        antTip.material.emissiveIntensity = 0.35 * eyePulse;
+        const gl = eyePulse * flick;
+        matEye.color.setRGB(0.60 * gl, 0.90 * gl, Math.min(1, 1.0 * gl));
+        antTip.material.emissiveIntensity = 0.4 * eyePulse;
+
+        // shadow stays on the floor and shrinks/fades as the droid lifts off
+        const airT = THREE.MathUtils.clamp(root.position.y / 1.6, 0, 1);
+        shadow.position.y = 0.015 - root.position.y / root.scale.y;
+        shadow.scale.setScalar(Math.max(0.4, 1 - airT * 0.5));
+        shadow.material.opacity = 0.26 * (1 - airT * 0.7);
 
         renderer.render(scene, camera);
       }
