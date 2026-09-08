@@ -158,6 +158,7 @@
     .nav-links, .nav-email{ display:none; }
     .menu-toggle{ display:block; }
     .hero-tag-vert{ display:none; }
+    .hero-socials{ display:none; }
   }
   /* The wider tracking that matches the reference costs horizontal room, so
      the nav pill and the hero role line tighten up on small screens rather
@@ -168,7 +169,6 @@
     .resume-pill{ font-size:11.5px; letter-spacing:0.09em; padding:7px 13px; }
     .nav-right{ gap:12px; }
     .hero .role{ letter-spacing:0.2em; font-size:0.72rem; }
-    .hero-socials{ display:none; }
   }
 
   /* HERO */
@@ -199,11 +199,22 @@
   .btn.solid{ background:var(--violet-dim); border:1px solid rgba(167,139,250,0.4); color:var(--text); }
   .btn.solid:hover{ transform:translateY(-2px); background:rgba(167,139,250,0.3); }
 
+  /* Social rail — fixed to the left edge and vertically centred, so it stays
+     pinned on the left at the same spot no matter how far down the page you
+     scroll (not just within the hero). */
   .hero-socials{
-    position:absolute; left:28px; bottom:36px; z-index:3; display:flex; flex-direction:column; gap:22px;
+    position:fixed; left:26px; top:50%; transform:translateY(-50%); z-index:50;
+    display:flex; flex-direction:column; align-items:center; gap:20px;
   }
-  .hero-socials a{ color:var(--dim); font-size:18px; transition:color .2s; }
-  .hero-socials a:hover{ color:var(--violet); }
+  .hero-socials::after{
+    content:''; width:1px; height:84px; margin-top:4px;
+    background:linear-gradient(var(--faint), transparent);
+  }
+  .hero-socials a{ color:var(--dim); font-size:18px; transition:color .2s ease, transform .2s ease; }
+  .hero-socials a:hover{ color:var(--violet); transform:translateY(-3px); }
+  /* Hidden once the nav collapses — declared after the base rule so it wins
+     over the earlier max-width:980px block. */
+  @media (max-width: 980px){ .hero-socials{ display:none; } }
 
   .scroll-cue{
     position:absolute; left:50%; bottom:34px; transform:translateX(-50%); z-index:3;
@@ -381,6 +392,13 @@
   </nav>
 </header>
 
+<!-- Page-level social rail: fixed to the left edge, follows you down the page. -->
+<div class="hero-socials">
+  <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+  <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+  <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer" aria-label="Medium"><i class="fa-brands fa-medium"></i></a>
+</div>
+
 <section class="hero" id="top">
   <canvas id="pcbCanvas"></canvas>
   <div class="hero-content">
@@ -390,11 +408,6 @@
       <a href="assets/resume/Resume.pdf" target="_blank" rel="noopener noreferrer" class="btn outline">RESUME</a>
       <a href="#work" class="btn solid">VIEW PROJECTS</a>
     </div>
-  </div>
-  <div class="hero-socials">
-    <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i></a>
-    <a href="https://www.linkedin.com/in/soham-banerjee-867a82255/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin"></i></a>
-    <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-medium"></i></a>
   </div>
   <div class="scroll-cue"><span>SCROLL DOWN</span><div class="mouse"></div></div>
   <div class="hero-tag-vert">RESUME</div>
@@ -682,493 +695,325 @@
     svg.appendChild(shape);
   })();
 
-  // Real Microduck robot (Pollen Robotics / Hugging Face, Apache-2.0) —
-  // torso + head assembled from the project's own official CAD shell meshes,
-  // positioned using the exact body transforms from their published MJCF rig.
-  // Source: github.com/pollen-robotics/microduck_rl
+  // Stylised bipedal mascot robot — a nod to Pollen Robotics' open-source
+  // Microduck, rebuilt from lightweight three.js primitives so it always
+  // renders in full, faces front, and can actually walk around, react to
+  // clicks / the cursor, and chatter about a cute robot future.
 </script>
 
 <script type="module">
   import * as THREE from 'three';
-  import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 
   const canvas = document.getElementById('pcbCanvas');
   const hero = document.querySelector('.hero');
 
-  if (canvas && hero){
+  if (canvas && hero) {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
 
-    // The camera position below is NOT hand-tuned to one screen size — that was
-    // the earlier bug (looked right on one test viewport, showed up as a tiny
-    // off-center blob on every other window width). Instead computeFit()/applyFit()
-    // below measure the assembled rig's real bounding box once it's loaded and
-    // solve for a distance that frames it correctly at whatever the current
-    // aspect ratio actually is, then redo just the distance math on every resize.
-    function sizeToContainer(){
+    // The robot lives on a little world-space "stage" (a floor plane at y=0) and
+    // wanders around it. The camera is fixed and just frames that stage in the
+    // upper half of the hero, above the name. framing math re-runs on resize so
+    // it stays correct at every aspect ratio instead of being hand-tuned to one.
+    function resize() {
       const w = hero.clientWidth, h = hero.clientHeight;
       renderer.setSize(w, h, false);
-      camera.aspect = w / h;
+      const a = w / h;
+      camera.aspect = a;
+      // Frame the robot into the clear band above the name. Aiming the camera
+      // at a lower world point tilts it down and lifts the robot up the frame;
+      // narrow / short heroes need that plus a bit more distance so the robot
+      // stays small and clear of the headline.
+      let camY = 1.5, camZ = 6.8, lookY = -0.15;
+      if (a < 1.5)  { camZ = 7.2;  lookY = -0.55; }
+      if (a < 1.2)  { camZ = 8.0;  lookY = -1.00; }
+      if (a < 0.9)  { camY = 1.4;  camZ = 9.2;  lookY = -1.60; }
+      if (h < 640)  { const k = 1 - h / 640; lookY -= 0.7 * k; camZ += 1.3 * k; }
+      camera.position.set(0, camY, camZ);
+      camera.lookAt(0, lookY, 0);
       camera.updateProjectionMatrix();
-      applyFit();
     }
 
-    scene.add(new THREE.AmbientLight(0xaaaaee, 1.0));
-    const key = new THREE.DirectionalLight(0xffffff, 1.6);
-    key.position.set(4, 6, 5);
+    // ---- Lighting (violet key + sky fill, matches the site palette) ----------
+    const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
+    const ambient = new THREE.AmbientLight(0xccccff, 0.9);
+    scene.add(ambient);
+    const key = new THREE.DirectionalLight(0xffffff, 1.7);
+    key.position.set(3, 5.5, 4);
     scene.add(key);
-    const rim = new THREE.PointLight(0x8c6cff, 3.0, 24);
-    rim.position.set(-4, 2, -3);
+    const rim = new THREE.PointLight(0x8c6cff, 3.4, 40);
+    rim.position.set(-5, 3, -3);
     scene.add(rim);
-    const fill = new THREE.PointLight(0x22d3ee, 1.1, 24);
-    fill.position.set(0, -2, 4);
+    const fill = new THREE.PointLight(0x22d3ee, 1.3, 40);
+    fill.position.set(4, -1, 5);
     scene.add(fill);
+    function syncTheme() {
+      ambient.intensity = isLight() ? 1.55 : 0.9;
+      key.intensity = isLight() ? 2.2 : 1.7;
+    }
+    syncTheme();
+    new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-    // Body tree mirrors the official MJCF kinematic chain of the real, full-size
-    // Microduck (pollen-robotics/microduck_rl) exactly — both legs (hip yaw -> hip
-    // roll -> hip pitch -> knee -> ankle -> foot) plus the head/neck chain — scaled
-    // up from meters for display, with the real per-part colors from the CAD asset.
-    const SCALE = 13;
-    const MODEL_BASE = 'assets/models/microduck/';
+    // ---- Materials ----------------------------------------------------------
+    const matShell = new THREE.MeshStandardMaterial({ color: 0xebebf2, roughness: 0.42, metalness: 0.22 });
+    const matDark = new THREE.MeshStandardMaterial({ color: 0x24272d, roughness: 0.5, metalness: 0.4 });
+    const matAccent = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.35, metalness: 0.2, emissive: 0x5b3fc0, emissiveIntensity: 0.35 });
+    const matEye = new THREE.MeshBasicMaterial({ color: 0x9be7ff });
 
-    const bodyDefs = [
-      { name:'trunk_base', parent:null, pos:[0,0,0], quat:[1,0,0,0], meshes:[
-        { file:'right_shell.stl', pos:[0.004,-0.0005,-0.0175], quat:[0.707107,0,0,0.707107], color:0xd9d9d6 },
-        { file:'trunk_base.stl', pos:[0.004,0,-0.0175], quat:[0.707107,0,0,0.707107], color:0x212623 },
-        { file:'left_shell.stl', pos:[0.004,0,-0.0175785], quat:[0.707107,0,0,0.707107], color:0xcccccc }
-      ]},
-      { name:'yaw2roll', parent:'trunk_base', pos:[0.006,0.0175,-0.005], quat:[0,-0.707107,-0.707107,0], meshes:[
-        { file:'yaw2roll.stl', pos:[-0.0175,-0.002,0.0125], quat:[0,1.0,0,0], color:0x8c8c8c },
-        { file:'bearing_roll.stl', pos:[-0.0175,-0.002,0.0125], quat:[0,-1.0,0,0], color:0x43474d }
-      ]},
-      { name:'hip_l', parent:'yaw2roll', pos:[0,0.0165,0.0125], quat:[0.707107,-0.707107,0,0], meshes:[
-        { file:'hip_l.stl', pos:[-0.0175,0,-0.0185], quat:[0.707107,-0.707107,0,0], color:0xe6e6e6 }
-      ]},
-      { name:'upper_leg_left', parent:'hip_l', pos:[0.025,0,-0.0185], quat:[0.5,-0.5,0.5,-0.5], jointAngle:-1.1, meshes:[
-        { file:'upper_leg_left.stl', pos:[0,0,-0.0425], quat:[0.5,-0.5,-0.5,-0.5], color:0xdedede }
-      ]},
-      { name:'leg', parent:'upper_leg_left', pos:[0.022,0.0357771,-0.004], quat:[0,0.707107,0.707107,0], jointAngle:-1.0, meshes:[
-        { file:'leg.stl', pos:[-0.022,0.0357771,0.0385], quat:[0.5,0.5,0.5,-0.5], color:0xcfd7dc }
-      ]},
-      { name:'ankle_left', parent:'leg', pos:[0,0.042,-0.026], quat:[0,1.0,0,0], jointAngle:-1.55, meshes:[
-        { file:'sole_left.stl', pos:[-0.022,0.0062229,-0.0647], quat:[0.5,-0.5,-0.5,-0.5], color:0x8fe0d6 },
-        { file:'foot_left.stl', pos:[-0.022,0.0062229,-0.0647], quat:[0.5,-0.5,-0.5,-0.5], color:0xff6720 },
-        { file:'ankle_left.stl', pos:[-0.022,0.0062229,-0.0647], quat:[0.5,-0.5,-0.5,-0.5], color:0xff6720 }
-      ]},
-      { name:'neck', parent:'trunk_base', pos:[0.026,0.0145,0.0324215], quat:[0,0,0.707107,-0.707107], meshes:[
-        { file:'neck.stl', pos:[0.022,0.05,0.028], quat:[0.5,0.5,0.5,-0.5], color:0xacaa9a },
-        { file:'neck.stl', pos:[0.022,0.05,0.003], quat:[0.5,0.5,0.5,-0.5], color:0xacaa9a }
-      ]},
-      { name:'neck_pitch', parent:'neck', pos:[0,-0.05,0], quat:[0,1.0,0,0], meshes:[
-        { file:'neck_pitch.stl', pos:[0,0.0287931,-0.0145], quat:[0.5,-0.5,-0.5,-0.5], color:0x596066 }
-      ]},
-      { name:'yaw_roll_motion', parent:'neck_pitch', pos:[0,0.0186931,-0.0145], quat:[0,0,-0.707107,-0.707107], meshes:[
-        { file:'yaw_roll_motion.stl', pos:[0,0,0.01], quat:[0.707107,0,0,0.707107], color:0x212623 }
-      ]},
-      { name:'jaw_soft', parent:'yaw_roll_motion', pos:[-0.0179,0,0.0145], quat:[0.707107,0,-0.707107,0], meshes:[
-        { file:'lens.stl', pos:[0.0155,-9.14e-05,-0.05548], quat:[0.5,-0.5,0.5,-0.5], color:0x43474d },
-        { file:'face_part.stl', pos:[-0.0045,-9.14e-05,-0.0178], quat:[0.5,0.5,0.5,0.5], color:0xacaa9a },
-        { file:'jaw_soft.stl', pos:[-0.0046,0,-0.0179996], quat:[0.5,0.5,0.5,0.5], color:0xd9c1dd },
-        { file:'top_head_shell.stl', pos:[-0.0045,0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xd9d9d6 },
-        { file:'soft_mouth_top.stl', pos:[-0.0042007,0.0,-0.0180814], quat:[0.5,0.5,0.5,0.5], color:0xe0c3e6 },
-        { file:'noenoeil.stl', pos:[-0.0045,-9.14e-05,-0.0178], quat:[0.5,0.5,0.5,0.5], color:0x43474d },
-        { file:'jaw.stl', pos:[-0.0045,0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 },
-        { file:'bottom_head_shell.stl', pos:[-0.0043,0,-0.018], quat:[0.5,0.5,0.5,0.5], color:0xff6720 },
-        { file:'m12_lens_holder.stl', pos:[0.0155,-9.14e-05,-0.05558], quat:[0.5,-0.5,0.5,-0.5], color:0x43474d }
-      ]},
-      { name:'bearing_roll', parent:'trunk_base', pos:[0.006,-0.0175,-0.005], quat:[0,0.707107,0.707107,0], meshes:[
-        { file:'yaw2roll.stl', pos:[-0.0175,-0.002,0.0125], quat:[0,1.0,0,0], color:0x8c8c8c },
-        { file:'bearing_roll.stl', pos:[-0.0175,-0.002,0.0125], quat:[0,-1.0,0,0], color:0x43474d }
-      ]},
-      { name:'hip_l_2', parent:'bearing_roll', pos:[0,0.0165,0.0125], quat:[0,0,0.707107,0.707107], meshes:[
-        { file:'hip_l.stl', pos:[-0.0175,0,-0.0185], quat:[0.707107,-0.707107,0,0], color:0xe6e6e6 }
-      ]},
-      { name:'upper_leg_right', parent:'hip_l_2', pos:[0.025,0,-0.0185], quat:[0.5,-0.5,0.5,-0.5], jointAngle:1.1, meshes:[
-        { file:'upper_leg_right.stl', pos:[0,0,-0.0425], quat:[0.5,-0.5,0.5,0.5], color:0xdedede }
-      ]},
-      { name:'leg_2', parent:'upper_leg_right', pos:[-0.022,0.0357771,-0.004], quat:[0,1.0,0,0], jointAngle:1.0, meshes:[
-        { file:'leg.stl', pos:[-0.0357771,-0.022,0.0385], quat:[0.707107,0,0.707107,0], color:0xcfd7dc }
-      ]},
-      { name:'ankle_right', parent:'leg_2', pos:[-0.042,0,-0.026], quat:[0,-0.707107,-0.707107,0], jointAngle:-1.55, meshes:[
-        { file:'ankle_right.stl', pos:[0.022,0.0062229,-0.0647], quat:[0.5,-0.5,0.5,0.5], color:0xff6720 },
-        { file:'sole_right.stl', pos:[0.022,0.0062229,-0.0647], quat:[0.5,-0.5,0.5,0.5], color:0x8fe0d6 },
-        { file:'foot_right.stl', pos:[0.022,0.0062229,-0.0647], quat:[0.5,-0.5,0.5,0.5], color:0xff6720 }
-      ]}
+    const B = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+
+    // ---- Build the robot ---------------------------------------------------
+    // root(heading) > bob(bob + sway) > torso(lean) > { neck > head, hipL.., hipR.. }
+    const root = new THREE.Group();
+    const bob = new THREE.Group();
+    const torso = new THREE.Group();
+    root.add(bob); bob.add(torso);
+    scene.add(root);
+
+    const bodyLower = B(0.60, 0.48, 0.48, matShell); torso.add(bodyLower);
+    const bodyUpper = B(0.70, 0.44, 0.56, matShell); bodyUpper.position.y = 0.44; torso.add(bodyUpper);
+    const chest = B(0.34, 0.24, 0.05, matAccent); chest.position.set(0, 0.44, 0.29); torso.add(chest);
+    const backpack = B(0.42, 0.52, 0.18, matDark); backpack.position.set(0, 0.30, -0.33); torso.add(backpack);
+    const collar = B(0.30, 0.10, 0.30, matDark); collar.position.y = 0.70; torso.add(collar);
+
+    const neck = new THREE.Group(); neck.position.set(0, 0.72, 0.02); torso.add(neck);
+    const head = new THREE.Group(); head.position.y = 0.16; neck.add(head);
+    const skull = B(0.56, 0.46, 0.54, matShell); skull.position.y = 0.15; head.add(skull);
+    const visor = B(0.46, 0.22, 0.06, matDark); visor.position.set(0, 0.17, 0.27); head.add(visor);
+    const eye = new THREE.Mesh(new THREE.CircleGeometry(0.075, 32), matEye);
+    eye.position.set(0, 0.17, 0.305); head.add(eye);
+    const eyeRing = new THREE.Mesh(new THREE.RingGeometry(0.085, 0.115, 32), matAccent);
+    eyeRing.position.set(0, 0.17, 0.302); head.add(eyeRing);
+    const earGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.09, 20);
+    const earL = new THREE.Mesh(earGeo, matDark); earL.rotation.z = Math.PI / 2; earL.position.set(-0.31, 0.16, -0.02); head.add(earL);
+    const earR = earL.clone(); earR.position.x = 0.31; head.add(earR);
+    const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.26, 8), matDark);
+    antenna.position.set(0.13, 0.46, -0.10); head.add(antenna);
+    const antTip = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 16), matAccent);
+    antTip.position.set(0.13, 0.60, -0.10); head.add(antTip);
+
+    function buildLeg(side) {
+      const hip = new THREE.Group();
+      hip.position.set(0.19 * side, -0.22, 0);
+      torso.add(hip);
+      const thigh = B(0.17, 0.34, 0.17, matDark); thigh.position.y = -0.17; hip.add(thigh);
+      const thighAcc = B(0.10, 0.18, 0.18, matAccent); thighAcc.position.y = -0.15; hip.add(thighAcc);
+      const knee = new THREE.Group(); knee.position.y = -0.34; hip.add(knee);
+      const shin = B(0.14, 0.34, 0.14, matShell); shin.position.y = -0.17; knee.add(shin);
+      const ankle = new THREE.Group(); ankle.position.y = -0.34; knee.add(ankle);
+      const foot = B(0.22, 0.10, 0.36, matDark); foot.position.set(0, -0.05, 0.07); ankle.add(foot);
+      const toe = B(0.22, 0.06, 0.10, matAccent); toe.position.set(0, -0.04, 0.26); ankle.add(toe);
+      return { hip, knee, ankle };
+    }
+    const legL = buildLeg(-1);
+    const legR = buildLeg(1);
+
+    const HIP_REST = -0.10, KNEE_REST = 0.30, ANKLE_REST = -0.20;
+    legL.hip.rotation.x = legR.hip.rotation.x = HIP_REST;
+    legL.knee.rotation.x = legR.knee.rotation.x = KNEE_REST;
+    legL.ankle.rotation.x = legR.ankle.rotation.x = ANKLE_REST;
+
+    root.scale.setScalar(0.72);
+    const BOB_BASE = 1.02;              // lifts the feet down onto the y=0 floor
+    bob.position.y = BOB_BASE;
+
+    const shadow = new THREE.Mesh(
+      new THREE.CircleGeometry(0.55, 40),
+      new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.26, depthWrite: false })
+    );
+    shadow.rotation.x = -Math.PI / 2;
+    shadow.position.y = 0.015;
+    root.add(shadow);
+
+    // ---- Wander / walk state ---------------------------------------------
+    const BOUND_X = 2.05, MIN_Z = -1.05, MAX_Z = 0.30;
+    let heading = 0, targetHeading = 0;
+    let walking = !reduceMotion;
+    let phase = 0, speed = 0;
+    let pauseUntil = 0, nextDecision = 0;
+    let target = { x: 0, z: 0, set: false };
+    let hop = 0, hopV = 0;
+    let headYaw = 0, headPitch = 0, headYawT = 0, headPitchT = 0;
+    let lookHoldUntil = 0;
+    let eyePulse = 1, eyePulseT = 1;
+    let blink = -1;
+
+    function newTarget(now) {
+      target.x = (Math.random() * 2 - 1) * BOUND_X * 0.85;
+      target.z = MIN_Z + Math.random() * (MAX_Z - MIN_Z);
+      target.set = true;
+      const dx = target.x - root.position.x, dz = target.z - root.position.z;
+      targetHeading = Math.atan2(dx, dz);
+      nextDecision = now + 2600 + Math.random() * 3800;
+    }
+
+    // ---- Speech bubble --------------------------------------------------
+    const LINES = [
+      { emoji: '🤖', text: "In the cute robot future, every home has a little bot like me — mostly to knock mugs off tables and be forgiven instantly." },
+      { emoji: '💜', text: "Prediction: your vacuum robot will have a name, a personality, and very strong opinions about the cat." },
+      { emoji: '🌱', text: "Soon, palm-sized robots will tend window gardens while I supervise, slightly clumsily, from the sill." },
+      { emoji: '☕', text: "One day I'll bring you coffee without spilling it. Today I can waddle in a tidy circle. Progress!" },
+      { emoji: '✨', text: "The good future isn't robots replacing people — it's robots deleting the boring parts so you get to build cool things." },
+      { emoji: '🦆', text: "I'm modelled on Pollen Robotics' open-source Microduck: 25 cm tall, 800 g, and absurdly determined to walk." },
+      { emoji: '🧠', text: "Soham trains walking gaits with reinforcement learning in simulation, then ships them straight to real legs." },
+      { emoji: '📐', text: "Control theory plus deep RL is how you get a robot to walk like it means it, instead of falling over politely." },
+      { emoji: '🛰️', text: "Future me: exploring a crater on Mars. Present me: exploring the left edge of this hero section." },
+      { emoji: '👋', text: "Click me and I'll react — I get restless just standing here looking adorable." }
     ];
-
-    function toQuat(wxyz){
-      const [w,x,y,z] = wxyz;
-      return new THREE.Quaternion(x,y,z,w);
-    }
-
-    // `rig` is the outer group the animation/camera code below sways, tilts and
-    // bobs. `rigModel` is a fixed child of it holding the actual body tree: the
-    // MJCF source is Z-up (MuJoCo's convention) but three.js is Y-up, so without
-    // this correction the legs project mostly into depth/sideways instead of
-    // hanging down (harmless-looking on the old head-only bust, but obviously
-    // wrong once full legs made the mismatch visible). A single -90° rotation
-    // about X on this one wrapper group re-bases the whole tree to Y-up without
-    // having to touch any of the individual body/mesh transforms above, which
-    // are copied straight from the official MJCF and stay correct relative to
-    // each other.
-    const rig = new THREE.Group();
-    const rigModel = new THREE.Group();
-    rigModel.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
-    rig.add(rigModel);
-
-    const groupsByName = {};
-    const loader = new STLLoader();
-    let loaded = 0;
-    let totalMeshes = 0;
-    bodyDefs.forEach(d => { totalMeshes += d.meshes.length; });
-
-    bodyDefs.forEach(def => {
-      const group = new THREE.Group();
-      group.position.set(...def.pos.map(v => v * SCALE));
-      group.quaternion.copy(toQuat(def.quat));
-      if (def.jointAngle){
-        // Static rest-pose offset for the leg joints only: the MJCF's zero-angle
-        // configuration is a compact assembly/reference pose, not a standing
-        // pose (it's whatever angle the sim's own walking policy starts from) —
-        // these angles (found by solving for roughly-vertical hip-to-ankle
-        // extension within each joint's real range) straighten the legs into a
-        // natural standing stance for display. Joint axis is local Z per MJCF.
-        group.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), def.jointAngle));
-      }
-      groupsByName[def.name] = group;
-      (def.parent ? groupsByName[def.parent] : rigModel).add(group);
-
-      def.meshes.forEach(m => {
-        loader.load(
-          MODEL_BASE + m.file,
-          (geometry) => {
-            geometry.scale(SCALE, SCALE, SCALE);
-            const material = new THREE.MeshStandardMaterial({ color:m.color, roughness:0.55, metalness:0.15 });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.set(m.pos[0]*SCALE, m.pos[1]*SCALE, m.pos[2]*SCALE);
-            mesh.quaternion.copy(toQuat(m.quat));
-            group.add(mesh);
-            loaded++;
-            if (loaded === totalMeshes) computeFit();
-          },
-          undefined,
-          (err) => {
-            console.warn('Microduck mesh failed to load:', m.file, err);
-            loaded++;
-            if (loaded === totalMeshes) computeFit();
-          }
-        );
-      });
-    });
-
-    const BASE_ANGLE = 0.55;
-    rig.rotation.x = -0.15;
-    rig.rotation.y = BASE_ANGLE;
-    scene.add(rig);
-
-    // Rest-pose quaternions for every joint, captured right away (group transforms
-    // exist synchronously; only their STL geometry streams in async). Used both by
-    // the gesture engine (tweens away from and back to this) and unaffected by fit.
-    const restQuat = {};
-    Object.keys(groupsByName).forEach(n => { restQuat[n] = groupsByName[n].quaternion.clone(); });
-
-    // ---------------------------------------------------------------------
-    // Dynamic camera framing — measures the assembled rig's real bounding
-    // SPHERE once its meshes are in, then solves camera distance from that
-    // sphere and the CURRENT aspect ratio (recomputed on every resize). This
-    // replaces a fixed, hand-typed camera position that only ever looked right
-    // at one window size. A sphere fit (rather than fitting height/width at a
-    // single flat depth) is what keeps this correct for a full standing biped:
-    // the model is nearly as deep front-to-back as it is wide, so a flat-plane
-    // fit put the camera too close and the head — nearest the lens — filled
-    // the frame in an exaggerated fisheye way while the legs vanished. Fitting
-    // the full 3D sphere accounts for that depth and keeps the whole body in
-    // frame with normal-looking perspective at every screen size.
-    // ---------------------------------------------------------------------
-    const FIT_VIEW_DIR = new THREE.Vector3(-0.5, 0.08, 0.86).normalize();
-    // Margin is intentionally generous now that the rig is a full standing
-    // biped (head to feet) rather than a head/trunk bust — a tight margin
-    // made the duck fill almost the entire hero and cover the name, the
-    // subtitle and the CTA buttons. The vertical bias then aims the camera
-    // slightly below the model's true center so the duck renders in the
-    // upper portion of the hero, like an avatar floating above the text,
-    // instead of dead-center through it.
-    const FIT_MARGIN = 2.3;
-    const FIT_VERTICAL_BIAS = 1.25;
-    let fit = null;
-
-    function computeFit(){
-      rig.updateMatrixWorld(true);
-      const box = new THREE.Box3().setFromObject(rig);
-      if (box.isEmpty()) return;
-      const sphere = box.getBoundingSphere(new THREE.Sphere());
-      fit = { radius: sphere.radius, center: sphere.center.clone() };
-      applyFit();
-    }
-
-    function applyFit(){
-      if (!fit) return;
-      const vFOV = camera.fov * Math.PI / 180;
-      const hFOV = 2 * Math.atan(Math.tan(vFOV / 2) * camera.aspect);
-      const limitFOV = Math.min(vFOV, hFOV);
-      const dist = (fit.radius / Math.sin(limitFOV / 2)) * FIT_MARGIN;
-      const lookTarget = fit.center.clone();
-      // On a portrait viewport the name wraps to two lines and rises into the
-      // duck's space, so lift the duck a little further there.
-      const bias = FIT_VERTICAL_BIAS * (camera.aspect < 1 ? 1.45 : 1);
-      lookTarget.y -= fit.radius * bias;
-      camera.position.copy(lookTarget.clone().addScaledVector(FIT_VIEW_DIR, dist));
-      camera.lookAt(lookTarget);
-    }
-
-    sizeToContainer();
-    window.addEventListener('resize', sizeToContainer);
-
-    setTimeout(() => {
-      if (loaded === 0){
-        const note = document.createElement('div');
-        note.style.cssText = 'margin-top:20px;font-family:JetBrains Mono,monospace;font-size:11px;color:rgba(255,255,255,0.6);';
-        note.textContent = '3D model assets not found — copy assets/models/microduck/ into your repo (see deployment notes).';
-        hero.querySelector('.hero-content').appendChild(note);
-      }
-    }, 8000);
-
-    // ---------------------------------------------------------------------
-    // Gesture engine — tweens the three real joints (neck_pitch, yaw_roll_motion,
-    // jaw_soft) around their rest pose. Axes below were picked by rendering the
-    // actual STL rig from several test angles: rotating neck_pitch about its local
-    // X axis reads as a nod, and yaw_roll_motion / jaw_soft about local Z read as a
-    // clean turn/wobble without exposing the mounting bracket inside the head shell.
-    // ---------------------------------------------------------------------
-    function easeInOutQuad(t){ return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2; }
-
-    function playTrack(track){
-      return new Promise(resolve => {
-        const group = groupsByName[track.joint];
-        const base = restQuat[track.joint];
-        if (!group || !base){ resolve(); return; }
-        const axis = new THREE.Vector3(...track.axis).normalize();
-        let i = 0;
-        function next(){
-          if (i >= track.steps.length){ group.quaternion.copy(base); resolve(); return; }
-          const step = track.steps[i++];
-          const from = group.quaternion.clone();
-          const to = base.clone().multiply(new THREE.Quaternion().setFromAxisAngle(axis, step.angle));
-          const start = performance.now();
-          function tick(now){
-            const t = Math.min(1, (now - start) / step.dur);
-            group.quaternion.slerpQuaternions(from, to, easeInOutQuad(t));
-            if (t < 1) requestAnimationFrame(tick); else next();
-          }
-          requestAnimationFrame(tick);
-        }
-        next();
-      });
-    }
-
-    const GESTURES = {
-      nod: {
-        emoji: '🙂', tint: 0xffb37a,
-        tracks: [{ joint:'neck_pitch', axis:[1,0,0], steps:[
-          { angle:0.22, dur:200 }, { angle:-0.10, dur:200 }, { angle:0.16, dur:180 }, { angle:0, dur:220 }
-        ]}]
-      },
-      lookAround: {
-        emoji: '🧐', tint: 0x8c6cff,
-        tracks: [{ joint:'yaw_roll_motion', axis:[0,0,1], steps:[
-          { angle:0.38, dur:420 }, { angle:0.38, dur:380 }, { angle:-0.34, dur:520 }, { angle:0, dur:380 }
-        ]}]
-      },
-      shake: {
-        emoji: '😅', tint: 0xff6b9d,
-        tracks: [{ joint:'yaw_roll_motion', axis:[0,0,1], steps:[
-          { angle:0.28, dur:150 }, { angle:-0.28, dur:190 }, { angle:0.2, dur:170 }, { angle:0, dur:180 }
-        ]}]
-      },
-      wobble: {
-        emoji: '🤩', tint: 0x22d3ee, bounce: true,
-        tracks: [
-          { joint:'jaw_soft', axis:[0,0,1], steps:[
-            { angle:0.18, dur:90 }, { angle:-0.14, dur:90 }, { angle:0.12, dur:90 }, { angle:0, dur:120 }
-          ]},
-          { joint:'yaw_roll_motion', axis:[0,0,1], steps:[
-            { angle:0.1, dur:90 }, { angle:-0.08, dur:90 }, { angle:0, dur:150 }
-          ]}
-        ]
-      },
-      curiousTilt: {
-        emoji: '💭', tint: 0xa78bfa,
-        tracks: [
-          { joint:'yaw_roll_motion', axis:[0,0,1], steps:[ { angle:0.2, dur:400 }, { angle:0.2, dur:800 }, { angle:0, dur:400 } ]},
-          { joint:'neck_pitch', axis:[1,0,0], steps:[ { angle:0.1, dur:400 }, { angle:0.1, dur:800 }, { angle:0, dur:400 } ]}
-        ]
-      },
-      waddle: {
-        // A little duck-like side-to-side rock through the (now-present) hip
-        // roll joints — only possible once the legs were added.
-        emoji: '🦵', tint: 0xffd166,
-        tracks: [
-          { joint:'hip_l', axis:[0,0,1], steps:[
-            { angle:0.16, dur:220 }, { angle:-0.14, dur:260 }, { angle:0.1, dur:220 }, { angle:0, dur:220 }
-          ]},
-          { joint:'hip_l_2', axis:[0,0,1], steps:[
-            { angle:-0.16, dur:220 }, { angle:0.14, dur:260 }, { angle:-0.1, dur:220 }, { angle:0, dur:220 }
-          ]}
-        ]
-      }
-    };
-
-    // ---------------------------------------------------------------------
-    // Speech bubble — a mix of real facts about the actual open-source Microduck
-    // (Pollen Robotics x Hugging Face) and a few about Soham's own robotics work,
-    // plus one live stat fetched from the public GitHub API at load (falls back
-    // silently to the static facts if that request is blocked or offline).
-    // ---------------------------------------------------------------------
-    const DUCK_FACTS_REAL = [
-      { emoji:'🦆', text:"Fun fact: my full-size cousin is Pollen Robotics' open-source Microduck — 25cm tall, 800g, 15 servos, and it can walk, kick, and quack." },
-      { emoji:'🧠', text:'My walking gaits are trained with PPO in MuJoCo simulation, then deployed straight to real hardware — sim-to-real, no fine-tuning.' },
-      { emoji:'📷', text:"The full-size me carries a camera, dual IMUs, and a depth sensor to see where it's waddling." },
-      { emoji:'🌐', text:'The whole Microduck project is Apache-2.0 licensed and open on GitHub — anyone can retrain or remix its moves.' },
-      { emoji:'🥋', text:'It can get knocked over and stand right back up — recovery is one of its trained policies too.' }
-    ];
-    const DUCK_FACTS_SOHAM = [
-      { emoji:'🤖', text:'My human, Soham, is designing pneumatic ankle push-off actuation for bipedal robots at IIT Bombay.' },
-      { emoji:'📐', text:'Soham blends control theory — MPC, Lyapunov design — with deep RL to make legged robots move naturally.' },
-      { emoji:'🛩️', text:'He flew a Crazyflie using receding-horizon control and trajectory optimization — tiny drone, big math.' },
-      { emoji:'🎓', text:'Systems & Control Engineering, IIT Bombay, CPI 9.52 — he probably wants you to know that.' }
-    ];
-
     const speechEl = document.getElementById('duckSpeech');
     const speechEmoji = document.getElementById('duckEmoji');
     const speechText = document.getElementById('duckText');
     const hintEl = document.getElementById('duckHint');
-    let speechTimer = null;
-
-    function sayLine(line, holdMs){
+    let speechTimer = null, lastLine = -1;
+    function say(idx, hold) {
       if (!speechEl) return;
-      speechEmoji.textContent = line.emoji;
-      speechText.textContent = line.text;
+      if (idx == null) { do { idx = Math.floor(Math.random() * LINES.length); } while (idx === lastLine && LINES.length > 1); }
+      lastLine = idx;
+      speechEmoji.textContent = LINES[idx].emoji;
+      speechText.textContent = LINES[idx].text;
       speechEl.classList.add('show');
       clearTimeout(speechTimer);
-      speechTimer = setTimeout(() => speechEl.classList.remove('show'), holdMs || 4600);
-    }
-    function pickLineFor(gesture){
-      const pool = DUCK_FACTS_REAL.concat(DUCK_FACTS_SOHAM);
-      const line = pool[Math.floor(Math.random() * pool.length)];
-      return { emoji: gesture.emoji || line.emoji, text: line.text };
+      speechTimer = setTimeout(() => speechEl.classList.remove('show'), hold || 5200);
     }
 
-    if (!reduceMotion){
-      fetch('https://api.github.com/repos/pollen-robotics/microduck')
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-          if (!data || !data.stargazers_count) return;
-          DUCK_FACTS_REAL.push({
-            emoji: '⭐',
-            text: `As of right now, ${data.stargazers_count.toLocaleString()} people have starred my open-source family on GitHub` +
-                  (data.forks_count ? ` (and ${data.forks_count.toLocaleString()} forked it).` : '.')
-          });
-        })
-        .catch(() => { /* offline or blocked — the static facts above cover it */ });
-    }
-
-    // ---------------------------------------------------------------------
-    // Mood tint (rim light) + gentle idle bounce, driven from the render loop.
-    // ---------------------------------------------------------------------
-    const BASE_TINT = 0x8c6cff;
-    const tintTarget = new THREE.Color(BASE_TINT);
-    const tintCurrent = new THREE.Color(BASE_TINT);
-    let bounceBoost = 0;
-    let isGesturePlaying = false;
-
-    function pulseBounce(){
-      const start = performance.now(), dur = 500, amp = 0.14;
-      function tick(now){
-        const t = Math.min(1, (now - start) / dur);
-        bounceBoost = Math.sin(Math.PI * t) * amp;
-        if (t < 1) requestAnimationFrame(tick); else bounceBoost = 0;
-      }
-      requestAnimationFrame(tick);
-    }
-
-    function playGesture(name){
-      if (reduceMotion || isGesturePlaying) return;
-      const g = GESTURES[name];
-      if (!g) return;
-      isGesturePlaying = true;
-      tintTarget.set(g.tint);
-      sayLine(pickLineFor(g));
-      if (g.bounce) pulseBounce();
-      Promise.all(g.tracks.map(playTrack)).then(() => {
-        isGesturePlaying = false;
-        tintTarget.set(BASE_TINT);
-      });
-    }
-
-    // Idle: the duck reacts on its own every so often, unprompted.
-    function scheduleIdleGesture(){
-      const delay = 7000 + Math.random() * 6000;
-      setTimeout(() => {
-        if (!document.hidden){
-          const names = Object.keys(GESTURES);
-          playGesture(names[Math.floor(Math.random() * names.length)]);
-        }
-        scheduleIdleGesture();
-      }, delay);
-    }
-
-    // Hover: a quick curious glance the first time the cursor arrives.
-    // Click: anywhere in the hero triggers a punchier, randomly-picked reaction.
-    let hovered = false, hasInteracted = false;
+    let hasInteracted = false;
     try { hasInteracted = !!localStorage.getItem('duckHintSeen'); } catch (e) {}
-
-    canvas.style.cursor = 'pointer';
-    canvas.addEventListener('pointerenter', () => {
-      if (reduceMotion || hovered) return;
-      hovered = true;
-      playGesture('curiousTilt');
-    });
-    canvas.addEventListener('pointerleave', () => { hovered = false; });
-    canvas.addEventListener('click', () => {
-      const names = ['nod', 'lookAround', 'shake', 'wobble', 'waddle'];
-      playGesture(names[Math.floor(Math.random() * names.length)]);
+    function markInteracted() {
       hasInteracted = true;
       if (hintEl) hintEl.classList.remove('show');
       try { localStorage.setItem('duckHintSeen', '1'); } catch (e) {}
+    }
+
+    // ---- Interaction ---------------------------------------------------
+    function react() {
+      markInteracted();
+      hopV = 3.6;
+      eyePulseT = 2.6;
+      headYawT = (Math.random() * 2 - 1) * 0.5;
+      headPitchT = -0.16;
+      lookHoldUntil = performance.now() + 1600;
+      walking = false;
+      speed = 0;
+      pauseUntil = performance.now() + 1700;
+      say(null);
+    }
+    canvas.style.cursor = 'pointer';
+    canvas.addEventListener('click', react);
+    hero.addEventListener('pointermove', (e) => {
+      const r = hero.getBoundingClientRect();
+      const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+      headYawT = THREE.MathUtils.clamp(nx * 0.6, -0.7, 0.7);
+      headPitchT = THREE.MathUtils.clamp(ny * 0.32, -0.28, 0.4);
+      lookHoldUntil = performance.now() + 2200;
     });
 
-    if (!reduceMotion){
-      scheduleIdleGesture();
-      setTimeout(() => {
-        if (!hasInteracted && hintEl) hintEl.classList.add('show');
-        sayLine({ emoji:'👋', text:"Hi, I'm the office mascot — click me, or just watch, I'll do my own thing." }, 4200);
-      }, 3200);
-    }
-
-    // ---------------------------------------------------------------------
-    // Render loop — gentle idle sway instead of a constant spin (the duck now
-    // settles at a 3/4 angle and glances side to side, rather than turning like
-    // a display turntable), plus the gesture bounce and mood-tint lerp.
-    // ---------------------------------------------------------------------
-    const clock = new THREE.Clock();
-    function animate(){
-      requestAnimationFrame(animate);
-      if (!reduceMotion){
-        const t = clock.getElapsedTime();
-        rig.rotation.y = BASE_ANGLE + Math.sin(t * 0.35) * 0.14;
-        rig.position.y = Math.sin(t * 0.9) * 0.05 + bounceBoost;
-        tintCurrent.lerp(tintTarget, 0.06);
-        rim.color.copy(tintCurrent);
-      }
+    // ---- Reduced motion: a still, front-facing pose --------------------
+    if (reduceMotion) {
+      resize();
+      window.addEventListener('resize', () => { resize(); renderer.render(scene, camera); });
       renderer.render(scene, camera);
+    } else {
+      setTimeout(() => {
+        say(9, 4600);
+        if (!hasInteracted && hintEl) hintEl.classList.add('show');
+      }, 3200);
+      setInterval(() => {
+        if (!document.hidden && speechEl && !speechEl.classList.contains('show')) say(null);
+      }, 12000 + Math.random() * 5000);
+
+      resize();
+      window.addEventListener('resize', resize);
+      // Stand facing front for a moment before wandering off.
+      walking = false;
+      pauseUntil = performance.now() + 2400;
+
+      const clock = new THREE.Clock();
+      function frame() {
+        requestAnimationFrame(frame);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        const now = performance.now();
+
+        if (walking && now > nextDecision) newTarget(now);
+        if (!walking && now > pauseUntil) { walking = true; newTarget(now); }
+
+        // turn toward the target heading by the short way
+        let dh = targetHeading - heading;
+        while (dh > Math.PI) dh -= Math.PI * 2;
+        while (dh < -Math.PI) dh += Math.PI * 2;
+        heading += THREE.MathUtils.clamp(dh, -2.6 * dt, 2.6 * dt);
+        root.rotation.y = heading;
+
+        const aligned = Math.abs(dh) < 0.55;
+        const wantSpeed = walking && aligned ? 0.95 : 0;
+        speed += (wantSpeed - speed) * Math.min(1, dt * 3.5);
+
+        root.position.x += Math.sin(heading) * speed * dt;
+        root.position.z += Math.cos(heading) * speed * dt;
+        if (Math.abs(root.position.x) > BOUND_X) { root.position.x = Math.sign(root.position.x) * BOUND_X; newTarget(now); }
+        if (root.position.z < MIN_Z) { root.position.z = MIN_Z; newTarget(now); }
+        if (root.position.z > MAX_Z) { root.position.z = MAX_Z; newTarget(now); }
+
+        if (target.set) {
+          const dx = target.x - root.position.x, dz = target.z - root.position.z;
+          if (dx * dx + dz * dz < 0.10) {
+            target.set = false;
+            walking = false; speed = 0;
+            pauseUntil = now + 1500 + Math.random() * 2800;
+            if (Math.random() < 0.55) say(null);
+            headYawT = (Math.random() * 2 - 1) * 0.6;
+            lookHoldUntil = now + 1800;
+          }
+        }
+
+        // gait
+        const stride = THREE.MathUtils.clamp(speed / 0.95, 0, 1);
+        phase += dt * 7.0 * stride;
+        const s = Math.sin(phase), s2 = Math.sin(phase + Math.PI);
+        legL.hip.rotation.x = HIP_REST + s * 0.55 * stride;
+        legR.hip.rotation.x = HIP_REST + s2 * 0.55 * stride;
+        legL.knee.rotation.x = KNEE_REST + Math.max(0, -s) * 0.95 * stride;
+        legR.knee.rotation.x = KNEE_REST + Math.max(0, -s2) * 0.95 * stride;
+        legL.ankle.rotation.x = ANKLE_REST - legL.hip.rotation.x * 0.3 - (legL.knee.rotation.x - KNEE_REST) * 0.4;
+        legR.ankle.rotation.x = ANKLE_REST - legR.hip.rotation.x * 0.3 - (legR.knee.rotation.x - KNEE_REST) * 0.4;
+
+        // body bob, sway, lean, plus a soft hop and idle breathing
+        const t = clock.elapsedTime;
+        hopV -= 13 * dt; hop = Math.max(0, hop + hopV * dt); if (hop === 0) hopV = 0;
+        bob.position.y = BOB_BASE + Math.abs(Math.sin(phase)) * 0.055 * stride + hop * 0.11 + (1 - stride) * Math.sin(t * 1.7) * 0.012;
+        bob.rotation.z = Math.sin(phase) * 0.05 * stride;
+        torso.rotation.x = 0.04 + 0.10 * stride;
+        torso.rotation.y = Math.sin(phase) * 0.04 * stride;
+
+        // head: track cursor/look target briefly, otherwise face travel direction
+        if (now > lookHoldUntil && speed > 0.25) { headYawT += (0 - headYawT) * Math.min(1, dt * 2); headPitchT = -0.02; }
+        headYaw += (headYawT - headYaw) * Math.min(1, dt * 6);
+        headPitch += (headPitchT - headPitch) * Math.min(1, dt * 6);
+        head.rotation.y = headYaw;
+        head.rotation.x = headPitch;
+        neck.rotation.x = headPitch * 0.3;
+
+        // blink
+        blink -= dt;
+        if (blink < -0.10 && Math.random() < 0.010) blink = 0.12;
+        eye.scale.y = blink > 0 ? Math.max(0.06, 1 - blink * 12) : 1;
+
+        // eye / antenna glow
+        eyePulseT += (1 - eyePulseT) * Math.min(1, dt * 1.6);
+        eyePulse += (eyePulseT - eyePulse) * Math.min(1, dt * 7);
+        matEye.color.setRGB(0.60 * eyePulse, 0.90 * eyePulse, Math.min(1, 1.0 * eyePulse));
+        antTip.material.emissiveIntensity = 0.35 * eyePulse;
+
+        renderer.render(scene, camera);
+      }
+      frame();
     }
-    animate();
   }
 </script>
 
