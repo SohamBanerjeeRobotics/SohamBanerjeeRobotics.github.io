@@ -695,11 +695,14 @@
     svg.appendChild(shape);
   })();
 
-  // Stylised bipedal mascot robot — a nod to Disney's BDX droid (the little
-  // bird-legged "duck" robot), rebuilt from lightweight three.js primitives so
-  // it always renders in full, faces front, wanders the stage on its own, and
-  // reacts: it watches the cursor, emotes when you click it, and can be picked
-  // up and tossed around the hero — then it stumbles, recovers, and carries on.
+  // Bipedal mascot robot modeled on Pollen Robotics' Microduck — the real
+  // open-source 25cm biped, rebuilt complete (body, camera + depth-sensor
+  // face, articulated grasping beak, both antennas, jointed legs and feet)
+  // from lightweight three.js primitives so it always renders in full, faces
+  // front, wanders the stage on its own, and reacts: it watches the cursor,
+  // emotes when you click it, and can be picked up and tossed around the
+  // hero (kept bounded to the visible stage) — then it stumbles, recovers,
+  // and carries on.
 </script>
 
 <script type="module">
@@ -717,6 +720,36 @@
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+
+    // The robot's roam/drag/toss bounds are the actual visible camera frustum
+    // at ground level (y=0), not a hand-picked constant — so at every aspect
+    // ratio the duck stays fully on screen instead of wandering, being
+    // dragged, or bouncing out past the edge of the canvas. Recomputed on
+    // every resize() alongside the camera framing.
+    const STAGE = { xMin: -2.05, xMax: 2.05, zMin: -1.05, zMax: 0.30 };
+    const STAGE_MARGIN = 0.5; // half the duck's on-screen footprint, so its silhouette (not just its origin) stays in frame
+    const stageRay = new THREE.Raycaster();
+    const stageNDC = new THREE.Vector2();
+    const stageGround = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const stageHit = new THREE.Vector3();
+    function computeStage() {
+      camera.updateMatrixWorld(true);
+      let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([nx, ny]) => {
+        stageNDC.set(nx, ny);
+        stageRay.setFromCamera(stageNDC, camera);
+        if (stageRay.ray.intersectPlane(stageGround, stageHit)) {
+          minX = Math.min(minX, stageHit.x); maxX = Math.max(maxX, stageHit.x);
+          minZ = Math.min(minZ, stageHit.z); maxZ = Math.max(maxZ, stageHit.z);
+        }
+      });
+      if (minX < maxX && minZ < maxZ) {
+        STAGE.xMin = minX + STAGE_MARGIN; STAGE.xMax = maxX - STAGE_MARGIN;
+        STAGE.zMin = minZ + STAGE_MARGIN; STAGE.zMax = maxZ - STAGE_MARGIN;
+        if (STAGE.xMin > STAGE.xMax) { const c = (minX + maxX) / 2; STAGE.xMin = STAGE.xMax = c; }
+        if (STAGE.zMin > STAGE.zMax) { const c = (minZ + maxZ) / 2; STAGE.zMin = STAGE.zMax = c; }
+      }
+    }
 
     // The robot lives on a little world-space "stage" (a floor plane at y=0) and
     // wanders around it. The camera is fixed and just frames that stage in the
@@ -739,6 +772,7 @@
       camera.position.set(0, camY, camZ);
       camera.lookAt(0, lookY, 0);
       camera.updateProjectionMatrix();
+      computeStage();
     }
 
     // ---- Lighting (violet key + sky fill, matches the site palette) ----------
@@ -761,20 +795,31 @@
     syncTheme();
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-    // ---- Materials ----------------------------------------------------------
-    const matShell = new THREE.MeshStandardMaterial({ color: 0xf0f0f4, roughness: 0.38, metalness: 0.18 });
-    const matPanel = new THREE.MeshStandardMaterial({ color: 0xd7d8e0, roughness: 0.45, metalness: 0.25 });
+    // ---- Materials ------------------------------------------------------
+    // Pollen Robotics' Microduck ships in four real colorways (Cream, Graphite,
+    // Lavender, Sky); "Sky" is used here since its light-blue shell plays
+    // nicely with the site's own sky-blue accent. Beak + trim are the matching
+    // real-product orange.
+    const matShell = new THREE.MeshStandardMaterial({ color: 0xaee0ef, roughness: 0.48, metalness: 0.08 });
+    const matPanel = new THREE.MeshStandardMaterial({ color: 0xf3ede1, roughness: 0.5, metalness: 0.1 });
     const matDark = new THREE.MeshStandardMaterial({ color: 0x22242b, roughness: 0.5, metalness: 0.45 });
-    const matMetal = new THREE.MeshStandardMaterial({ color: 0x3a3d47, roughness: 0.35, metalness: 0.8 });
+    const matMetal = new THREE.MeshStandardMaterial({ color: 0x585c68, roughness: 0.35, metalness: 0.75 });
+    const matBeak = new THREE.MeshStandardMaterial({ color: 0xf0954a, roughness: 0.4, metalness: 0.08 });
     const matAccent = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.35, metalness: 0.2, emissive: 0x5b3fc0, emissiveIntensity: 0.4 });
     const matEye = new THREE.MeshBasicMaterial({ color: 0x9be7ff });
+    const matRec = new THREE.MeshBasicMaterial({ color: 0xff4d4d });
 
     const B = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
     const CYL = (rt, rb, h, mat, seg = 16) => new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), mat);
     const SPH = (r, mat, s = 20) => new THREE.Mesh(new THREE.SphereGeometry(r, s, Math.round(s * 0.7)), mat);
 
-    // ---- Build the robot — Disney BDX-style bird-legged droid --------------
-    // root(heading) > bob(bounce + sway) > body(squash/lean) > { neck > head, legL, legR }
+    // ---- Build the robot — Pollen Robotics Microduck (complete model) ------
+    // root(heading) > bob(bounce + sway) > body(squash/lean) > { neck > head > beak, legL, legR }
+    // Every external part from the real 15-DOF, 25cm biped is represented:
+    // rounded duck body, camera + depth-sensor "face", REC-style activity
+    // light, articulated grasping beak (upper + hinged lower jaw), the two
+    // antennas (one head-mounted, one beak-mounted), and a pair of jointed
+    // legs with feet — no arms, matching the real robot.
     const root = new THREE.Group();
     const bob = new THREE.Group();
     const body = new THREE.Group();           // kept named `torso` too for the animator
@@ -782,29 +827,32 @@
     root.add(bob); bob.add(body);
     scene.add(root);
 
-    // Egg-shaped shell — wider at the bottom, tucked at the top.
+    // Plump duck-egg shell — wider at the bottom, tucked at the top.
     const shell = SPH(0.5, matShell, 32);
     shell.scale.set(0.72, 0.82, 0.7);
     shell.position.y = 0.16;
     body.add(shell);
     // Shoulder collar that the neck rises out of — closes the head/body gap.
-    const collar = SPH(0.32, matPanel, 24);
+    const collar = SPH(0.32, matShell, 24);
     collar.scale.set(1, 0.5, 1);
     collar.position.y = 0.5;
     body.add(collar);
-    const bellyPlate = SPH(0.5, matAccent, 28);
+    // Pale belly panel, like a duck's underside.
+    const bellyPlate = SPH(0.5, matPanel, 28);
     bellyPlate.scale.set(0.4, 0.34, 0.16);
     bellyPlate.position.set(0, 0.14, 0.32);
     body.add(bellyPlate);
-    const seam = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.022, 10, 40), matDark);
+    const seam = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.022, 10, 40), matBeak);
     seam.rotation.x = Math.PI / 2;
     seam.position.y = 0.12;
     seam.scale.set(1, 1, 0.62);
     body.add(seam);
-    // Back battery / cooling pack.
+    // Back battery / compute pack, with a small status light.
     const pack = B(0.34, 0.42, 0.2, matDark); pack.position.set(0, 0.06, -0.34); body.add(pack);
     const vent = B(0.24, 0.26, 0.04, matMetal); vent.position.set(0, 0.06, -0.45); body.add(vent);
-    const tail = CYL(0.02, 0.05, 0.22, matMetal, 10); tail.rotation.x = 1.1; tail.position.set(0, -0.12, -0.42); body.add(tail);
+    const packLight = SPH(0.024, matAccent, 10); packLight.position.set(0, 0.14, -0.455); body.add(packLight);
+    // Duck tail nub.
+    const tail = CYL(0.02, 0.06, 0.2, matBeak, 10); tail.rotation.x = 1.1; tail.position.set(0, -0.12, -0.42); body.add(tail);
 
     // ---- Neck + head ------------------------------------------------------
     const neck = new THREE.Group(); neck.position.set(0, 0.5, 0.03); body.add(neck);
@@ -812,12 +860,12 @@
     const neckRing = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.022, 8, 20), matAccent); neckRing.rotation.x = Math.PI / 2; neckRing.position.y = 0.11; neck.add(neckRing);
 
     const head = new THREE.Group(); head.position.y = 0.12; neck.add(head);
-    // Domed skull, slightly forward-leaning like the BDX droid.
+    // Domed skull, slightly forward-leaning.
     const skull = SPH(0.32, matShell, 32);
     skull.scale.set(1.0, 0.94, 1.04);
     skull.position.y = 0.06;
     head.add(skull);
-    // Jaw / chin block so the head meets the neck cleanly.
+    // Cheek mass the beak roots into, so the head meets the neck cleanly.
     const jaw = SPH(0.24, matShell, 20);
     jaw.scale.set(1, 0.62, 0.9);
     jaw.position.y = -0.08;
@@ -826,42 +874,70 @@
     brow.rotation.set(Math.PI / 2, 0, Math.PI);
     brow.position.set(0, 0.21, 0.03);
     head.add(brow);
-    // Dark recessed face plate the eyes sit proud of.
+    // Dark recessed face plate the camera + depth sensor sit proud of.
     const face = SPH(0.3, matDark, 28);
     face.scale.set(1.02, 0.68, 0.62);
     face.position.set(0, 0.08, 0.02);
     head.add(face);
-    // Two big camera eyes on stubby turret barrels that poke out past the dome.
+    // Left "eye" = front camera (with a small REC-style activity light);
+    // right "eye" = the depth sensor — the real robot's actual sensor pair,
+    // mounted side by side so they read as a face.
     function buildEye(side) {
       const g = new THREE.Group();
       g.position.set(0.132 * side, 0.11, 0.25);
       g.rotation.y = side * -0.14;
       head.add(g);
       const barrel = CYL(0.1, 0.13, 0.14, matMetal, 20); barrel.rotation.x = Math.PI / 2; barrel.position.z = 0.05; g.add(barrel);
-      const lens = new THREE.Mesh(new THREE.CircleGeometry(0.108, 28), matEye); lens.position.z = 0.135; g.add(lens);
+      const lens = new THREE.Mesh(new THREE.CircleGeometry(0.108, 28), side < 0 ? matEye : matDark); lens.position.z = 0.135; g.add(lens);
       const ring = new THREE.Mesh(new THREE.RingGeometry(0.108, 0.13, 28), matAccent); ring.position.z = 0.138; g.add(ring);
+      if (side < 0) {
+        const rec = SPH(0.02, matRec, 10); rec.position.set(0.12, 0.1, 0.1); g.add(rec);
+      } else {
+        // Depth-sensor dot grid, suggesting an active IR emitter.
+        for (let i = -1; i <= 1; i++) {
+          const dot = SPH(0.012, matAccent, 8); dot.position.set(i * 0.045, 0, 0.132); g.add(dot);
+        }
+      }
       return { g, lens };
     }
     const eyeL = buildEye(-1);
     const eyeR = buildEye(1);
     const eye = eyeL.lens;                     // animator dims/scales both via helpers below
     const eyes = [eyeL.lens, eyeR.lens];
-    // Antenna "ears" swept back off the dome.
-    function buildEar(side) {
+
+    // ---- Articulated grasping beak — upper (fixed) + lower jaw (hinged) --
+    const beak = new THREE.Group();
+    beak.position.set(0, -0.1, 0.2);
+    head.add(beak);
+    const beakUpper = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.24, 4), matBeak);
+    beakUpper.rotation.x = Math.PI / 2; beakUpper.rotation.y = Math.PI / 4; beakUpper.scale.set(1, 0.5, 1);
+    beakUpper.position.set(0, 0.045, 0.095);
+    beak.add(beakUpper);
+    const beakHinge = new THREE.Group(); beakHinge.position.set(0, 0.005, 0.01); beak.add(beakHinge);
+    const beakLower = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.19, 4), matBeak);
+    beakLower.rotation.x = Math.PI / 2; beakLower.rotation.y = Math.PI / 4; beakLower.scale.set(1, 0.38, 1);
+    beakLower.position.set(0, -0.03, 0.08);
+    beakHinge.add(beakLower);
+
+    // ---- Antennas — one head-mounted, one beak-mounted (per the real part list) --
+    function buildAntenna(pos, rot, scale) {
       const e = new THREE.Group();
-      e.position.set(0.24 * side, 0.18, -0.04);
-      e.rotation.z = -0.5 * side;
-      e.rotation.x = 0.3;
-      head.add(e);
-      const stalk = CYL(0.015, 0.022, 0.22, matMetal, 10); stalk.position.y = 0.11; e.add(stalk);
-      const tip = SPH(0.035, matAccent, 14); tip.position.y = 0.23; e.add(tip);
+      e.position.copy(pos);
+      e.rotation.set(rot.x, rot.y, rot.z);
+      const stalk = CYL(0.014 * scale, 0.02 * scale, 0.22 * scale, matMetal, 10); stalk.position.y = 0.11 * scale; e.add(stalk);
+      const tip = SPH(0.034 * scale, matAccent, 14); tip.position.y = 0.23 * scale; e.add(tip);
       return e;
     }
-    const earL = buildEar(-1);
-    const earR = buildEar(1);
+    const antHead = buildAntenna(new THREE.Vector3(0.05, 0.24, -0.12), { x: 0.25, y: 0, z: -0.18 }, 1);
+    head.add(antHead);
+    const antBeak = buildAntenna(new THREE.Vector3(0.1, 0.03, 0.12), { x: 0.25, y: 0, z: -0.7 }, 0.62);
+    beak.add(antBeak);
+    // Kept as `earL`/`earR` so the existing wiggle + glow animation below needs no changes.
+    const earL = antBeak, earR = antHead;
     const antTip = earR.children[1];           // glow target for the animator
 
-    // ---- Bird legs (digitigrade, reverse knee) --------------------------
+    // ---- Legs (digitigrade, reverse knee — the waddle gait already read
+    // well, so only materials/colors changed here, not the joint rig) -----
     function buildLeg(side) {
       const hip = new THREE.Group();
       hip.position.set(0.17 * side, -0.16, 0);
@@ -878,7 +954,7 @@
       const ankleBall = SPH(0.055, matMetal, 14); ankle.add(ankleBall);
       const foot = B(0.16, 0.06, 0.26, matDark); foot.position.set(0, -0.03, 0.05); ankle.add(foot);
       const heelSpur = B(0.1, 0.05, 0.09, matMetal); heelSpur.position.set(0, -0.02, -0.11); ankle.add(heelSpur);
-      const toeCap = B(0.16, 0.05, 0.07, matAccent); toeCap.position.set(0, -0.02, 0.18); ankle.add(toeCap);
+      const toeCap = B(0.16, 0.05, 0.07, matBeak); toeCap.position.set(0, -0.02, 0.18); ankle.add(toeCap);
       return { hip, knee, ankle };
     }
     const legL = buildLeg(-1);
@@ -909,7 +985,7 @@
 
     // ---- Motion state ---------------------------------------------------
     // mode: 'idle' | 'walk' | 'emote' | 'held' | 'toss' | 'recover'
-    const BOUND_X = 2.05, MIN_Z = -1.05, MAX_Z = 0.30;
+    // (roam/drag/toss bounds live in STAGE, computed per-resize above)
     let mode = reduceMotion ? 'idle' : 'idle';
     let heading = 0, targetHeading = 0;
     let phase = 0, speed = 0;
@@ -923,7 +999,8 @@
     let blink = -1;
     let squash = 1, squashT = 1;               // <1 = flattened, >1 = stretched
     let leanT = 0, lean = 0;                    // extra torso pitch for emotes/toss
-    let earWiggle = 0;                          // decays; drives ear flutter
+    let earWiggle = 0;                          // decays; drives antenna flutter
+    let beakOpenT = 0, beakOpen = 0;            // drives the hinged lower-beak "talking" flap
     let spin = null;                            // { t, dur, from, to }
     let modeUntil = 0;                          // when the current emote/recover ends
     let dizzy = 0;                              // decays through 'recover'
@@ -956,8 +1033,8 @@
     }
 
     function newTarget(now) {
-      target.x = (Math.random() * 2 - 1) * BOUND_X * 0.85;
-      target.z = MIN_Z + Math.random() * (MAX_Z - MIN_Z);
+      target.x = STAGE.xMin + Math.random() * (STAGE.xMax - STAGE.xMin);
+      target.z = STAGE.zMin + Math.random() * (STAGE.zMax - STAGE.zMin);
       target.set = true;
       const dx = target.x - root.position.x, dz = target.z - root.position.z;
       targetHeading = Math.atan2(dx, dz);
@@ -971,7 +1048,7 @@
       { emoji: '🌱', text: "Soon, palm-sized robots will tend window gardens while I supervise, slightly clumsily, from the sill." },
       { emoji: '☕', text: "One day I'll bring you coffee without spilling it. Today I can waddle in a tidy circle. Progress!" },
       { emoji: '✨', text: "The good future isn't robots replacing people — it's robots deleting the boring parts so you get to build cool things." },
-      { emoji: '🦆', text: "I'm styled after Disney's BDX droid — bird legs, big eyes, and an unreasonable amount of bounce for my size." },
+      { emoji: '🦆', text: "I'm modeled on Pollen Robotics' Microduck — a real 25cm open-source biped, beak, antennas and all." },
       { emoji: '🧠', text: "Soham trains walking gaits with reinforcement learning in simulation, then ships them straight to real legs." },
       { emoji: '📐', text: "Control theory plus deep RL is how you get a robot to walk like it means it, instead of falling over politely." },
       { emoji: '🛰️', text: "Future me: exploring a crater on Mars. Present me: exploring the left edge of this hero section." },
@@ -992,7 +1069,8 @@
       speechText.textContent = LINES[idx].text;
       speechEl.classList.add('show');
       clearTimeout(speechTimer);
-      speechTimer = setTimeout(() => speechEl.classList.remove('show'), hold || 5200);
+      beakOpenT = 1;
+      speechTimer = setTimeout(() => { speechEl.classList.remove('show'); beakOpenT = 0; }, hold || 5200);
     }
 
     let hasInteracted = false;
@@ -1061,8 +1139,8 @@
       if (mode === 'held') {
         setNDC(e);
         if (groundAt(0, _p)) {
-          _p.x = THREE.MathUtils.clamp(_p.x, -BOUND_X - 0.6, BOUND_X + 0.6);
-          _p.z = THREE.MathUtils.clamp(_p.z, MIN_Z - 0.4, MAX_Z + 0.6);
+          _p.x = THREE.MathUtils.clamp(_p.x, STAGE.xMin, STAGE.xMax);
+          _p.z = THREE.MathUtils.clamp(_p.z, STAGE.zMin, STAGE.zMax);
           const tp = performance.now();
           const dtm = Math.min(0.1, Math.max(0.008, (tp - lastMoveT) / 1000));
           heldVel.x += ((_p.x - heldWorld.x) / dtm - heldVel.x) * 0.6;
@@ -1160,11 +1238,19 @@
           legR.hip.rotation.x = 0.6 - Math.sin(sf) * 0.5;
           legL.knee.rotation.x = legR.knee.rotation.x = -1.2;
           legL.ankle.rotation.x = legR.ankle.rotation.x = 0.4;
-          if (Math.abs(root.position.x) > BOUND_X + 0.4) {
-            root.position.x = Math.sign(root.position.x) * (BOUND_X + 0.4);
+          // Bounce off all four edges of the visible stage (STAGE, from
+          // computeStage()) so a toss can never carry the duck off-canvas —
+          // a real thrown object rebounds off what contains it instead of
+          // vanishing past the boundary.
+          if (root.position.x < STAGE.xMin || root.position.x > STAGE.xMax) {
+            root.position.x = THREE.MathUtils.clamp(root.position.x, STAGE.xMin, STAGE.xMax);
             vel.x *= -0.45; earWiggle = 1;
           }
-          root.position.z = THREE.MathUtils.clamp(root.position.z, MIN_Z - 0.3, MAX_Z + 0.3);
+          if (root.position.z < STAGE.zMin || root.position.z > STAGE.zMax) {
+            root.position.z = THREE.MathUtils.clamp(root.position.z, STAGE.zMin, STAGE.zMax);
+            vel.z *= -0.45; earWiggle = 1;
+          }
+          if (root.position.y > 2.3) { root.position.y = 2.3; vel.y *= -0.4; }
           if (root.position.y <= 0) {
             root.position.y = 0; mode = 'recover'; modeUntil = now + 1500; dizzy = 1;
             squashT = 0.6; hopV = Math.min(2.2, Math.abs(vel.y) * 0.15); earWiggle = 1.4;
@@ -1233,9 +1319,10 @@
           root.position.x += Math.sin(heading) * speed * dt;
           root.position.z += Math.cos(heading) * speed * dt;
           root.position.y += (0 - root.position.y) * Math.min(1, dt * 8);
-          if (Math.abs(root.position.x) > BOUND_X) { root.position.x = Math.sign(root.position.x) * BOUND_X; newTarget(now); }
-          if (root.position.z < MIN_Z) { root.position.z = MIN_Z; newTarget(now); }
-          if (root.position.z > MAX_Z) { root.position.z = MAX_Z; newTarget(now); }
+          if (root.position.x < STAGE.xMin) { root.position.x = STAGE.xMin; newTarget(now); }
+          if (root.position.x > STAGE.xMax) { root.position.x = STAGE.xMax; newTarget(now); }
+          if (root.position.z < STAGE.zMin) { root.position.z = STAGE.zMin; newTarget(now); }
+          if (root.position.z > STAGE.zMax) { root.position.z = STAGE.zMax; newTarget(now); }
 
           if (target.set) {
             const dx = target.x - root.position.x, dz = target.z - root.position.z;
@@ -1312,6 +1399,12 @@
         const ew = (Math.sin(t * 22) * 0.4 + Math.sin(phase * 2) * 0.15 * stride) * (0.22 + earWiggle);
         earL.rotation.x = 0.3 + ew;
         earR.rotation.x = 0.3 - ew;
+
+        // beak: the hinged lower jaw opens while the speech bubble is up,
+        // with a light chatter flap — the grasping beak is a real, moving part.
+        beakOpen += (beakOpenT - beakOpen) * Math.min(1, dt * 5);
+        const chatter = beakOpen > 0.04 ? Math.max(0, Math.sin(t * 13)) : 0;
+        beakHinge.rotation.x = (0.05 + chatter * 0.34) * beakOpen;
 
         // blink + eye / antenna glow (flickers while dizzy)
         blink -= dt;
