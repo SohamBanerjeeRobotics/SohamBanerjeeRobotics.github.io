@@ -1,0 +1,87 @@
+name: Refresh GitHub stats
+
+# Writes assets/data/github-stats.json so the "Live GitHub Statistics" panel
+# on the site reads a same-origin file instead of calling api.github.com from
+# the visitor's browser (which gets rate-limited on shared/CGNAT IPs).
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # every 6 hours
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'assets/data/github-stats.json'
+      - '.github/workflows/github-stats.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-stats
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build stats JSON
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_USER: SohamBanerjeeRobotics
+        run: |
+          set -euo pipefail
+          api() { curl -sf -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$@"; }
+
+          user_json="$(api "https://api.github.com/users/$GH_USER")"
+          repos="$(echo "$user_json" | jq '.public_repos')"
+          followers="$(echo "$user_json" | jq '.followers')"
+
+          # All owned repos (paginate).
+          all='[]'
+          for p in 1 2 3 4; do
+            page="$(api "https://api.github.com/users/$GH_USER/repos?per_page=100&page=$p&type=owner")"
+            [ "$(echo "$page" | jq 'length')" = "0" ] && break
+            all="$(jq -s '.[0] + .[1]' <(echo "$all") <(echo "$page"))"
+          done
+
+          stars="$(echo "$all" | jq '[.[] | select(.fork | not) | .stargazers_count] | add // 0')"
+          languages="$(echo "$all" | jq -c '
+            [.[] | select(.fork | not) | .language | select(. != null)]
+            | group_by(.) | map({name: .[0], count: length})
+            | sort_by(-.count) | .[0:6]')"
+
+          # Total contributions in the trailing year — sum the per-day tooltip
+          # counts from the public contributions fragment (no auth needed).
+          contrib_html="$(curl -sf "https://github.com/users/$GH_USER/contributions" || true)"
+          contrib="$(printf '%s' "$contrib_html" \
+            | grep -oE '>[0-9,]+ contribution' | grep -oE '[0-9,]+' | tr -d ',' \
+            | awk '{s += $1} END {print s + 0}' || true)"
+          case "$contrib" in ''|*[!0-9]*) contrib=0 ;; esac
+
+          mkdir -p assets/data
+          jq -n \
+            --argjson repos "$repos" \
+            --argjson stars "$stars" \
+            --argjson followers "$followers" \
+            --argjson contributions "$contrib" \
+            --argjson languages "$languages" \
+            --arg generated "$(date -u +%FT%TZ)" \
+            '{generated: $generated, repos: $repos, stars: $stars, followers: $followers, contributions: $contributions, languages: $languages}' \
+            > assets/data/github-stats.json
+
+          cat assets/data/github-stats.json
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/data/github-stats.json
+          if git diff --staged --quiet; then
+            echo "No change."
+          else
+            git commit -m "chore: refresh GitHub stats [skip ci]"
+            git push
+          fi
