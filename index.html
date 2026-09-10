@@ -343,6 +343,24 @@
   .analytics-panel{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:16px; padding:24px; }
   .analytics-panel h4{ font-size:14px; color:var(--mid); font-weight:500; letter-spacing:0.25em; margin-bottom:18px; text-transform:uppercase; }
   .gh-stats-img{ width:100%; border-radius:12px; display:block; }
+  /* Live GitHub panel — numbers pulled from the GitHub API on load, with the
+     server-rendered card as a fallback if the request fails. */
+  .gh-live{ display:flex; flex-direction:column; gap:16px; }
+  .gh-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-soft); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .gh-stat{ background:var(--bg-panel); padding:14px 6px; text-align:center; }
+  .gh-num{ display:block; font-weight:700; color:var(--violet); font-size:1.35rem; line-height:1.1; letter-spacing:-0.02em; }
+  .gh-lbl{ display:block; font-size:9.5px; color:var(--faint); letter-spacing:0.1em; text-transform:uppercase; margin-top:5px; }
+  .gh-langs{ display:flex; gap:3px; height:8px; border-radius:9999px; overflow:hidden; }
+  .gh-langs:empty{ display:none; }
+  .gh-lang{ min-width:0; overflow:hidden; text-indent:-9999px; background:var(--violet-dim); }
+  .gh-lang:nth-child(1){ background:#a78bfa; } .gh-lang:nth-child(2){ background:#38bdf8; }
+  .gh-lang:nth-child(3){ background:#4ade80; } .gh-lang:nth-child(4){ background:#fbbf24; }
+  .gh-lang:nth-child(5){ background:#ec4899; }
+  .gh-legend{ display:flex; flex-wrap:wrap; gap:10px; font-size:11px; color:var(--dim); }
+  .gh-legend span{ display:flex; align-items:center; gap:5px; }
+  .gh-legend i{ width:8px; height:8px; border-radius:2px; display:inline-block; }
+  .gh-caption{ font-size:10px; color:var(--faint); letter-spacing:0.14em; text-transform:uppercase; margin:2px 0 -6px; }
+  .gh-chart{ width:100%; border-radius:10px; display:block; background:var(--border-soft); }
   .radar-wrap{ display:flex; justify-content:center; }
   @media (max-width:760px){ .analytics-row{ grid-template-columns:1fr; } }
 
@@ -377,8 +395,15 @@
   .exp-item ul{ margin:0; padding-left:18px; color:var(--dim); font-size:16px; line-height:1.625; }
   .exp-item ul li{ margin-bottom:6px; }
 
-  .edu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; margin-top:26px; }
-  .edu-card{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:16px; padding:22px; min-height:120px; display:flex; flex-direction:column; justify-content:center; }
+  .edu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin-top:26px; }
+  .edu-card{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:16px; overflow:hidden; display:flex; flex-direction:column; }
+  /* Photo slot at the top of every card — drop a file into
+     assets/images/education/ named as in the <img src> and it shows here;
+     until then the caption placeholder is visible. */
+  .edu-photo{ position:relative; aspect-ratio:16/10; background:var(--border-soft); display:flex; align-items:center; justify-content:center; }
+  .edu-photo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .edu-photo span{ font-size:10px; color:var(--faint); letter-spacing:0.14em; text-transform:uppercase; }
+  .edu-body{ padding:18px 20px; }
   .edu-card h5{ font-size:16px; font-weight:500; color:var(--strong); line-height:1.4; }
   .edu-card .meta{ font-size:13px; color:var(--faint); margin-top:8px; }
   @media (max-width:760px){ .edu-grid{ grid-template-columns:1fr; } }
@@ -561,7 +586,17 @@
     <div class="analytics-row reveal">
       <div class="analytics-panel">
         <h4>Live GitHub Statistics</h4>
-        <img class="gh-stats-img" src="https://github-readme-stats.vercel.app/api?username=SohamBanerjeeRobotics&show_icons=true&theme=dark&bg_color=0d0d10&border_color=2a2a30&title_color=a78bfa&text_color=cfcfd8&icon_color=38bdf8&hide_border=true" alt="Soham Banerjee GitHub stats" loading="lazy">
+        <div class="gh-live" id="ghLive" data-gh-user="SohamBanerjeeRobotics">
+          <div class="gh-grid">
+            <div class="gh-stat"><span class="gh-num" data-gh="repos">···</span><span class="gh-lbl">Repositories</span></div>
+            <div class="gh-stat"><span class="gh-num" data-gh="stars">···</span><span class="gh-lbl">Total Stars</span></div>
+            <div class="gh-stat"><span class="gh-num" data-gh="followers">···</span><span class="gh-lbl">Followers</span></div>
+          </div>
+          <div class="gh-langs" id="ghLangs"></div>
+          <div class="gh-legend" id="ghLegend" hidden></div>
+          <p class="gh-caption">Contribution activity — last 12 months</p>
+          <img class="gh-chart" src="https://ghchart.rshah.org/a78bfa/SohamBanerjeeRobotics" alt="Soham Banerjee — GitHub contribution graph, last year" loading="lazy">
+        </div>
       </div>
       <div class="analytics-panel">
         <h4>Core Capabilities</h4>
@@ -661,23 +696,50 @@
       </div>
     </div>
 
-    <div class="exp-card reveal">
-      <div class="exp-head"><i class="fa-solid fa-users"></i> Leadership</div>
-      <div class="exp-item">
-        <h4>Vice Chairman, IMechE Student Chapter</h4>
-        <div class="meta">IIEST Shibpur · Jul 2024 – Jul 2025</div>
-        <ul>
-          <li>Led and coordinated technical, outreach, and industrial initiatives, including CAD 2.0 and star-gazing sessions</li>
-          <li>Organizing Lead for the SOFE Eastern Region Finals (Oct 2023), overseeing event execution and logistics</li>
-        </ul>
-      </div>
-    </div>
-
+    <!-- Education — each card has a photo slot at the top. Drop images into
+         assets/images/education/ with the filenames used below (see the README
+         there) and they appear automatically. -->
     <div class="edu-grid reveal">
-      <div class="edu-card"><h5>M.Tech, Systems &amp; Control Engineering</h5><div class="meta">IIT Bombay · CPI 9.52 · 2027</div></div>
-      <div class="edu-card"><h5>B.Tech, Mechanical Engineering</h5><div class="meta">IIEST Shibpur · CPI 9.8 · 2025</div></div>
-      <div class="edu-card"><h5>Intermediate (WBCHSE)</h5><div class="meta">Kagram A.N.M High School · 95.20% · 2021</div></div>
-      <div class="edu-card"><h5>Matriculation (WBBSE)</h5><div class="meta">Kagram A.N.M High School · 92.57% · 2019</div></div>
+      <div class="edu-card">
+        <div class="edu-photo">
+          <img src="assets/images/education/iit-bombay.jpg" alt="IIT Bombay" loading="lazy" onerror="this.remove()">
+          <span>Photo coming soon</span>
+        </div>
+        <div class="edu-body">
+          <h5>M.Tech, Systems &amp; Control Engineering</h5>
+          <div class="meta">IIT Bombay · CPI 9.52 · 2027</div>
+        </div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-photo">
+          <img src="assets/images/education/iiest-shibpur.jpg" alt="IIEST Shibpur" loading="lazy" onerror="this.remove()">
+          <span>Photo coming soon</span>
+        </div>
+        <div class="edu-body">
+          <h5>B.Tech, Mechanical Engineering</h5>
+          <div class="meta">IIEST Shibpur · CPI 9.8 · 2025</div>
+        </div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-photo">
+          <img src="assets/images/education/kagram-highschool.jpg" alt="Kagram A.N.M High School" loading="lazy" onerror="this.remove()">
+          <span>Photo coming soon</span>
+        </div>
+        <div class="edu-body">
+          <h5>Intermediate (WBCHSE)</h5>
+          <div class="meta">Kagram A.N.M High School · 95.20% · 2021</div>
+        </div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-photo">
+          <img src="assets/images/education/kagram-highschool.jpg" alt="Kagram A.N.M High School" loading="lazy" onerror="this.remove()">
+          <span>Photo coming soon</span>
+        </div>
+        <div class="edu-body">
+          <h5>Matriculation (WBBSE)</h5>
+          <div class="meta">Kagram A.N.M High School · 92.57% · 2019</div>
+        </div>
+      </div>
     </div>
 
     <div class="ach-panel reveal">
@@ -1573,6 +1635,62 @@
       el.addEventListener('mouseenter', () => ring.classList.add('hover'));
       el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
     });
+  })();
+</script>
+
+<script>
+  // Live GitHub statistics — pulls real numbers from the public GitHub API on
+  // each visit (the visitor's browser has its own 60 req/hr unauthenticated
+  // budget). If anything fails, the panel falls back to the server-rendered
+  // stats card so it never shows a broken state.
+  (function initGitHubStats(){
+    const root = document.getElementById('ghLive');
+    if (!root) return;
+    const user = root.dataset.ghUser;
+    const set = (k, v) => { const el = root.querySelector(`[data-gh="${k}"]`); if (el) el.textContent = v; };
+    const nice = n => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n);
+    const LANG_COLORS = { '1': '#a78bfa', '2': '#38bdf8', '3': '#4ade80', '4': '#fbbf24', '5': '#ec4899' };
+
+    function fallback(){
+      root.innerHTML = '<img class="gh-stats-img" src="https://github-readme-stats.vercel.app/api?username=' + user +
+        '&show_icons=true&theme=dark&bg_color=0d0d10&border_color=2a2a30&title_color=a78bfa&text_color=cfcfd8&icon_color=38bdf8&hide_border=true" ' +
+        'alt="' + user + ' GitHub stats" loading="lazy">';
+    }
+
+    (async function run(){
+      let u, repos = [];
+      try {
+        const uRes = await fetch('https://api.github.com/users/' + user);
+        if (!uRes.ok) throw new Error('user ' + uRes.status);
+        u = await uRes.json();
+      } catch (e) { fallback(); return; }
+
+      set('repos', nice(u.public_repos || 0));
+      set('followers', nice(u.followers || 0));
+
+      try {
+        const rRes = await fetch('https://api.github.com/users/' + user + '/repos?per_page=100&sort=pushed');
+        if (rRes.ok) repos = await rRes.json();
+      } catch (e) { /* stars/langs just stay quiet */ }
+
+      const own = Array.isArray(repos) ? repos.filter(r => !r.fork) : [];
+      set('stars', nice(own.reduce((s, r) => s + (r.stargazers_count || 0), 0)));
+
+      // Language mix bar from repo primary languages.
+      const langs = {};
+      own.forEach(r => { if (r.language) langs[r.language] = (langs[r.language] || 0) + 1; });
+      const top = Object.entries(langs).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const bar = document.getElementById('ghLangs');
+      const legend = document.getElementById('ghLegend');
+      if (bar && top.length) {
+        bar.innerHTML = top.map(([l, n]) => `<span class="gh-lang" style="flex:${n}">${l}</span>`).join('');
+        if (legend) {
+          legend.hidden = false;
+          legend.innerHTML = top.map(([l], i) =>
+            `<span><i style="background:${LANG_COLORS[String(i + 1)]}"></i>${l}</span>`).join('');
+        }
+      }
+    })();
   })();
 </script>
 
