@@ -743,6 +743,7 @@
       <a href="https://medium.com/@banerjeesohamrobotics" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-medium"></i></a>
     </div>
     <div class="footer-copy">© <span id="year"></span> Soham Banerjee. Built with HTML, CSS, JS &amp; Three.js.</div>
+    <div class="footer-copy">Hero "Raspberry Pi" 3D model by <a href="https://sketchfab.com/Aleksander2019" target="_blank" rel="noopener noreferrer">Aleksander Buzlaev</a>, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>.</div>
   </div>
 </footer>
 
@@ -823,15 +824,18 @@
     svg.appendChild(shape);
   })();
 
-  // Hero centrepiece: a Raspberry Pi single-board computer, modeled from
-  // three.js primitives (PCB, USB/Ethernet/HDMI/USB-C ports, 40-pin GPIO
-  // header, SoC + RAM dies, microSD card) with a hand-drawn silkscreen
-  // texture on top. It rotates slowly in place and tilts gently toward the
-  // cursor, sized and framed to match arkamahajan.in's reference hero.
+  // Hero centrepiece: a real photogrammetry-textured Raspberry Pi model
+  // ("Raspberry Pi" by Aleksander Buzlaev, sketchfab.com/Aleksander2019,
+  // CC BY 4.0 — see the credit line in the footer), loaded via GLTFLoader
+  // in place of the old hand-built primitive version. It rotates slowly in
+  // place and tilts gently toward the cursor, framed to roughly match
+  // arkamahajan.in's reference hero but sized down a bit smaller.
 </script>
 
 <script type="module">
   import * as THREE from 'three';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
   const canvas = document.getElementById('pcbCanvas');
   const hero = document.querySelector('.hero');
@@ -842,9 +846,16 @@
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+
+    // Soft studio environment map so the board's metal ports/shielding and
+    // plastic connectors pick up realistic reflections instead of reading flat.
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
     // The board is centred in the hero and framed large, like the reference —
     // camera distance flexes with aspect ratio so it keeps roughly the same
@@ -866,7 +877,7 @@
 
     // ---- Lighting (violet key + sky fill, matches the site palette) ----------
     const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
-    const ambient = new THREE.AmbientLight(0xccccff, 0.95);
+    const ambient = new THREE.AmbientLight(0xccccff, 0.7);
     scene.add(ambient);
     const key = new THREE.DirectionalLight(0xffffff, 2.1);
     key.position.set(3, 6, 4);
@@ -878,210 +889,34 @@
     fill.position.set(4, -1, 5);
     scene.add(fill);
     function syncTheme() {
-      ambient.intensity = isLight() ? 1.65 : 0.95;
+      ambient.intensity = isLight() ? 1.2 : 0.7;
       key.intensity = isLight() ? 2.4 : 2.1;
     }
     syncTheme();
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-    // ---- Materials --------------------------------------------------------
-    const matPCB = new THREE.MeshStandardMaterial({ color: 0x1b6b3d, roughness: 0.55, metalness: 0.1 });
-    const matGold = new THREE.MeshStandardMaterial({ color: 0xd8b24a, roughness: 0.32, metalness: 0.85 });
-    const matPort = new THREE.MeshStandardMaterial({ color: 0xc9cdd3, roughness: 0.32, metalness: 0.8 });
-    const matPortDark = new THREE.MeshStandardMaterial({ color: 0x161418, roughness: 0.5, metalness: 0.4 });
-    const matUSB3 = new THREE.MeshStandardMaterial({ color: 0x2a5fb0, roughness: 0.35, metalness: 0.6 });
-    const matChip = new THREE.MeshStandardMaterial({ color: 0x0c0c10, roughness: 0.4, metalness: 0.4 });
-    const matChipLabel = new THREE.MeshStandardMaterial({ color: 0x1c1c22, roughness: 0.35, metalness: 0.55 });
-    const matPlastic = new THREE.MeshStandardMaterial({ color: 0x19191d, roughness: 0.6, metalness: 0.1 });
-    const matCap = new THREE.MeshStandardMaterial({ color: 0xe8d9a0, roughness: 0.4, metalness: 0.3 });
-    const matLedG = new THREE.MeshStandardMaterial({ color: 0x37ff8b, emissive: 0x1fbf5f, emissiveIntensity: 1.3, roughness: 0.4 });
-    const matLedR = new THREE.MeshStandardMaterial({ color: 0xff5544, emissive: 0xbf2318, emissiveIntensity: 1.1, roughness: 0.4 });
-    const matSD = new THREE.MeshStandardMaterial({ color: 0x0e0e12, roughness: 0.5, metalness: 0.3 });
-
-    const B = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-
-    // ---- Build the Raspberry Pi ---------------------------------------------
-    // pi(spin + cursor tilt) > board(extruded rounded PCB with mounting holes)
-    //   + silkscreen overlay + ports + GPIO header (40 instanced pins) + SoC/RAM
-    //   dies + crystal + caps + status LEDs + microSD card.
-    const pi = new THREE.Group();
-
-    const BW = 1.7, BD = 1.12; // board width (x) / depth (z), Pi-4-ish 85:56 ratio
-
-    function roundedRectShape(w, d, r) {
-      const s = new THREE.Shape();
-      const x = -w / 2, y = -d / 2;
-      s.moveTo(x + r, y);
-      s.lineTo(x + w - r, y);
-      s.quadraticCurveTo(x + w, y, x + w, y + r);
-      s.lineTo(x + w, y + d - r);
-      s.quadraticCurveTo(x + w, y + d, x + w - r, y + d);
-      s.lineTo(x + r, y + d);
-      s.quadraticCurveTo(x, y + d, x, y + d - r);
-      s.lineTo(x, y + r);
-      s.quadraticCurveTo(x, y, x + r, y);
-      return s;
-    }
-    const boardShape = roundedRectShape(BW, BD, 0.09);
-    const holeR = 0.026;
-    [[-BW / 2 + 0.11, -BD / 2 + 0.11], [BW / 2 - 0.11, -BD / 2 + 0.11],
-     [-BW / 2 + 0.11, BD / 2 - 0.11], [BW / 2 - 0.11, BD / 2 - 0.11]].forEach(([hx, hy]) => {
-      const hole = new THREE.Path();
-      hole.absellipse(hx, hy, holeR, holeR, 0, Math.PI * 2, false, 0);
-      boardShape.holes.push(hole);
-    });
-    const boardGeo = new THREE.ExtrudeGeometry(boardShape, {
-      depth: 0.075, bevelEnabled: true, bevelThickness: 0.006, bevelSize: 0.008, bevelSegments: 2, curveSegments: 14
-    });
-    boardGeo.rotateX(-Math.PI / 2);
-    boardGeo.computeBoundingBox();
-    const boardH = boardGeo.boundingBox.max.y - boardGeo.boundingBox.min.y;
-    boardGeo.translate(0, -boardGeo.boundingBox.min.y, 0); // sit flat, extend upward from y=0
-    const board = new THREE.Mesh(boardGeo, matPCB);
-    pi.add(board);
-
-    // Silkscreen / copper-trace overlay, drawn to a canvas so the board reads
-    // as a real PCB rather than a flat green slab.
-    function buildSilkscreen() {
-      const cw = 1024, ch = Math.round(cw * (BD / BW));
-      const cnv = document.createElement('canvas');
-      cnv.width = cw; cnv.height = ch;
-      const g = cnv.getContext('2d');
-      g.clearRect(0, 0, cw, ch);
-      const mx = cw * 0.03, my = ch * 0.04;
-
-      // faint copper traces
-      g.strokeStyle = 'rgba(210,180,90,0.35)';
-      g.lineWidth = 2;
-      for (let i = 0; i < 10; i++) {
-        g.beginPath();
-        const y = my + (ch - 2 * my) * (i / 9);
-        g.moveTo(mx + 40, y);
-        g.lineTo(mx + 40 + (cw * 0.22) * Math.sin(i), y);
-        g.stroke();
-      }
-      // white silkscreen labels
-      g.fillStyle = 'rgba(255,255,255,0.85)';
-      g.font = `bold ${Math.round(ch * 0.052)}px Arial`;
-      g.fillText('RASPBERRY PI 4 MODEL B', cw * 0.30, ch * 0.16);
-      g.font = `${Math.round(ch * 0.032)}px Arial`;
-      g.fillStyle = 'rgba(255,255,255,0.55)';
-      g.fillText('MADE IN UK', cw * 0.30, ch * 0.24);
-      // pin-1 marker + header outline
-      g.strokeStyle = 'rgba(255,255,255,0.4)';
-      g.lineWidth = 2;
-      g.strokeRect(cw * 0.06, ch * 0.06, cw * 0.60, ch * 0.10);
-      g.fillStyle = 'rgba(255,255,255,0.6)';
-      g.beginPath(); g.arc(cw * 0.065, ch * 0.065, 4, 0, Math.PI * 2); g.fill();
-      // SoC outline + text
-      g.strokeStyle = 'rgba(255,255,255,0.25)';
-      g.strokeRect(cw * 0.38, ch * 0.40, cw * 0.20, ch * 0.20);
-      g.fillStyle = 'rgba(255,255,255,0.4)';
-      g.font = `${Math.round(ch * 0.024)}px monospace`;
-      g.fillText('BCM', cw * 0.42, ch * 0.47);
-
-      const tex = new THREE.CanvasTexture(cnv);
-      tex.colorSpace = THREE.SRGBColorSpace;
-      return tex;
-    }
-    const silk = new THREE.Mesh(
-      new THREE.PlaneGeometry(BW - 0.05, BD - 0.05),
-      new THREE.MeshStandardMaterial({ map: buildSilkscreen(), transparent: true, roughness: 0.5, side: THREE.DoubleSide })
-    );
-    silk.rotation.x = -Math.PI / 2;
-    silk.position.y = boardH + 0.001;
-    pi.add(silk);
-
-    // ---- GPIO header — 40 gold pins (2x20) on a black plastic base ----------
-    const gpio = new THREE.Group();
-    const GPIO_LEN = BW * 0.6, GPIO_Z = -BD / 2 + 0.09;
-    const gpioBase = B(GPIO_LEN, 0.05, 0.11, matPlastic);
-    gpioBase.position.set(-BW / 2 + 0.14 + GPIO_LEN / 2, boardH + 0.025, GPIO_Z);
-    gpio.add(gpioBase);
-    const pinGeo = new THREE.BoxGeometry(0.014, 0.07, 0.014);
-    const pinMesh = new THREE.InstancedMesh(pinGeo, matGold, 40);
-    const pinM = new THREE.Matrix4();
-    let pinIdx = 0;
-    for (let row = 0; row < 2; row++) {
-      for (let col = 0; col < 20; col++) {
-        const x = -BW / 2 + 0.14 + col * (GPIO_LEN / 19);
-        const z = GPIO_Z - 0.028 + row * 0.056;
-        pinM.makeTranslation(x, boardH + 0.06, z);
-        pinMesh.setMatrixAt(pinIdx++, pinM);
-      }
-    }
-    gpio.add(pinMesh);
-    pi.add(gpio);
-
-    // ---- Right edge: Ethernet + stacked USB ports, protruding past the edge -
-    const rightX = BW / 2;
-    const eth = B(0.16, 0.17, 0.22, matPort);
-    eth.position.set(rightX + 0.03, boardH + 0.085, BD / 2 - 0.16);
-    pi.add(eth);
-
-    [0, 1].forEach((i) => {
-      const mat = i === 1 ? matUSB3 : matPort;
-      const usb = B(0.16, 0.15, 0.17, mat);
-      usb.position.set(rightX + 0.03, boardH + 0.08, BD / 2 - 0.16 - 0.30 - i * 0.20);
-      pi.add(usb);
-    });
-
-    // ---- Left edge: microSD card, half-inserted -----------------------------
-    const sd = B(0.12, 0.02, 0.14, matSD);
-    sd.position.set(-BW / 2 - 0.05, boardH * 0.35, -BD / 2 + 0.2);
-    pi.add(sd);
-
-    // ---- Front edge: USB-C power, 2x micro-HDMI, audio jack -----------------
-    const frontZ = BD / 2;
-    const usbC = B(0.13, 0.05, 0.09, matPort);
-    usbC.position.set(-BW / 2 + 0.16, boardH + 0.03, frontZ + 0.02);
-    pi.add(usbC);
-    [0, 1].forEach((i) => {
-      const hdmi = B(0.1, 0.045, 0.08, matPortDark);
-      hdmi.position.set(-BW / 2 + 0.42 + i * 0.16, boardH + 0.026, frontZ + 0.015);
-      pi.add(hdmi);
-    });
-    const jack = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.09, 16), matPlastic);
-    jack.rotation.x = Math.PI / 2;
-    jack.position.set(-BW / 2 + 0.85, boardH + 0.035, frontZ + 0.02);
-    pi.add(jack);
-
-    // ---- SoC, RAM, crystal, caps, status LEDs -------------------------------
-    const soc = B(0.26, 0.045, 0.26, matChip);
-    soc.position.set(0.02, boardH + 0.0225, -0.02);
-    pi.add(soc);
-    const socLabel = B(0.2, 0.001, 0.2, matChipLabel);
-    socLabel.position.set(0.02, boardH + 0.046, -0.02);
-    pi.add(socLabel);
-
-    const ram = B(0.16, 0.03, 0.14, matChip);
-    ram.position.set(-0.28, boardH + 0.015, 0.1);
-    pi.add(ram);
-
-    const crystal = B(0.05, 0.035, 0.035, matPort);
-    crystal.position.set(0.32, boardH + 0.0175, 0.24);
-    pi.add(crystal);
-
-    [[0.14, 0.3], [0.14, 0.36], [-0.05, 0.36]].forEach(([x, z]) => {
-      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.045, 14), matCap);
-      cap.position.set(x, boardH + 0.0225, z);
-      pi.add(cap);
-    });
-
-    const ledG = B(0.03, 0.012, 0.03, matLedG);
-    ledG.position.set(-BW / 2 + 0.16, boardH + 0.006, -BD / 2 + 0.28);
-    pi.add(ledG);
-    const ledR = B(0.03, 0.012, 0.03, matLedR);
-    ledR.position.set(-BW / 2 + 0.16, boardH + 0.006, -BD / 2 + 0.34);
-    pi.add(ledR);
-
-    // Rest the whole board so it's vertically centred on its own thickness
-    // rather than sitting on y=0, then lift/tilt it into the hero's frame.
-    pi.position.y = -boardH / 2;
+    // ---- Load the Raspberry Pi model -----------------------------------------
     const rig = new THREE.Group();
-    rig.add(pi);
-    rig.scale.setScalar(1.75); // fill the hero the way the reference board does
     scene.add(rig);
+
+    new GLTFLoader().load('assets/models/raspberry_pi.glb', (gltf) => {
+      const model = gltf.scene;
+
+      // Normalize to a fixed on-screen footprint regardless of the source
+      // model's native scale, then trim it down a little so it reads as a
+      // detail piece in the hero rather than dominating it.
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const TARGET_SIZE = 1.05, SHRINK = 0.85;
+      const scale = (TARGET_SIZE / Math.max(size.x, size.y, size.z)) * SHRINK;
+      model.scale.setScalar(scale);
+      // Nudge it down from dead-centre so it sits below the headline/tagline
+      // instead of covering them.
+      model.position.set(-center.x * scale, -center.y * scale - 0.4, -center.z * scale);
+
+      rig.add(model);
+    }, undefined, (err) => console.error('Raspberry Pi model failed to load', err));
 
     const BASE_TILT_X = 0.32; // lean back so the top face + front edge both read clearly
 
