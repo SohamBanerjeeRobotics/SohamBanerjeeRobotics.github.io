@@ -100,43 +100,41 @@
       radial-gradient(circle 720px at 50% 53%, var(--glow-2), transparent 66%),
       radial-gradient(ellipse 1000px 760px at 50% 50%, var(--glow-3), transparent 72%);
   }
-  /* Desk-lamp theme toggle — fixed to the bottom-right corner so it rides
-     along on scroll, like the reference. The lamp is "lit" in light mode and
-     dark in dark mode; a small pill above it names the current theme. */
+  /* Theme toggle — fixed to the bottom-right corner so it rides along on
+     scroll, like the reference. Icon is Lucide's "lamp" (ISC license,
+     lucide.dev) recoloured/animated to read as lit in light mode and off
+     in dark mode; a small pill above it names the current theme. */
   .lamp-toggle{
-    position:fixed; right:52px; bottom:22px; z-index:60;
-    width:150px; height:168px; cursor:pointer;
+    position:fixed; right:36px; bottom:26px; z-index:60;
+    width:64px; height:84px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
     background:none; border:none; padding:0; color:inherit;
     -webkit-tap-highlight-color:transparent;
   }
   .lamp-toggle:focus-visible{ outline:2px solid var(--violet); outline-offset:6px; border-radius:12px; }
   .lamp-label{
-    position:absolute; top:0; left:50%; transform:translateX(-50%); white-space:nowrap;
+    white-space:nowrap; order:-1;
     font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--text);
     background:rgba(0,0,0,0.55); border:1px solid var(--border); border-radius:9999px;
     padding:4px 11px; backdrop-filter:blur(6px); opacity:.85; pointer-events:none;
     transition:opacity .3s ease;
   }
   :root[data-theme="light"] .lamp-label{ background:rgba(255,255,255,0.7); }
-  .lamp-toggle svg{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:138px; height:150px; overflow:visible; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
-  /* Lamp parts settle from "reaching down / lit" to "upright / dark".
-     view-box transform-box lets the origins be real lamp joints. */
-  .lamp-head{ transform-box:view-box; transform-origin:52px 112px; transition:transform .5s cubic-bezier(.34,1.4,.5,1); }
-  .lamp-glow{ transition:opacity .45s ease; }
-  .lamp-beam{ transition:opacity .45s ease; }
-  .lamp-bulb{ transition:fill .45s ease, filter .45s ease; }
-  /* dark mode = lamp off, whole rod+shade a touch more upright */
-  .lamp-glow, .lamp-beam{ opacity:0; }
-  .lamp-head{ transform:rotate(8deg); }
-  .lamp-bulb{ fill:var(--faint); }
-  /* light mode = lamp on, reaching down over the page */
-  :root[data-theme="light"] .lamp-glow{ opacity:.9; }
-  :root[data-theme="light"] .lamp-beam{ opacity:1; }
-  :root[data-theme="light"] .lamp-head{ transform:rotate(0deg); }
-  :root[data-theme="light"] .lamp-bulb{ fill:#ffe9a8; filter:drop-shadow(0 0 6px #ffd873); }
+  .lamp-toggle svg{
+    width:44px; height:44px; overflow:visible;
+    stroke:var(--dim); transition:stroke .4s ease, transform .35s ease;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+  }
+  .lamp-glow{ opacity:0; transition:opacity .45s ease; }
+  /* dark mode = off, plain outline */
+  /* light mode = lit: warm stroke + soft glow behind the shade */
+  :root[data-theme="light"] .lamp-toggle svg{ stroke:#f5b93d; transform:scale(1.06); }
+  :root[data-theme="light"] .lamp-glow{ opacity:.85; }
+  .lamp-toggle:hover svg{ stroke:var(--violet); }
+  :root[data-theme="light"] .lamp-toggle:hover svg{ stroke:#f5b93d; }
   @media (max-width: 560px){
-    .lamp-toggle{ right:8px; bottom:8px; width:92px; height:104px; }
-    .lamp-toggle svg{ width:84px; height:92px; }
+    .lamp-toggle{ right:14px; bottom:14px; width:52px; height:52px; }
+    .lamp-toggle svg{ width:36px; height:36px; }
     .lamp-label{ display:none; }
   }
   ::selection{ background:var(--violet-dim); color:var(--text); }
@@ -513,71 +511,20 @@
 <!-- Desk-lamp light/dark toggle, fixed to the bottom-right corner. -->
 <button class="lamp-toggle" id="themeToggle" aria-label="Toggle light and dark theme" title="Toggle light / dark theme">
   <span class="lamp-label" id="lampLabel">Dark Mode</span>
-  <svg viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <!-- Icon: Lucide "lamp" (https://lucide.dev, ISC license). -->
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+       stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
-      <radialGradient id="lampGlow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#ffe6a0" stop-opacity="0.95"/>
-        <stop offset="55%" stop-color="#ffd166" stop-opacity="0.35"/>
+      <radialGradient id="lampGlow" cx="50%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#ffe6a0" stop-opacity="0.9"/>
+        <stop offset="60%" stop-color="#ffd166" stop-opacity="0.3"/>
         <stop offset="100%" stop-color="#ffd166" stop-opacity="0"/>
       </radialGradient>
-      <linearGradient id="lampBeam" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ffe6a0" stop-opacity="0.5"/>
-        <stop offset="100%" stop-color="#ffe6a0" stop-opacity="0"/>
-      </linearGradient>
-      <!-- Brushed-metal gradients: a light-from-upper-left highlight band
-           sliding down into a darker core and a shadowed lower edge, so the
-           lamp reads as machined metal instead of flat grey shapes. -->
-      <linearGradient id="metalRod" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#a4a4b6"/>
-        <stop offset="42%" stop-color="#6a6a79"/>
-        <stop offset="100%" stop-color="#333339"/>
-      </linearGradient>
-      <linearGradient id="metalHead" x1="0.1" y1="0" x2="0.9" y2="1">
-        <stop offset="0%" stop-color="#b4b4c4"/>
-        <stop offset="45%" stop-color="#7c7c8d"/>
-        <stop offset="100%" stop-color="#404049"/>
-      </linearGradient>
-      <linearGradient id="metalHeadUnder" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#5a5a67"/>
-        <stop offset="100%" stop-color="#2c2c33"/>
-      </linearGradient>
-      <linearGradient id="metalBase" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#5c5c6c"/>
-        <stop offset="100%" stop-color="#28282e"/>
-      </linearGradient>
-      <radialGradient id="jointShine" cx="32%" cy="28%" r="75%">
-        <stop offset="0%" stop-color="#d8d8e6"/>
-        <stop offset="45%" stop-color="#87879a"/>
-        <stop offset="100%" stop-color="#404048"/>
-      </radialGradient>
-      <radialGradient id="baseShine" cx="38%" cy="32%" r="80%">
-        <stop offset="0%" stop-color="#8c8c9c"/>
-        <stop offset="60%" stop-color="#55555f"/>
-        <stop offset="100%" stop-color="#2a2a30"/>
-      </radialGradient>
     </defs>
-    <g stroke="#9a9aab" stroke-width="0.6" stroke-linejoin="round">
-      <!-- base: a flat oval foot with a small power-button dimple -->
-      <ellipse cx="54" cy="118" rx="27" ry="7" fill="url(#baseShine)"/>
-      <circle cx="54" cy="116" r="2" fill="url(#jointShine)" stroke="none"/>
-      <!-- trailing power cord, curling off to a plug -->
-      <path d="M76 120 C 90 123, 89 116, 98 122" fill="none" stroke="url(#metalRod)" stroke-width="2" stroke-linecap="round"/>
-      <rect x="95" y="120" width="7" height="5.5" rx="1.2" fill="url(#metalBase)"/>
-      <!-- single straight rod + conical shade, tilts upright together in dark mode -->
-      <g class="lamp-head">
-        <path d="M52 112 L30 34" fill="none" stroke="url(#metalRod)" stroke-width="5" stroke-linecap="round"/>
-        <path d="M32 18 L50 26 L38 44 L16 38 Z" fill="url(#metalHead)"/>
-        <path d="M16 38 L38 44 L33 50 L14 44 Z" fill="url(#metalHeadUnder)"/>
-        <path d="M33 20 L42 24 L37 31 L29 27 Z" fill="#fff" opacity="0.35" stroke="none"/>
-        <!-- pull cord -->
-        <path d="M25 41 L23 53" fill="none" stroke="#9a9aab" stroke-width="1"/>
-        <circle cx="23" cy="54.5" r="1.8" fill="url(#jointShine)" stroke="none"/>
-        <ellipse cx="25" cy="41" rx="10" ry="4" fill="#232328" stroke="none" transform="rotate(20 25 41)"/>
-        <circle class="lamp-bulb" cx="25" cy="41" r="4.2" stroke="none"/>
-        <path class="lamp-beam" d="M18 40 L33 46 L16 110 L-16 94 Z" fill="url(#lampBeam)" stroke="none"/>
-        <circle class="lamp-glow" cx="25" cy="42" r="16" fill="url(#lampGlow)" stroke="none"/>
-      </g>
-    </g>
+    <circle class="lamp-glow" cx="12" cy="8" r="10" fill="url(#lampGlow)" stroke="none"/>
+    <path d="M12 12v6"/>
+    <path d="M4.077 10.615A1 1 0 0 0 5 12h14a1 1 0 0 0 .923-1.385l-3.077-7.384A2 2 0 0 0 15 2H9a2 2 0 0 0-1.846 1.23Z"/>
+    <path d="M8 20a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1z"/>
   </svg>
 </button>
 
@@ -937,7 +884,7 @@
     renderer.toneMappingExposure = 1.1;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
 
     // Soft studio environment map so the board's metal ports/shielding and
     // plastic connectors pick up realistic reflections instead of reading flat.
@@ -952,13 +899,16 @@
       renderer.setSize(w, h, false);
       const a = w / h;
       camera.aspect = a;
-      let dist = 4.1, lookY = -0.05;
-      if (a < 1.5) { dist = 4.5; }
-      if (a < 1.2) { dist = 4.9; lookY = -0.02; }
-      if (a < 0.9) { dist = 5.6; lookY = 0.05; }
-      if (h < 640) { dist += (1 - h / 640) * 1.3; }
-      camera.position.set(0, 0.7, dist);
-      camera.lookAt(0, lookY, 0);
+      // Matches arkamahajan.in's own <Canvas camera={{position:[0,0,7],fov:45}}> —
+      // same fov, camera sits level with the model (no elevation), and distance
+      // only flexes for narrower/shorter viewports so nothing gets clipped.
+      let dist = 7;
+      if (a < 1.5) { dist = 7.6; }
+      if (a < 1.2) { dist = 8.3; }
+      if (a < 0.9) { dist = 9.4; }
+      if (h < 640) { dist += (1 - h / 640) * 2.2; }
+      camera.position.set(0, 0, dist);
+      camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
     }
 
@@ -995,12 +945,13 @@
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
-      const TARGET_SIZE = 2.2, SHRINK = 1;
-      const scale = (TARGET_SIZE / Math.max(size.x, size.y, size.z)) * SHRINK;
+      // TARGET_SIZE matches arkamahajan.in's own board scale relative to its
+      // camera frustum (their raw model at group scale 0.5, our board's
+      // largest raw dimension is the same 8.64 units, so 8.64*0.5 = 4.32).
+      const TARGET_SIZE = 4.32;
+      const scale = TARGET_SIZE / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
-      // Sit close to dead-centre so it wraps around the headline/tagline,
-      // like the reference, instead of sitting apart below them.
-      model.position.set(-center.x * scale, -center.y * scale - 0.16, -center.z * scale);
+      model.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
 
       rig.add(model);
       window.__boot && window.__boot.setProgress(100);
@@ -1017,38 +968,26 @@
       window.__boot && window.__boot.setProgress(100);
     });
 
-    const BASE_TILT_X = 0.14; // shallow, more side-on lean like the reference, less top-down
-
-    // ---- Pointer parallax — a light tilt toward the cursor, no physics ------
-    let targetTiltX = 0, targetTiltZ = 0, tiltX = 0, tiltZ = 0;
-    hero.addEventListener('pointermove', (e) => {
-      const r = hero.getBoundingClientRect();
-      const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
-      const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
-      targetTiltZ = -nx * 0.14;
-      targetTiltX = ny * 0.1;
-    });
-    hero.addEventListener('pointerleave', () => { targetTiltX = 0; targetTiltZ = 0; });
-
     // ---- Resize + render loop ------------------------------------------------
     resize();
     window.addEventListener('resize', resize);
     if (window.ResizeObserver) new ResizeObserver(resize).observe(hero);
 
-    let last = performance.now();
+    const start = performance.now();
     function frame(now) {
       requestAnimationFrame(frame);
-      const dt = Math.min(0.05, (now - last) / 1000 || 0);
-      last = now;
 
       if (!reduceMotion) {
-        rig.rotation.y += dt * 0.22; // slow continuous turntable spin
+        // Same bounded sway as arkamahajan.in's useFrame — sine oscillations
+        // on all three axes, not a full turntable spin, so the board settles
+        // into a consistent "mostly facing camera" angle instead of ever
+        // presenting edge-on (which is what caused the old clipping).
+        const t = (now - start) / 1000;
+        rig.rotation.y = Math.sin(t / 2) * 0.5;
+        rig.rotation.x = Math.sin(t / 3) * 0.2 + 0.5;
+        rig.rotation.z = Math.sin(t / 4) * 0.1;
+        rig.position.y = Math.sin(t * 0.9) * 0.04;
       }
-      tiltX += (targetTiltX - tiltX) * Math.min(1, dt * 3.5);
-      tiltZ += (targetTiltZ - tiltZ) * Math.min(1, dt * 3.5);
-      rig.rotation.x = BASE_TILT_X + tiltX;
-      rig.rotation.z = tiltZ;
-      rig.position.y = reduceMotion ? 0 : Math.sin(now * 0.00065) * 0.05;
 
       renderer.render(scene, camera);
     }
