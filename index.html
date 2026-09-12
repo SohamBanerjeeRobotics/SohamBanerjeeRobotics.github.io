@@ -218,6 +218,11 @@
   .btn{
     font-family:'Inter',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.1em;
     padding:14px 32px; border-radius:9999px; transition:all .25s; display:inline-flex; align-items:center; gap:8px;
+    /* Same low-opacity fills as the reference, but they only read as solid
+       over the busy hero because the backdrop itself gets blurred first —
+       without this the button background is basically invisible against
+       the board's fine detail. */
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
   }
   .btn.outline{ color:var(--text); background:var(--bg-panel); border:1px solid rgba(255,255,255,0.2); }
   :root[data-theme="light"] .btn.outline{ border-color:rgba(0,0,0,0.15); }
@@ -869,7 +874,7 @@
 <script type="module">
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+  import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
   const canvas = document.getElementById('pcbCanvas');
   const hero = document.querySelector('.hero');
@@ -886,10 +891,21 @@
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
 
-    // Soft studio environment map so the board's metal ports/shielding and
-    // plastic connectors pick up realistic reflections instead of reading flat.
+    // Real HDRI environment — the same one arkamahajan.in uses (drei's "city"
+    // preset is this exact Poly Haven CC0 file, redistributed via
+    // pmndrs/drei-assets). This is what actually makes the metal shield and
+    // rough-metal parts shine correctly: they're barely lit by point/direct
+    // lights at all (real metal has almost no diffuse response), so their
+    // brightness comes overwhelmingly from what the environment reflects —
+    // a flat procedural room stayed dim, a real photographed environment
+    // with a bright sky direction does not.
     const pmrem = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    new RGBELoader().load('assets/models/potsdamer_platz_1k.hdr', (hdrTex) => {
+      const envMap = pmrem.fromEquirectangular(hdrTex).texture;
+      scene.environment = envMap;
+      hdrTex.dispose();
+      pmrem.dispose();
+    });
 
     // The board is centred in the hero and framed large, like the reference —
     // camera distance flexes with aspect ratio so it keeps roughly the same
