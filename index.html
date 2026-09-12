@@ -121,20 +121,17 @@
   .lamp-toggle svg{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:138px; height:150px; overflow:visible; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
   /* Lamp parts settle from "reaching down / lit" to "upright / dark".
      view-box transform-box lets the origins be real lamp joints. */
-  .lamp-head{ transform-box:view-box; transform-origin:68px 36px; transition:transform .5s cubic-bezier(.34,1.4,.5,1); }
-  .lamp-arm-upper{ transform-box:view-box; transform-origin:45px 66px; transition:transform .5s cubic-bezier(.34,1.4,.5,1); }
+  .lamp-head{ transform-box:view-box; transform-origin:52px 112px; transition:transform .5s cubic-bezier(.34,1.4,.5,1); }
   .lamp-glow{ transition:opacity .45s ease; }
   .lamp-beam{ transition:opacity .45s ease; }
   .lamp-bulb{ transition:fill .45s ease, filter .45s ease; }
-  /* dark mode = lamp off, arm a touch more upright */
+  /* dark mode = lamp off, whole rod+shade a touch more upright */
   .lamp-glow, .lamp-beam{ opacity:0; }
-  .lamp-arm-upper{ transform:rotate(7deg); }
-  .lamp-head{ transform:rotate(9deg); }
+  .lamp-head{ transform:rotate(8deg); }
   .lamp-bulb{ fill:var(--faint); }
   /* light mode = lamp on, reaching down over the page */
   :root[data-theme="light"] .lamp-glow{ opacity:.9; }
   :root[data-theme="light"] .lamp-beam{ opacity:1; }
-  :root[data-theme="light"] .lamp-arm-upper{ transform:rotate(0deg); }
   :root[data-theme="light"] .lamp-head{ transform:rotate(0deg); }
   :root[data-theme="light"] .lamp-bulb{ fill:#ffe9a8; filter:drop-shadow(0 0 6px #ffd873); }
   @media (max-width: 560px){
@@ -204,9 +201,9 @@
 
   /* HERO — height leaves room for the sticky header so the whole hero,
      scroll cue included, sits inside the first screenful. */
-  .hero{ position:relative; min-height:calc(100vh - 76px + 20vh); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .hero{ position:relative; min-height:calc(100vh - 76px); display:flex; align-items:center; justify-content:center; overflow:hidden; }
   #pcbCanvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
-  .hero-content{ position:relative; z-index:2; text-align:center; padding:0 20px; pointer-events:none; transform:translateY(-19%); }
+  .hero-content{ position:relative; z-index:2; text-align:center; padding:0 20px; pointer-events:none; }
   .hero-content a, .hero-content button{ pointer-events:auto; }
   .hero h1{
     font-size:clamp(2.25rem, 5.6vw, 4.1rem); font-weight:700; letter-spacing:-0.05em; line-height:1.5;
@@ -560,26 +557,25 @@
       </radialGradient>
     </defs>
     <g stroke="#9a9aab" stroke-width="0.6" stroke-linejoin="round">
-      <!-- base -->
-      <ellipse cx="52" cy="123" rx="24" ry="5.5" fill="url(#baseShine)"/>
-      <rect x="47.5" y="110" width="9" height="13" rx="2.5" fill="url(#metalBase)"/>
-      <circle cx="52" cy="110" r="4.2" fill="url(#jointShine)"/>
-      <!-- lower arm -->
-      <rect x="49.6" y="64" width="4.6" height="48" rx="2.3" fill="url(#metalRod)" transform="rotate(-8 52 110)"/>
-      <circle cx="45" cy="66" r="4.6" fill="url(#jointShine)"/>
-      <!-- upper arm + head -->
-      <g class="lamp-arm-upper">
-        <rect x="42.7" y="30" width="4.6" height="38" rx="2.3" fill="url(#metalRod)" transform="rotate(38 45 66)"/>
-        <circle cx="68" cy="36" r="4.4" fill="url(#jointShine)"/>
-        <g class="lamp-head">
-          <path d="M70 26 L86 33 L74 55 L50 46 Z" fill="url(#metalHead)"/>
-          <path d="M50 46 L74 55 L69 61 L49.5 52 Z" fill="url(#metalHeadUnder)"/>
-          <path class="lamp-shine" d="M71 28 L80 32 L75 39 L67 35 Z" fill="#fff" opacity="0.35" stroke="none"/>
-          <ellipse cx="59.5" cy="52" rx="11" ry="4.4" fill="#232328" stroke="none" transform="rotate(20 59.5 52)"/>
-          <circle class="lamp-bulb" cx="60" cy="52" r="4.6" stroke="none"/>
-          <path class="lamp-beam" d="M52 52 L70 58 L40 124 L4 108 Z" fill="url(#lampBeam)" stroke="none"/>
-          <circle class="lamp-glow" cx="60" cy="54" r="18" fill="url(#lampGlow)" stroke="none"/>
-        </g>
+      <!-- base: a flat oval foot with a small power-button dimple -->
+      <ellipse cx="54" cy="118" rx="27" ry="7" fill="url(#baseShine)"/>
+      <circle cx="54" cy="116" r="2" fill="url(#jointShine)" stroke="none"/>
+      <!-- trailing power cord, curling off to a plug -->
+      <path d="M76 120 C 90 123, 89 116, 98 122" fill="none" stroke="url(#metalRod)" stroke-width="2" stroke-linecap="round"/>
+      <rect x="95" y="120" width="7" height="5.5" rx="1.2" fill="url(#metalBase)"/>
+      <!-- single straight rod + conical shade, tilts upright together in dark mode -->
+      <g class="lamp-head">
+        <path d="M52 112 L30 34" fill="none" stroke="url(#metalRod)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M32 18 L50 26 L38 44 L16 38 Z" fill="url(#metalHead)"/>
+        <path d="M16 38 L38 44 L33 50 L14 44 Z" fill="url(#metalHeadUnder)"/>
+        <path d="M33 20 L42 24 L37 31 L29 27 Z" fill="#fff" opacity="0.35" stroke="none"/>
+        <!-- pull cord -->
+        <path d="M25 41 L23 53" fill="none" stroke="#9a9aab" stroke-width="1"/>
+        <circle cx="23" cy="54.5" r="1.8" fill="url(#jointShine)" stroke="none"/>
+        <ellipse cx="25" cy="41" rx="10" ry="4" fill="#232328" stroke="none" transform="rotate(20 25 41)"/>
+        <circle class="lamp-bulb" cx="25" cy="41" r="4.2" stroke="none"/>
+        <path class="lamp-beam" d="M18 40 L33 46 L16 110 L-16 94 Z" fill="url(#lampBeam)" stroke="none"/>
+        <circle class="lamp-glow" cx="25" cy="42" r="16" fill="url(#lampGlow)" stroke="none"/>
       </g>
     </g>
   </svg>
@@ -999,12 +995,12 @@
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
-      const TARGET_SIZE = 2.4, SHRINK = 1;
+      const TARGET_SIZE = 2.2, SHRINK = 1;
       const scale = (TARGET_SIZE / Math.max(size.x, size.y, size.z)) * SHRINK;
       model.scale.setScalar(scale);
-      // Nudge it down from dead-centre so it sits below the headline/tagline
-      // instead of covering them.
-      model.position.set(-center.x * scale, -center.y * scale - 0.62, -center.z * scale);
+      // Sit close to dead-centre so it wraps around the headline/tagline,
+      // like the reference, instead of sitting apart below them.
+      model.position.set(-center.x * scale, -center.y * scale - 0.16, -center.z * scale);
 
       rig.add(model);
       window.__boot && window.__boot.setProgress(100);
