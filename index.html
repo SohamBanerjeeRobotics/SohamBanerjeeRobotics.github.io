@@ -919,6 +919,12 @@
     const key = new THREE.DirectionalLight(0xffffff, 2.1);
     key.position.set(3, 6, 4);
     scene.add(key);
+    // Overhead top-light, like arkamahajan.in's setup — this is what puts a
+    // bright specular shine along the board's top edge and connectors rather
+    // than just even front fill.
+    const top = new THREE.DirectionalLight(0xffffff, 3.4);
+    top.position.set(0, 10, 2);
+    scene.add(top);
     const rim = new THREE.PointLight(0x8c6cff, 3.8, 40);
     rim.position.set(-5, 3, -3);
     scene.add(rim);
@@ -928,6 +934,7 @@
     function syncTheme() {
       ambient.intensity = isLight() ? 1.2 : 0.7;
       key.intensity = isLight() ? 2.4 : 2.1;
+      top.intensity = isLight() ? 3.8 : 3.4;
     }
     syncTheme();
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -945,10 +952,11 @@
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
-      // TARGET_SIZE matches arkamahajan.in's own board scale relative to its
-      // camera frustum (their raw model at group scale 0.5, our board's
-      // largest raw dimension is the same 8.64 units, so 8.64*0.5 = 4.32).
-      const TARGET_SIZE = 4.32;
+      // TARGET_SIZE is based on arkamahajan.in's own board scale relative to
+      // its camera frustum (their raw model at group scale 0.5, our board's
+      // largest raw dimension is the same 8.64 units, so 8.64*0.5 = 4.32),
+      // bumped up a bit further per request.
+      const TARGET_SIZE = 4.85;
       const scale = TARGET_SIZE / Math.max(size.x, size.y, size.z);
       model.scale.setScalar(scale);
       model.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
