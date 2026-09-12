@@ -885,7 +885,7 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 0.9;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
@@ -933,14 +933,14 @@
     // its shine almost entirely from the HDRI environment above, not from a
     // rig of point lights — so replicate that instead of re-deriving it.
     const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
-    const ambient = new THREE.AmbientLight(0xffffff, 1.5);
+    const ambient = new THREE.AmbientLight(0xffffff, 1.05);
     scene.add(ambient);
-    const key = new THREE.DirectionalLight(0xffffff, 2.5);
+    const key = new THREE.DirectionalLight(0xffffff, 1.8);
     key.position.set(10, 10, 5);
     scene.add(key);
     function syncTheme() {
-      ambient.intensity = isLight() ? 1.8 : 1.5;
-      key.intensity = isLight() ? 2.9 : 2.5;
+      ambient.intensity = isLight() ? 1.3 : 1.05;
+      key.intensity = isLight() ? 2.1 : 1.8;
     }
     syncTheme();
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
