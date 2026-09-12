@@ -206,7 +206,7 @@
      scroll cue included, sits inside the first screenful. */
   .hero{ position:relative; min-height:calc(100vh - 76px); display:flex; align-items:center; justify-content:center; overflow:hidden; }
   #pcbCanvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
-  .hero-content{ position:relative; z-index:2; text-align:center; padding:0 20px; pointer-events:none; }
+  .hero-content{ position:relative; z-index:2; text-align:center; padding:0 20px; pointer-events:none; transform:translateY(-19%); }
   .hero-content a, .hero-content button{ pointer-events:auto; }
   .hero h1{
     font-size:clamp(2.25rem, 5.6vw, 4.1rem); font-weight:700; letter-spacing:-0.05em; line-height:1.5;
@@ -420,9 +420,68 @@
   @media (pointer: coarse){ .cursor-dot, .cursor-ring{ display:none; } }
 
   @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+
+  /* Boot screen — shown over everything on first paint and driven by the
+     real download progress of the hero's 3D model (by far the heaviest
+     asset on the page), not a fake timer. Fades out once it hits 100%. */
+  #bootLoader{
+    position:fixed; inset:0; z-index:9999; background:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .5s ease;
+  }
+  #bootLoader.hide{ opacity:0; pointer-events:none; }
+  .boot-panel{ width:min(420px, 84vw); text-align:center; }
+  .boot-name{
+    font-weight:700; letter-spacing:0.3em; font-size:0.9rem; color:var(--text);
+    text-transform:uppercase; margin-bottom:20px;
+  }
+  .boot-track{ height:2px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .boot-fill{ height:100%; width:0%; background:var(--violet); transition:width .2s ease-out; }
+  .boot-row{
+    display:flex; justify-content:space-between; margin-top:14px;
+    font-size:0.72rem; letter-spacing:0.15em; color:var(--dim); text-transform:uppercase;
+  }
 </style>
 </head>
 <body>
+
+<div id="bootLoader">
+  <div class="boot-panel">
+    <div class="boot-name">Soham Banerjee</div>
+    <div class="boot-track"><div class="boot-fill" id="bootFill"></div></div>
+    <div class="boot-row"><span>SYSTEM.BOOT</span><span id="bootPct">0%</span></div>
+  </div>
+</div>
+
+<script>
+  // Drives #bootLoader. The hero's GLTFLoader (further down the page) reports
+  // real download progress into window.__boot.setProgress; this stays a
+  // self-contained, dependency-free script so it can run first and never gets
+  // stuck if the module script below fails for any reason.
+  (function(){
+    const root = document.getElementById('bootLoader');
+    const fill = document.getElementById('bootFill');
+    const pctEl = document.getElementById('bootPct');
+    let shown = 0, hidden = false;
+
+    function setProgress(p){
+      shown = Math.max(shown, Math.min(100, p));
+      if (fill) fill.style.width = shown + '%';
+      if (pctEl) pctEl.textContent = Math.round(shown) + '%';
+      if (shown >= 100) hide();
+    }
+    function hide(){
+      if (hidden || !root) return;
+      hidden = true;
+      root.classList.add('hide');
+      setTimeout(() => root.remove(), 550);
+    }
+    window.__boot = { setProgress, hide };
+    // Safety net: if the model load never reports back (blocked, offline,
+    // errors out), don't strand visitors behind the boot screen forever.
+    window.addEventListener('load', () => setTimeout(() => setProgress(100), 1200));
+  })();
+</script>
 
 <header>
   <nav>
@@ -908,15 +967,27 @@
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
-      const TARGET_SIZE = 1.05, SHRINK = 0.85;
+      const TARGET_SIZE = 2.4, SHRINK = 1;
       const scale = (TARGET_SIZE / Math.max(size.x, size.y, size.z)) * SHRINK;
       model.scale.setScalar(scale);
       // Nudge it down from dead-centre so it sits below the headline/tagline
       // instead of covering them.
-      model.position.set(-center.x * scale, -center.y * scale - 0.4, -center.z * scale);
+      model.position.set(-center.x * scale, -center.y * scale - 0.62, -center.z * scale);
 
       rig.add(model);
-    }, undefined, (err) => console.error('Raspberry Pi model failed to load', err));
+      window.__boot && window.__boot.setProgress(100);
+    }, (xhr) => {
+      // Drives the boot screen with the model's real download progress —
+      // it's ~15MB and dwarfs every other asset on the page. Reserve the
+      // last few percent for scene setup so the bar doesn't stall at 100
+      // while the frame is still being built.
+      if (xhr.lengthComputable && window.__boot) {
+        window.__boot.setProgress((xhr.loaded / xhr.total) * 95);
+      }
+    }, (err) => {
+      console.error('Raspberry Pi model failed to load', err);
+      window.__boot && window.__boot.setProgress(100);
+    });
 
     const BASE_TILT_X = 0.32; // lean back so the top face + front edge both read clearly
 
