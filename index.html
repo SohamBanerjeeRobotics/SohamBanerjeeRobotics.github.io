@@ -881,7 +881,7 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 0.95;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
@@ -914,27 +914,38 @@
 
     // ---- Lighting (violet key + sky fill, matches the site palette) ----------
     const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
-    const ambient = new THREE.AmbientLight(0xccccff, 0.7);
+    // Note: intensities here are tuned lower than they might look like they
+    // need to be, because fixing the model's broken metalness/roughness
+    // export (below) makes every surface respond to light properly again —
+    // at the old intensities that turned into a blown-out wash.
+    const ambient = new THREE.AmbientLight(0xccccff, 0.55);
     scene.add(ambient);
-    const key = new THREE.DirectionalLight(0xffffff, 2.1);
+    const key = new THREE.DirectionalLight(0xffffff, 1.2);
     key.position.set(3, 6, 4);
     scene.add(key);
     // Overhead top-light, like arkamahajan.in's setup — this is what puts a
     // bright specular shine along the board's top edge and connectors rather
     // than just even front fill.
-    const top = new THREE.DirectionalLight(0xffffff, 3.4);
+    const top = new THREE.DirectionalLight(0xffffff, 1.8);
     top.position.set(0, 10, 2);
     scene.add(top);
-    const rim = new THREE.PointLight(0x8c6cff, 3.8, 40);
+    // Neutral fill on the left, over the port stack — the only other light
+    // reaching that side was the violet rim accent, so at a sane intensity
+    // for that (not to wash the board purple) the ports stayed dark.
+    const leftFill = new THREE.DirectionalLight(0xffffff, 1.5);
+    leftFill.position.set(-4, 5, 3);
+    scene.add(leftFill);
+    const rim = new THREE.PointLight(0x8c6cff, 1.1, 40);
     rim.position.set(-5, 3, -3);
     scene.add(rim);
-    const fill = new THREE.PointLight(0x22d3ee, 1.5, 40);
+    const fill = new THREE.PointLight(0x22d3ee, 0.5, 40);
     fill.position.set(4, -1, 5);
     scene.add(fill);
     function syncTheme() {
-      ambient.intensity = isLight() ? 1.2 : 0.7;
-      key.intensity = isLight() ? 2.4 : 2.1;
-      top.intensity = isLight() ? 3.8 : 3.4;
+      ambient.intensity = isLight() ? 0.9 : 0.55;
+      key.intensity = isLight() ? 1.4 : 1.2;
+      top.intensity = isLight() ? 2.1 : 1.8;
+      leftFill.intensity = isLight() ? 1.8 : 1.5;
     }
     syncTheme();
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -945,6 +956,42 @@
 
     new GLTFLoader().load('assets/models/raspberry_pi.glb', (gltf) => {
       const model = gltf.scene;
+
+      // The source file exports almost every material as metalness:1,
+      // roughness:1 — a broken fallback (real metals have near-zero diffuse
+      // response, so at full roughness they barely react to direct lights at
+      // all and read as flat black, which is why the port housings and chips
+      // stayed dark under the new top light). Recolour by name: true metal
+      // parts stay metallic but shinier; everything else becomes a normal
+      // diffuse plastic/PCB surface so it actually catches the scene lights.
+      model.traverse((o) => {
+        if (!o.isMesh || !o.material) return;
+        const m = o.material;
+        if (m.metalness !== 1) return;
+        const n = m.name.toLowerCase();
+        if (/metal|copper|gold|solder/.test(n)) {
+          // Includes the "Metallic" shield around the ports, which was a
+          // pure roughness:0 mirror — reflecting only the (dim, in that
+          // direction) environment map and nothing from the scene's actual
+          // lights, which is why that whole side stayed dark. A little
+          // roughness lets it pick up the direct lights as a real highlight.
+          m.metalness = 0.85;
+          m.roughness = Math.max(m.roughness, 0.28);
+        } else if (m.roughness === 1) {
+          m.metalness = 0.08;
+          m.roughness = 0.5;
+          // Some "black" parts have no texture and a plain white base
+          // colour — their blackness was faked entirely by starving them
+          // of light via metalness/roughness. Now that they respond to
+          // light normally, give them an actual dark colour to match.
+          if (!m.map && m.color.getHex() === 0xffffff && /black|dark/.test(n)) {
+            m.color.setHex(0x1c1c1e);
+          }
+        } else {
+          return;
+        }
+        m.needsUpdate = true;
+      });
 
       // Normalize to a fixed on-screen footprint regardless of the source
       // model's native scale, then trim it down a little so it reads as a
