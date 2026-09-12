@@ -224,13 +224,11 @@
        button actually being legible. */
     -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
   }
-  .btn.outline{ color:var(--text); background:rgba(20,20,24,0.55); border:1px solid rgba(255,255,255,0.3); }
-  :root[data-theme="light"] .btn.outline{ background:rgba(255,255,255,0.7); border-color:rgba(0,0,0,0.15); color:var(--text); }
-  .btn.outline:hover{ background:rgba(30,30,36,0.7); }
-  :root[data-theme="light"] .btn.outline:hover{ background:rgba(255,255,255,0.85); }
-  .btn.solid{ background:rgba(124,92,235,0.55); border:1px solid rgba(167,139,250,0.6); color:#fff; }
-  :root[data-theme="light"] .btn.solid{ background:rgba(124,92,235,0.6); }
-  .btn.solid:hover{ transform:translateY(-2px); background:rgba(139,110,255,0.7); }
+  /* Both buttons share one look — same fill, same border — per request. */
+  .btn.outline, .btn.solid{ color:var(--text); background:rgba(20,20,24,0.55); border:1px solid rgba(255,255,255,0.3); }
+  :root[data-theme="light"] .btn.outline, :root[data-theme="light"] .btn.solid{ background:rgba(255,255,255,0.7); border-color:rgba(0,0,0,0.15); color:var(--text); }
+  .btn.outline:hover, .btn.solid:hover{ transform:translateY(-2px); background:rgba(30,30,36,0.7); }
+  :root[data-theme="light"] .btn.outline:hover, :root[data-theme="light"] .btn.solid:hover{ background:rgba(255,255,255,0.85); }
 
   /* Social rail — fixed to the left edge and vertically centred, so it stays
      pinned on the left at the same spot no matter how far down the page you
@@ -887,7 +885,7 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.95;
+    renderer.toneMappingExposure = 1.05;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
@@ -929,40 +927,20 @@
       camera.updateProjectionMatrix();
     }
 
-    // ---- Lighting (violet key + sky fill, matches the site palette) ----------
+    // ---- Lighting: arkamahajan.in's exact recipe (from their bundle) --------
+    // <ambientLight intensity={1.5}/> + <directionalLight position={[10,10,5]}
+    // intensity={2.5}/>, nothing else. Their board is the same asset and gets
+    // its shine almost entirely from the HDRI environment above, not from a
+    // rig of point lights — so replicate that instead of re-deriving it.
     const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
-    // Note: intensities here are tuned lower than they might look like they
-    // need to be, because fixing the model's broken metalness/roughness
-    // export (below) makes every surface respond to light properly again —
-    // at the old intensities that turned into a blown-out wash.
-    const ambient = new THREE.AmbientLight(0xccccff, 0.55);
+    const ambient = new THREE.AmbientLight(0xffffff, 1.5);
     scene.add(ambient);
-    const key = new THREE.DirectionalLight(0xffffff, 1.2);
-    key.position.set(3, 6, 4);
+    const key = new THREE.DirectionalLight(0xffffff, 2.5);
+    key.position.set(10, 10, 5);
     scene.add(key);
-    // Overhead top-light, like arkamahajan.in's setup — this is what puts a
-    // bright specular shine along the board's top edge and connectors rather
-    // than just even front fill.
-    const top = new THREE.DirectionalLight(0xffffff, 1.8);
-    top.position.set(0, 10, 2);
-    scene.add(top);
-    // Neutral fill on the left, over the port stack — the only other light
-    // reaching that side was the violet rim accent, so at a sane intensity
-    // for that (not to wash the board purple) the ports stayed dark.
-    const leftFill = new THREE.DirectionalLight(0xffffff, 1.5);
-    leftFill.position.set(-4, 5, 3);
-    scene.add(leftFill);
-    const rim = new THREE.PointLight(0x8c6cff, 1.1, 40);
-    rim.position.set(-5, 3, -3);
-    scene.add(rim);
-    const fill = new THREE.PointLight(0x22d3ee, 0.5, 40);
-    fill.position.set(4, -1, 5);
-    scene.add(fill);
     function syncTheme() {
-      ambient.intensity = isLight() ? 0.9 : 0.55;
-      key.intensity = isLight() ? 1.4 : 1.2;
-      top.intensity = isLight() ? 2.1 : 1.8;
-      leftFill.intensity = isLight() ? 1.8 : 1.5;
+      ambient.intensity = isLight() ? 1.8 : 1.5;
+      key.intensity = isLight() ? 2.9 : 2.5;
     }
     syncTheme();
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -992,8 +970,9 @@
           // direction) environment map and nothing from the scene's actual
           // lights, which is why that whole side stayed dark. A little
           // roughness lets it pick up the direct lights as a real highlight.
-          m.metalness = 0.85;
-          m.roughness = Math.max(m.roughness, 0.28);
+          m.metalness = 0.9;
+          m.roughness = Math.max(m.roughness, 0.22);
+          m.envMapIntensity = 1.8;
         } else if (m.roughness === 1) {
           m.metalness = 0.08;
           m.roughness = 0.5;
