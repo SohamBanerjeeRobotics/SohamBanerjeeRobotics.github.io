@@ -363,13 +363,19 @@
 
   /* TIMELINE */
   .exp-card{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:24px; padding:30px 32px; margin-top:44px; }
-  .exp-head{ display:flex; align-items:center; gap:10px; font-size:14px; font-weight:500; color:var(--violet); margin-bottom:20px; text-transform:uppercase; letter-spacing:0.2em; }
-  .exp-item{ padding-left:22px; border-left:2px solid var(--border); margin-bottom:24px; position:relative; }
-  .exp-item::before{ content:''; position:absolute; left:-6px; top:2px; width:10px; height:10px; border-radius:50%; background:var(--violet); }
-  .exp-item h4{ font-size:20px; font-weight:500; color:var(--strong); }
-  .exp-item .meta{ font-size:14px; color:var(--faint); margin-top:4px; margin-bottom:10px; }
-  .exp-item ul{ margin:0; padding-left:18px; color:var(--dim); font-size:16px; line-height:1.625; }
-  .exp-item ul li{ margin-bottom:6px; }
+  .exp-head{ display:flex; align-items:center; gap:12px; font-size:24px; font-weight:700; color:var(--strong); margin-bottom:28px; }
+  .exp-head i{ color:var(--violet); font-size:21px; }
+  .exp-item{ padding-left:24px; border-left:2px solid var(--border); margin-bottom:32px; position:relative; }
+  .exp-item:last-child{ margin-bottom:0; }
+  .exp-item::before{ content:''; position:absolute; left:-7px; top:6px; width:12px; height:12px; border-radius:50%; background:var(--violet); box-shadow:0 0 8px var(--violet-dim); }
+  .exp-item .exp-row{ display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px 16px; }
+  .exp-item h4{ font-size:20px; font-weight:700; color:var(--strong); margin:0; }
+  .exp-item .exp-date{ font-size:12px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--violet); white-space:nowrap; }
+  .exp-item .meta{ font-size:14.5px; font-weight:600; color:var(--mid); margin-top:6px; margin-bottom:14px; }
+  .exp-item ul{ margin:0; padding-left:0; list-style:none; color:var(--dim); font-size:15.5px; line-height:1.7; }
+  .exp-item ul li{ position:relative; padding-left:18px; margin-bottom:8px; }
+  .exp-item ul li::before{ content:''; position:absolute; left:0; top:9px; width:5px; height:5px; border-radius:50%; background:var(--violet); }
+  .exp-item ul li:last-child{ margin-bottom:0; }
 
   .edu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin-top:26px; }
   .edu-card{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:16px; overflow:hidden; display:flex; flex-direction:column; }
@@ -689,15 +695,21 @@
     <div class="exp-card reveal">
       <div class="exp-head"><i class="fa-solid fa-briefcase"></i> Experience</div>
       <div class="exp-item">
-        <h4>Graduate Student Researcher — INDUS Lab, IIT Bombay</h4>
-        <div class="meta">IIT Bombay · Full-time · May 2026 – Present · Mumbai Metropolitan Region · On-site</div>
+        <div class="exp-row">
+          <h4>Graduate Student Researcher — INDUS Lab, IIT Bombay</h4>
+          <span class="exp-date">May 2026 – Present</span>
+        </div>
+        <div class="meta">IIT Bombay · Full-time | Mumbai Metropolitan Region · On-site</div>
         <ul>
           <li>Working on hardware design and development of in-house planar biped robots and Adaptive Model Predictive Control–based walking with an ankle push-off mechanism</li>
         </ul>
       </div>
       <div class="exp-item">
-        <h4>Undergraduate Student Researcher — IIEST, Shibpur</h4>
-        <div class="meta">IIEST, Shibpur · Full-time · Jan 2025 – Dec 2025 · India · Hybrid</div>
+        <div class="exp-row">
+          <h4>Undergraduate Student Researcher — IIEST, Shibpur</h4>
+          <span class="exp-date">Jan 2025 – Dec 2025</span>
+        </div>
+        <div class="meta">IIEST, Shibpur · Full-time | India · Hybrid</div>
         <ul>
           <li>Designed and implemented Computed Torque Control (CTC) for 2-DOF and 6-DOF robotic manipulators</li>
           <li>Formulated LMI-based regional pole placement conditions to systematically design controller gains with prescribed stability and damping constraints</li>
@@ -706,8 +718,11 @@
         </ul>
       </div>
       <div class="exp-item">
-        <h4>Research Intern — VEHC Lab, Dept. of AM&amp;BE, IIT Madras</h4>
-        <div class="meta">Indian Institute of Technology Madras · Internship · May 2024 – Aug 2025 · Chennai, Tamil Nadu, India · Hybrid</div>
+        <div class="exp-row">
+          <h4>Research Intern — VEHC Lab, Dept. of AM&amp;BE, IIT Madras</h4>
+          <span class="exp-date">May 2024 – Aug 2025</span>
+        </div>
+        <div class="meta">Indian Institute of Technology Madras · Internship | Chennai, Tamil Nadu, India · Hybrid</div>
         <ul>
           <li>Performed numerical simulations using Wolfram Mathematica, MATLAB, and Simulink for modeling and analysis of dynamic systems</li>
           <li>Investigated the nonlinear dynamics of a vertical cantilever beam subjected to inclined base excitations at varying angles</li>
@@ -715,8 +730,11 @@
         </ul>
       </div>
       <div class="exp-item">
-        <h4>Research Intern — Indira Gandhi Centre for Atomic Research (IGCAR)</h4>
-        <div class="meta">IGCAR, Kalpakkam · Internship · May 2024 – Aug 2025 · Remote</div>
+        <div class="exp-row">
+          <h4>Research Intern — Indira Gandhi Centre for Atomic Research (IGCAR)</h4>
+          <span class="exp-date">May 2024 – Aug 2025</span>
+        </div>
+        <div class="meta">IGCAR, Kalpakkam · Internship | Remote</div>
         <ul>
           <li>Analyzed leak-before-break (LBB) criteria for design of secondary coolant piping systems in nuclear power plants to improve structural integrity and safety margins</li>
           <li>Simulated hydraulic transient (water hammering) phenomena in pipeline networks using Deltares WANDA, evaluating time-varying pressure fluctuations to assess system reliability</li>
