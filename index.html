@@ -885,7 +885,7 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.9;
+    renderer.toneMappingExposure = 1;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
@@ -933,14 +933,14 @@
     // its shine almost entirely from the HDRI environment above, not from a
     // rig of point lights — so replicate that instead of re-deriving it.
     const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
-    const ambient = new THREE.AmbientLight(0xffffff, 1.05);
+    const ambient = new THREE.AmbientLight(0xffffff, 1.5);
     scene.add(ambient);
-    const key = new THREE.DirectionalLight(0xffffff, 1.8);
+    const key = new THREE.DirectionalLight(0xffffff, 2.5);
     key.position.set(10, 10, 5);
     scene.add(key);
     function syncTheme() {
-      ambient.intensity = isLight() ? 1.3 : 1.05;
-      key.intensity = isLight() ? 2.1 : 1.8;
+      ambient.intensity = isLight() ? 1.8 : 1.5;
+      key.intensity = isLight() ? 2.9 : 2.5;
     }
     syncTheme();
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -953,36 +953,29 @@
       const model = gltf.scene;
 
       // The source file exports almost every material as metalness:1,
-      // roughness:1 — a broken fallback (real metals have near-zero diffuse
-      // response, so at full roughness they barely react to direct lights at
-      // all and read as flat black, which is why the port housings and chips
-      // stayed dark under the new top light). Recolour by name: true metal
-      // parts stay metallic but shinier; everything else becomes a normal
-      // diffuse plastic/PCB surface so it actually catches the scene lights.
+      // roughness:1 — a broken fallback. For a TEXTURED material this still
+      // reads fine (the albedo tints the environment-reflected specular, and
+      // arkamahajan.in's own scene never touches these, so leave them alone
+      // to match). It's only a real problem for untextured parts with a
+      // plain white base colour, which fake "black" purely by starving
+      // themselves of light — recolour just those, plus give true metal
+      // parts (by name) a roughness floor so they pick up a highlight
+      // instead of needing a perfectly aligned mirror reflection.
       model.traverse((o) => {
         if (!o.isMesh || !o.material) return;
         const m = o.material;
         if (m.metalness !== 1) return;
         const n = m.name.toLowerCase();
         if (/metal|copper|gold|solder/.test(n)) {
-          // Includes the "Metallic" shield around the ports, which was a
-          // pure roughness:0 mirror — reflecting only the (dim, in that
-          // direction) environment map and nothing from the scene's actual
-          // lights, which is why that whole side stayed dark. A little
-          // roughness lets it pick up the direct lights as a real highlight.
           m.metalness = 0.9;
           m.roughness = Math.max(m.roughness, 0.22);
-          m.envMapIntensity = 1.8;
+          m.envMapIntensity = 1.15;
+        } else if (m.map) {
+          return; // textured — leave exactly as the reference does
         } else if (m.roughness === 1) {
           m.metalness = 0.08;
           m.roughness = 0.5;
-          // Some "black" parts have no texture and a plain white base
-          // colour — their blackness was faked entirely by starving them
-          // of light via metalness/roughness. Now that they respond to
-          // light normally, give them an actual dark colour to match.
-          if (!m.map && m.color.getHex() === 0xffffff && /black|dark/.test(n)) {
-            m.color.setHex(0x1c1c1e);
-          }
+          if (m.color.getHex() === 0xffffff && /black|dark/.test(n)) m.color.setHex(0x1c1c1e);
         } else {
           return;
         }
