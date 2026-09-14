@@ -773,6 +773,16 @@ footer p {
     margin-top: -0.6em;
 }
 
+/* Some case-study pages write figure captions as raw HTML instead of the
+   image-gallery include — a <div style="text-align:center"> wrapping an
+   <img> and a <p>. text-align is inherited, but the general paragraph rule
+   above matches the <p> directly (a specified value always beats an
+   inherited one), so it forces justify unless overridden back here. */
+.post-view .content div[style*="text-align: center"] p {
+    text-align: center;
+    text-align-last: center;
+}
+
 .post-view .content .image-gallery img {
     flex: 1 1 260px;
     min-width: 0;

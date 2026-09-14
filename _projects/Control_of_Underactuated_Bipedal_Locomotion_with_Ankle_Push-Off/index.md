@@ -2,6 +2,7 @@
 layout: post
 permalink: /projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/
 title: Control of Underactuated Bipedal Locomotion with Ankle Push-Off
+github: https://github.com/SohamBanerjeeRobotics
 description: >
     Formulated, modeled, and implemented an open-loop and closed-loop control framework 
     for an underactuated planar bipedal robot featuring pneumatic ankle push-off actuation. 
@@ -16,7 +17,7 @@ skills:
   - Python / MATLAB Simulation
   - Hardware-in-the-Loop (HIL) Testing
 
-main-image: /biped_hardware_front.jpeg
+main-image: /biped_hardware_setup.jpeg
 ---
 
 ## Overview
@@ -56,7 +57,7 @@ where:
 ## Control & Modeling Framework
 
 <div style="text-align: center; margin: 20px 0;">
-  <img src="/biped_control_architecture.jpeg" alt="Biped Control Framework and Dynamic Modeling Diagram" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="biped_control_architecture.jpg" alt="Biped Control Framework and Dynamic Modeling Diagram" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p style="font-size: 12px; color: #666; margin-top: 8px;"><em>Figure 1: Control system flow diagram illustrating MPC trajectory generation and dSPACE hardware characterization loop.</em></p>
 </div>
 
@@ -75,7 +76,7 @@ The physical platform underwent major structural, electronic, and actuation upgr
 - **Kinematic Design:** Formulated custom foot mechanisms to handle smooth ground force transmission during stance phases.
 
 <div style="text-align: center; margin: 20px 0;">
-  <img src="/biped_hardware_setup.jpeg" alt="Planar Biped Hardware Setup" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="biped_hardware_setup.jpeg" alt="Planar Biped Hardware Setup" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p style="font-size: 12px; color: #666; margin-top: 8px;"><em>Figure 2: Physical planar bipedal robot hardware setup with pneumatic push-off actuators and dSPACE interface.</em></p>
 </div>
 ---

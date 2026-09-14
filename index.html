@@ -349,7 +349,7 @@
   .work-list{ display:flex; flex-direction:column; gap:130px; margin-top:60px; }
   .work-row{ display:flex; flex-direction:column; gap:30px; }
   .work-media{ border-radius:24px; overflow:hidden; border:1px solid var(--border); aspect-ratio:21/9; background:var(--bg-panel); }
-  .work-media video{ width:100%; height:100%; object-fit:cover; display:block; }
+  .work-media video, .work-media img{ width:100%; height:100%; object-fit:cover; display:block; }
   .work-media.dual{ display:flex; gap:0; aspect-ratio:auto; background:none; border:none; overflow:visible; }
   .work-media.dual > div{ flex:1; min-width:0; border-radius:0; overflow:hidden; border:1px solid var(--border); aspect-ratio:16/9; background:var(--bg-panel); }
   .work-media.dual > div + div{ border-left:none; }
@@ -656,16 +656,15 @@
       </div>
 
       <div class="work-row reveal">
-        <div class="work-media">
-          <video autoplay muted loop playsinline preload="metadata" poster="_projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/biped_hardware_front.jpeg">
-            <source src="assets/videos/work/bipedal-ankle-pushoff.mp4" type="video/mp4">
-          </video>
+        <div class="work-media dual">
+          <div><img src="assets/images/work/biped-rig-front.jpg" alt="Planar biped rig, front view" loading="lazy"></div>
+          <div><img src="assets/images/work/biped-rig-angle.jpg" alt="Planar biped rig, angled view with ankle actuator" loading="lazy"></div>
         </div>
         <div class="work-info">
           <h3>Underactuated Bipedal Locomotion with Ankle Push-Off</h3>
           <div class="category">Control Theory / IIT Bombay Research</div>
-          <p>Open- and closed-loop control for a planar bipedal robot with pneumatic ankle push-off actuation, comparing PID and Model Predictive Control across simulation and hardware-in-the-loop testing.</p>
-          <div class="work-tags"><span>MPC</span><span>PID</span><span>dSPACE HIL</span></div>
+          <p>Open- and closed-loop control for an underactuated planar bipedal robot with pneumatic ankle push-off actuation, investigating precise impulse control during double-support transition phases. Built a unified modeling, simulation, and experimental framework from scratch, evaluating PID and Model Predictive Control (MPC) across multiple initial configurations and step sizes on both simulation and hardware-in-the-loop dSPACE setups to ensure gait stability and robust step tracking.</p>
+          <div class="work-tags"><span>MPC</span><span>PID</span><span>dSPACE HIL</span><span>Pneumatic Actuation</span><span>Trajectory Generation</span><span>Python / MATLAB</span></div>
           <div class="work-links"><a href="projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/">Find out more →</a></div>
         </div>
       </div>
