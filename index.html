@@ -282,7 +282,7 @@
   /* ABOUT / ARSENAL */
   /* Both columns stretch to the same height so the intro card and the skills
      grid line up on the bottom edge as well as the top. */
-  .about-layout{ display:grid; grid-template-columns:300px 1fr; gap:40px; margin-top:44px; align-items:stretch; }
+  .about-layout{ display:grid; grid-template-columns:300px 1fr; gap:40px; margin-top:64px; align-items:stretch; }
   /* Cards are translucent "glass" like the reference — white at 5% over the
      page glow, with a hairline white border — rather than flat dark panels. */
   .about-card{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:24px; padding:28px; display:flex; flex-direction:column; }
@@ -315,7 +315,7 @@
   .skill-card .tags span{ font-size:11px; font-weight:500; color:var(--violet); background:var(--violet-faint); border:1px solid var(--violet-dim); padding:4px 12px; border-radius:9999px; }
   @media (max-width: 760px){ .about-layout{ grid-template-columns:1fr; } .skills-grid{ grid-template-columns:1fr; } }
 
-  .analytics-row{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:26px; }
+  .analytics-row{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:96px; }
   .analytics-panel{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:16px; padding:24px; }
   .analytics-panel h4{ font-size:14px; color:var(--mid); font-weight:500; letter-spacing:0.25em; margin-bottom:18px; text-transform:uppercase; }
   .gh-stats-img{ width:100%; border-radius:12px; display:block; }
@@ -337,6 +337,8 @@
   .gh-legend i{ width:8px; height:8px; border-radius:2px; display:inline-block; }
   .gh-caption{ font-size:10px; color:var(--faint); letter-spacing:0.14em; text-transform:uppercase; margin:2px 0 -6px; }
   .gh-chart{ width:100%; border-radius:10px; display:block; background:var(--border-soft); }
+  .gh-chart svg{ display:block; width:100%; height:auto; }
+  .gh-chart img{ width:100%; border-radius:10px; display:block; }
   .radar-wrap{ display:flex; justify-content:center; }
   @media (max-width:760px){ .analytics-row{ grid-template-columns:1fr; } }
 
@@ -566,7 +568,7 @@
 
 <section id="about">
   <div class="wrap">
-    <h2 class="sec-title reveal">My <span class="bold">Arsenal</span></h2>
+    <h2 class="sec-title reveal"><span class="light">My</span> <span class="bold">Arsenal</span></h2>
 
     <div class="about-layout reveal">
       <div class="about-card">
@@ -626,7 +628,7 @@
           <div class="gh-langs" id="ghLangs"></div>
           <div class="gh-legend" id="ghLegend" hidden></div>
           <p class="gh-caption">Contribution activity — last 12 months</p>
-          <img class="gh-chart" src="https://ghchart.rshah.org/a78bfa/SohamBanerjeeRobotics" alt="Soham Banerjee — GitHub contribution graph, last year" loading="lazy" onerror="this.style.display='none'">
+          <div class="gh-chart" id="ghChart" data-gh-user="SohamBanerjeeRobotics" role="img" aria-label="Soham Banerjee — GitHub contribution graph, last year"></div>
         </div>
       </div>
       <div class="analytics-panel">
@@ -1248,6 +1250,59 @@
   })();
 </script>
 
+<script>
+  // Contribution calendar — rendered with GitHub's own dark-theme level
+  // colors (empty cells are GitHub's real grey, #161b22, not the plain
+  // white a plain-color chart-generator service gives you) using live
+  // daily contribution data from a CORS-friendly mirror of the GitHub
+  // contributions API. Falls back to the old single-color chart image
+  // if that API is ever unreachable.
+  (async function initContributionChart(){
+    const container = document.getElementById('ghChart');
+    if (!container) return;
+    const user = container.dataset.ghUser;
+    const LEVELS = ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'];
+    try {
+      const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=last`);
+      if (!res.ok) throw new Error('bad status ' + res.status);
+      const data = await res.json();
+      const days = data.contributions;
+      if (!Array.isArray(days) || !days.length) throw new Error('no data');
+      const pad = new Date(days[0].date + 'T00:00:00').getDay();
+      const cells = new Array(pad).fill(null).concat(days);
+      const weeks = [];
+      for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+      const cell = 10, gap = 3, leftPad = 24, topPad = 14;
+      const w = leftPad + weeks.length * (cell + gap), h = topPad + 7 * (cell + gap);
+      const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const DAY_LABELS = { 1: 'Mon', 3: 'Wed', 5: 'Fri' };
+      const textStyle = "fill:#767676;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;white-space:nowrap;";
+      let rects = '';
+      let months = '';
+      let lastMonth = -1;
+      weeks.forEach((week, wi) => {
+        const x = leftPad + wi * (cell + gap);
+        week.forEach((day, di) => {
+          if (!day) return;
+          const y = topPad + di * (cell + gap);
+          const fill = LEVELS[day.level] || LEVELS[0];
+          rects += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="2" fill="${fill}"><title>${day.count} contribution${day.count === 1 ? '' : 's'} on ${day.date}</title></rect>`;
+          const m = new Date(day.date + 'T00:00:00').getMonth();
+          if (di === 0 && m !== lastMonth) {
+            months += `<text x="${x}" y="${topPad - 4}" style="${textStyle}font-size:9px;">${MONTHS[m]}</text>`;
+            lastMonth = m;
+          }
+        });
+      });
+      const dayLabels = Object.entries(DAY_LABELS).map(([di, label]) =>
+        `<text x="0" y="${topPad + di * (cell + gap) + cell - 1}" style="${textStyle}font-size:9px;">${label}</text>`
+      ).join('');
+      container.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">${months}${dayLabels}${rects}</svg>`;
+    } catch (e) {
+      container.innerHTML = `<img src="https://ghchart.rshah.org/39d353/${user}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'">`;
+    }
+  })();
+</script>
 
 </body>
 </html>
