@@ -92,8 +92,8 @@ p {
 
 /* NAVBAR */
 nav {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     padding: 18px 0;
     height: auto;
     align-items: center;
@@ -108,6 +108,8 @@ nav {
     padding-left: 50px;
     padding-right: 50px;
 }
+
+nav .left { grid-column: 1; }
 
 nav .left a {
     display: flex;
@@ -129,52 +131,65 @@ nav .left .avatar-dot {
     display: inline-block;
 }
 
-nav .right {
+nav .right.desktop-nav {
+    grid-column: 2;
+    justify-self: center;
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
 nav .right a {
-    color: var(--text-color);
+    color: var(--link-color);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin-left: 30px;
-    transition: color .2s;
-}
-
-nav .right a:hover {
-    color: var(--link-color);
-}
-
-nav .right a.resume-pill-link
- {
     border: 1px solid rgba(140,108,255,0.45);
-    color: var(--link-color);
     padding: 8px 18px;
     border-radius: 100px;
-    letter-spacing: 0.05em;
+    transition: color .2s, background-color .2s, border-color .2s;
 }
 
-nav .right a.resume-pill-link:hover,
+nav .right a:hover,
 nav .mobile-nav a.resume-pill-link:hover {
     color: var(--text-color);
     background-color: rgba(140,108,255,0.12);
-    border-radius: 100px;
+    border-color: var(--link-color);
 }
 
-.theme-toggle {
-    display:inline-flex; align-items:center; justify-content:center;
-    width:36px; height:36px; border-radius:50%; border:1px solid var(--border-color);
-    background:transparent; color:var(--text-color); cursor:pointer; font-size:14px;
-    transition:border-color .2s ease, background-color .2s ease; flex-shrink:0; margin-left:20px;
+/* Theme toggle — fixed to the bottom-right corner, same as the home page.
+   Lit/warm in light mode, plain outline in dark mode. */
+.lamp-toggle{
+    position:fixed; right:36px; bottom:26px; z-index:60;
+    width:64px; height:84px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    background:none; border:none; padding:0; color:inherit;
+    -webkit-tap-highlight-color:transparent;
 }
-.theme-toggle:hover { border-color:var(--link-color); background-color:rgba(140,108,255,0.12); }
-.theme-toggle .fa-sun { display:none; }
-:root[data-theme="light"] .theme-toggle .fa-moon { display:none; }
-:root[data-theme="light"] .theme-toggle .fa-sun { display:inline; }
+.lamp-toggle:focus-visible{ outline:2px solid var(--link-color); outline-offset:6px; border-radius:12px; }
+.lamp-label{
+    white-space:nowrap; order:-1;
+    font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--text-color);
+    background:var(--nav-bg); border:1px solid var(--border-color); border-radius:9999px;
+    padding:4px 11px; backdrop-filter:blur(6px); opacity:.85; pointer-events:none;
+    transition:opacity .3s ease;
+}
+.lamp-toggle svg{
+    width:44px; height:44px; overflow:visible;
+    stroke:var(--text-color); transition:stroke .4s ease, transform .35s ease;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+}
+.lamp-glow{ opacity:0; transition:opacity .45s ease; }
+:root[data-theme="light"] .lamp-toggle svg{ stroke:#f5b93d; transform:scale(1.06); }
+:root[data-theme="light"] .lamp-glow{ opacity:.85; }
+.lamp-toggle:hover svg{ stroke:var(--link-color); }
+:root[data-theme="light"] .lamp-toggle:hover svg{ stroke:#f5b93d; }
+@media (max-width: 560px){
+    .lamp-toggle{ right:14px; bottom:14px; width:52px; height:52px; }
+    .lamp-toggle svg{ width:36px; height:36px; }
+    .lamp-label{ display:none; }
+}
 
 /* Navbar Mobile Menu Button */
 nav .menu-toggle {
@@ -646,7 +661,7 @@ footer p {
 /* PROJECT POST VIEW */
 
 .post-view {
-    max-width: 980px;
+    max-width: 1140px;
     margin: 25px auto;
     border: 1px solid var(--border-color);
     background: var(--light-background-color);
@@ -720,11 +735,13 @@ footer p {
 }
   
 .post-view .summary .skill {
-    background-color: var(--light-background-color);
+    background-color: rgba(140,108,255,0.1);
+    border: 1px solid rgba(140,108,255,0.35);
     color: var(--link-color);
-    border-radius: 12px;
-    padding: 5px 10px;
+    border-radius: 9999px;
+    padding: 6px 14px;
     font-size: 0.9em;
+    font-weight: 500;
 }
   
 .post-view .content {
@@ -740,6 +757,20 @@ footer p {
     width: 100%;
     gap: 16px;
     margin: 1.2em 0;
+}
+
+/* Captions — the markdown always writes a small <span> right after the
+   image gallery / video embed; kramdown wraps it in its own <p>, so centre
+   that paragraph rather than the span itself. */
+.post-view .content .image-gallery + p,
+.post-view .content .youtube-container + p {
+    text-align: center;
+    /* Captions are single-line, and text-align-last (set to "left" on the
+       general paragraph rule below, for justified body text) takes over
+       alignment for a block's one-and-only line — override it back here
+       or captions would render left-aligned despite text-align: center. */
+    text-align-last: center;
+    margin-top: -0.6em;
 }
 
 .post-view .content .image-gallery img {
@@ -763,6 +794,15 @@ footer p {
 
 .post-view .content  p {
     margin-bottom: 1em;
+    text-align: justify;
+    text-align-last: left;
+    hyphens: auto;
+  }
+
+.post-view .summary .project-description p {
+    text-align: justify;
+    text-align-last: left;
+    hyphens: auto;
   }
 
 .post-view .content  a:hover {
@@ -780,6 +820,9 @@ footer p {
     font-size: 17px;
     line-height: 1.7;
     margin-bottom: 0.4em;
+    text-align: justify;
+    text-align-last: left;
+    hyphens: auto;
   }
 
 .post-view .content blockquote {
@@ -830,6 +873,13 @@ footer p {
     max-width: var(--max-width);
     margin: 0 ;
     padding: 5px
+}
+
+/* Case-study pages: ignore the per-embed width param and always fill the
+   content column, so videos line up with the paragraphs above/below them. */
+.post-view .content .youtube-container {
+    max-width: 100%;
+    margin: 1.2em 0;
 }
 
 .youtube-aspect-ratio {

@@ -4,11 +4,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // visit before anything paints, so there's no flash of the wrong theme.
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
+        const lampLabel = document.getElementById('lampLabel');
+        const syncLabel = function() {
+            if (lampLabel) {
+                lampLabel.textContent = document.documentElement.getAttribute('data-theme') === 'light' ? 'Light Mode' : 'Dark Mode';
+            }
+        };
+        syncLabel();
         themeToggle.addEventListener('click', function() {
             const root = document.documentElement;
             const isLight = root.getAttribute('data-theme') === 'light';
             if (isLight) { root.removeAttribute('data-theme'); } else { root.setAttribute('data-theme', 'light'); }
             try { localStorage.setItem('theme', isLight ? 'dark' : 'light'); } catch (e) {}
+            syncLabel();
         });
     }
 
