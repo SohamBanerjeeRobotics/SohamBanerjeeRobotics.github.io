@@ -357,7 +357,9 @@
   .work-info{ max-width:none; }
   .work-info h3{ font-size:clamp(1.5rem,2.4vw,1.875rem); font-weight:700; color:var(--strong); line-height:1.2; margin-bottom:12px; }
   .work-info .category{ color:var(--violet); font-size:14px; font-weight:500; letter-spacing:0.02em; margin-bottom:16px; }
-  .work-info p{ color:var(--dim); font-size:18px; line-height:1.7; margin-bottom:18px; max-width:none; }
+  .work-info p{ color:var(--dim); font-size:18px; line-height:1.7; margin-bottom:18px; max-width:none; text-align:justify; text-align-last:left; hyphens:none; }
+  .work-more{ text-align:center; margin-top:56px; }
+  .work-more p{ color:var(--dim); font-size:16px; margin-bottom:18px; }
   .work-tags{ display:flex; flex-wrap:wrap; gap:8px; }
   .work-tags span{ font-size:11px; font-weight:500; color:var(--violet); background:var(--violet-faint); border:1px solid var(--violet-dim); padding:4px 12px; border-radius:9999px; }
   .work-links{ margin-top:20px; }
@@ -408,7 +410,7 @@
   footer{
     position:relative; text-align:center;
     min-height:100vh; display:flex; flex-direction:column; justify-content:center;
-    padding:96px 0 56px; border-top:1px solid var(--border);
+    padding:96px 0 56px;
   }
   footer h2{ font-size:clamp(3rem,6vw,5rem); font-weight:700; letter-spacing:-0.05em; line-height:1.3; margin-bottom:44px; }
   .footer-info{ display:flex; justify-content:center; gap:40px; flex-wrap:wrap; color:var(--mid); font-size:19px; margin-bottom:36px; }
@@ -737,6 +739,11 @@
           <div class="work-links"><a href="projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/">Find out more →</a></div>
         </div>
       </div>
+    </div>
+
+    <div class="work-more reveal">
+      <p>Find out more projects on my GitHub page</p>
+      <a href="https://github.com/SohamBanerjeeRobotics" target="_blank" rel="noopener noreferrer" class="btn outline"><i class="fa-brands fa-github"></i> GitHub</a>
     </div>
   </div>
 </section>
