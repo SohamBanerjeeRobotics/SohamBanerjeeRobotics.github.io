@@ -2,6 +2,7 @@
 layout: post
 permalink: /projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/
 title: Motion Planning and Coordination for Autonomous Vehicles (TurtleBot)
+github: https://github.com/DarkSoul14789/Motion_planning-turtlebot-assignment
 description: >
     Implemented configuration space (C-space) modeling, grid-based search (A*), 
     and sampling-based motion planning (RRT) for a nonholonomic differential-drive 
@@ -59,16 +60,16 @@ This constraint prevents instantaneous sideways motion; the robot must reorient 
 
 ## Configuration Space Obstacles & Free Space Construction
 
-Let $\mathcal{O}$ represent obstacle regions in the physical workspace . The corresponding C-space obstacle region $\mathcal{C}_{\text{obs}}$ is defined as :
+Let $\mathcal{O}$ represent obstacle regions in the physical workspace . The corresponding C-space obstacle region $\mathcal{C}\_{\text{obs}}$ is defined as :
 
 $$\mathcal{C}_{\text{obs}} = \{q \in \mathcal{C} \mid \text{the robot at configuration } q \text{ intersects } \mathcal{O}\}$$
 
 Assuming a circular disk approximation for the TurtleBot:
 - Workspace obstacles are inflated by the robot's radius using Minkowski sum operations .
-- $\mathcal{C}_{\text{obs}} = (\text{inflated workspace obstacles}) \times S^1$ .
-- Free configuration space is defined as $\mathcal{C}_{\text{free}} = \mathcal{C} \setminus \mathcal{C}_{\text{obs}}$ .
+- $\mathcal{C}\_{\text{obs}} = (\text{inflated workspace obstacles}) \times S^1$ .
+- Free configuration space is defined as $\mathcal{C}\_{\text{free}} = \mathcal{C} \setminus \mathcal{C}\_{\text{obs}}$ .
 
-The trajectory generation goal is to establish a continuous trajectory $\gamma(t) \in \mathcal{C}_{\text{free}}$ for $0 \le t \le 1$ such that $\gamma(0) = q_{\text{start}}$ and $\gamma(1) = q_{\text{goal}}$, while respecting differential kinodynamic limits .
+The trajectory generation goal is to establish a continuous trajectory $\gamma(t) \in \mathcal{C}\_{\text{free}}$ for $0 \le t \le 1$ such that $\gamma(0) = q\_{\text{start}}$ and $\gamma(1) = q\_{\text{goal}}$, while respecting differential kinodynamic limits .
 
 ---
 
@@ -79,12 +80,8 @@ Two core spatial path-planning strategies were implemented and benchmarked :
 ### 1. A* Planner (Grid-Based Search)
 A deterministic graph-search planner using cost function evaluation $f(n) = g(n) + h(n)$, where $g(n)$ is the exact path cost from start to node $n$, and $h(n)$ is an admissible heuristic . Implemented in `astar_planner.py`, it guarantees resolution optimality, generating shortest-path grid trajectories .
 
-> **Source Code:** View the full implementation of [`astar_planner.py`](https://github.com/DarkSoul14789/Motion_planning-turtlebot-assignment) on GitHub .
-
 ### 2. Rapidly-Exploring Random Tree (RRT Planner)
-A probabilistic, sampling-based planner implemented in `RRT_Planner.py` . RRT rapidly explores high-dimensional C-spaces by incrementally growing a search tree toward randomly sampled states $q_{\text{rand}} \in \mathcal{C}_{\text{free}}$ . It is probabilistically complete and explores open spaces quickly, though raw paths tend to be non-optimal and jagged .
-
-> **Source Code:** View the full implementation of [`RRT_Planner.py`](https://github.com/DarkSoul14789/Motion_planning-turtlebot-assignment) on GitHub .
+A probabilistic, sampling-based planner implemented in `RRT_Planner.py` . RRT rapidly explores high-dimensional C-spaces by incrementally growing a search tree toward randomly sampled states $q\_{\text{rand}} \in \mathcal{C}\_{\text{free}}$ . It is probabilistically complete and explores open spaces quickly, though raw paths tend to be non-optimal and jagged .
 
 ---
 
@@ -94,9 +91,6 @@ The generated global paths were executed on the TurtleBot platform via ROS integ
 
 {% include youtube-video.html id="9YX_3wYgB8M" autoplay="false" width="900px" %}
 <span style="font-size: 10px">Live Demonstration: A* Path Planner running on TurtleBot .</span>
-
-{% include youtube-video.html id="dD21LSMiPJs" autoplay="false" width="900px" %}
-<span style="font-size: 10px">Live Demonstration: RRT Path Planner running on TurtleBot .</span>
 
 {% include youtube-video.html id="rTKAuFA87B4" autoplay="false" width="900px" %}
 <span style="font-size: 10px">Simulation Demonstration: Full C-Space Navigation Trajectory in Gazebo/Webots Environment.</span>

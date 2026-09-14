@@ -688,16 +688,23 @@
       </div>
 
       <div class="work-row reveal">
-        <div class="work-media">
-          <video autoplay muted loop playsinline preload="metadata" poster="_projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/turtlebot_main.jpeg">
-            <source src="assets/videos/work/motion-planning-turtlebot.mp4" type="video/mp4">
-          </video>
+        <div class="work-media dual">
+          <div>
+            <video autoplay muted loop playsinline preload="metadata" poster="_projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/turtlebot_main.jpeg">
+              <source src="assets/videos/work/turtlebot-astar-hardware.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div>
+            <video autoplay muted loop playsinline preload="metadata" poster="_projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/turtlebot_main.jpeg">
+              <source src="assets/videos/work/motion-planning-turtlebot.mp4" type="video/mp4">
+            </video>
+          </div>
         </div>
         <div class="work-info">
           <h3>Motion Planning &amp; Coordination for Autonomous Vehicles</h3>
           <div class="category">Path Planning / Mobile Robotics</div>
-          <p>Configuration-space modeling, A* grid search, and RRT sampling-based planning for a nonholonomic TurtleBot, deployed to hardware with AMCL localization and Pure Pursuit tracking.</p>
-          <div class="work-tags"><span>A* / RRT</span><span>AMCL</span><span>ROS</span></div>
+          <p>Configuration-space (C-space) modeling for a nonholonomic differential-drive TurtleBot, treating every pose as a point in the SE(2) manifold and inflating workspace obstacles via Minkowski sums to build free space. Benchmarked deterministic A* grid search against sampling-based RRT for planner efficiency, path length, and obstacle clearance, then closed the sim-to-real gap on hardware using AMCL localization over laser scans and an adaptive Pure Pursuit controller to compensate for wheel slip and onboard processing latency.</p>
+          <div class="work-tags"><span>A* / RRT</span><span>AMCL</span><span>ROS</span><span>Configuration Space</span><span>Pure Pursuit</span><span>Python</span></div>
           <div class="work-links"><a href="projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/">Find out more →</a></div>
         </div>
       </div>
