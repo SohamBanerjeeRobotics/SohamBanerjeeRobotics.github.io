@@ -369,14 +369,15 @@
   .exp-head i{ color:var(--violet); font-size:21px; }
   .exp-item{ padding-left:24px; border-left:2px solid var(--border); margin-bottom:32px; position:relative; }
   .exp-item:last-child{ margin-bottom:0; }
-  .exp-item::before{ content:''; position:absolute; left:-7px; top:6px; width:12px; height:12px; border-radius:50%; background:var(--violet); box-shadow:0 0 8px var(--violet-dim); }
+  .exp-item::before{ content:''; position:absolute; left:-7px; top:6px; width:12px; height:12px; border-radius:50%; background:var(--violet); box-shadow:0 0 10px 3px var(--violet), 0 0 24px 8px var(--violet-dim); animation:dotglow 2.2s infinite; }
+  @keyframes dotglow{ 0%,100%{ box-shadow:0 0 10px 3px var(--violet), 0 0 24px 8px var(--violet-dim); } 50%{ box-shadow:0 0 6px 2px var(--violet), 0 0 14px 5px var(--violet-dim); } }
   .exp-item .exp-row{ display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px 16px; }
   .exp-item h4{ font-size:20px; font-weight:700; color:var(--strong); margin:0; }
   .exp-item .exp-date{ font-size:12px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--violet); white-space:nowrap; }
   .exp-item .meta{ font-size:14.5px; font-weight:600; color:var(--mid); margin-top:6px; margin-bottom:14px; }
   .exp-item ul{ margin:0; padding-left:0; list-style:none; color:var(--dim); font-size:15.5px; line-height:1.7; }
-  .exp-item ul li{ position:relative; padding-left:18px; margin-bottom:8px; }
-  .exp-item ul li::before{ content:''; position:absolute; left:0; top:9px; width:5px; height:5px; border-radius:50%; background:var(--violet); }
+  .exp-item ul li{ position:relative; padding-left:18px; margin-bottom:8px; text-align:justify; text-align-last:left; hyphens:none; }
+  .exp-item ul li::before{ content:''; position:absolute; left:0; top:9px; width:5px; height:5px; border-radius:50%; background:var(--dim); }
   .exp-item ul li:last-child{ margin-bottom:0; }
 
   .edu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin-top:26px; }
@@ -385,15 +386,21 @@
      assets/images/education/ named as in the <img src> and it shows here;
      until then the caption placeholder is visible. */
   .edu-photo{ position:relative; aspect-ratio:16/10; background:var(--border-soft); display:flex; align-items:center; justify-content:center; }
-  .edu-photo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .edu-photo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease; }
+  .edu-card:hover .edu-photo img{ transform:scale(1.1); }
   .edu-photo span{ font-size:10px; color:var(--faint); letter-spacing:0.14em; text-transform:uppercase; }
   .edu-body{ padding:18px 20px; }
   .edu-card h5{ font-size:16px; font-weight:500; color:var(--strong); line-height:1.4; }
   .edu-card .meta{ font-size:13px; color:var(--faint); margin-top:8px; }
   @media (max-width:760px){ .edu-grid{ grid-template-columns:1fr; } }
 
-  .ach-panel{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:24px; padding:28px 32px; margin-top:26px; }
-  .ach-panel h4{ font-size:14px; color:var(--mid); font-weight:500; text-transform:uppercase; letter-spacing:0.25em; margin-bottom:16px; }
+  .ach-panel{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:24px; padding:32px 36px; margin-top:26px; }
+  .ach-panel h4{ display:flex; align-items:center; gap:12px; font-size:24px; color:var(--strong); font-weight:700; margin-bottom:22px; }
+  .ach-panel h4 i{ color:var(--violet); font-size:21px; }
+  .ach-panel .exp-item{ padding-left:0; border-left:none; }
+  .ach-panel .exp-item::before{ content:none; }
+  .ach-panel .exp-item ul li{ text-align:justify; text-align-last:left; hyphens:none; margin-bottom:18px; }
+  .doi-link{ font-size:0.9em; white-space:nowrap; }
   .paper-link{ color:var(--violet); text-decoration:none; font-weight:600; transition:color .2s ease; }
   .paper-link:hover{ color:var(--text); }
 
@@ -630,7 +637,7 @@
 
 <section id="work">
   <div class="wrap">
-    <h2 class="sec-title reveal">My <span class="bold">Work</span></h2>
+    <h2 class="sec-title reveal"><span class="light">My</span> <span class="bold">Work</span></h2>
 
     <div class="work-list">
       <div class="work-row reveal">
@@ -736,7 +743,7 @@
 
 <section id="timeline">
   <div class="wrap">
-    <h2 class="sec-title reveal">My <span class="bold">Timeline</span></h2>
+    <h2 class="sec-title reveal"><span class="light">My</span> <span class="bold">Timeline</span></h2>
 
     <div class="exp-card reveal">
       <div class="exp-head"><i class="fa-solid fa-briefcase"></i> Experience</div>
@@ -835,13 +842,13 @@
     </div>
 
     <div class="ach-panel reveal">
-      <h4>Achievements</h4>
+      <h4><i class="fa-solid fa-trophy"></i> Achievements</h4>
       <div class="exp-item">
         <ul>
           <li>Awarded the Gold Medal for outstanding academic performance in B.Tech, Mechanical Engineering, IIEST Shibpur</li>
-          <li>Published <a class="paper-link" href="https://doi.org/10.1115/1.4070606" target="_blank" rel="noopener noreferrer">"Nonlinear Dynamics of a Vertical Cantilever Beam Under Biaxial Base Excitation"</a> in the ASME Journal of Computational and Nonlinear Dynamics, studying piezoelectric energy-harvesting potential under biaxial base excitation</li>
+          <li>Published <a class="paper-link" href="https://doi.org/10.1115/1.4070606" target="_blank" rel="noopener noreferrer">"Nonlinear Dynamics of a Vertical Cantilever Beam Under Biaxial Base Excitation"</a> in the ASME Journal of Computational and Nonlinear Dynamics, studying piezoelectric energy-harvesting potential under biaxial base excitation <a class="paper-link doi-link" href="https://doi.org/10.1115/1.4070606" target="_blank" rel="noopener noreferrer">[doi.org/10.1115/1.4070606]</a></li>
           <li>Co-authored <a class="paper-link" href="https://ieeexplore.ieee.org/document/11240459/" target="_blank" rel="noopener noreferrer">"Design of Computed Torque Control with LMI-Based Regional Pole Placement for Two-Link Robotic Manipulator,"</a> presented at ICSTCC 2025 and indexed in IEEE Xplore</li>
-          <li>Co-authored the book chapter "Modeling and Numerical Study of Thermoelectric Generators," part of <a class="paper-link" href="https://link.springer.com/book/10.1007/978-3-032-18334-7" target="_blank" rel="noopener noreferrer">Sustainable Energy, Environment and Green Technology for a Greener Future</a> (Springer, ICEEGT 2025, NITTTR Kolkata)</li>
+          <li>Co-authored the book chapter "Modeling and Numerical Study of Thermoelectric Generators," part of <a class="paper-link" href="https://link.springer.com/book/10.1007/978-3-032-18334-7" target="_blank" rel="noopener noreferrer">Sustainable Energy, Environment and Green Technology for a Greener Future</a> (Springer, ICEEGT 2025, NITTTR Kolkata) <a class="paper-link doi-link" href="https://link.springer.com/book/10.1007/978-3-032-18334-7" target="_blank" rel="noopener noreferrer">[doi.org/10.1007/978-3-032-18334-7]</a></li>
         </ul>
       </div>
     </div>
