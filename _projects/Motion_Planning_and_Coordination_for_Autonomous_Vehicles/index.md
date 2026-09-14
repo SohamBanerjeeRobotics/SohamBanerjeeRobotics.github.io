@@ -1,5 +1,6 @@
 ---
 layout: post
+permalink: /projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/
 title: Motion Planning and Coordination for Autonomous Vehicles (TurtleBot)
 description: >
     Implemented configuration space (C-space) modeling, grid-based search (A*), 

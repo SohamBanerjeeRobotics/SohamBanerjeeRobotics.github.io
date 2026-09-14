@@ -1,5 +1,6 @@
 ---
 layout: post
+permalink: /projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/
 title: Virtual-to-Real Mapless Navigation via Deep Reinforcement Learning
 description: >
     Implemented an asynchronous actor-critic deep reinforcement learning (ADDPG) 

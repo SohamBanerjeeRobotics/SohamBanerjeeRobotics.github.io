@@ -23,6 +23,18 @@
 
     <script src="{{ '/assets/js/script.js' | relative_url }}"></script>
 
+    <!-- Renders $...$ / $$...$$ LaTeX in project write-ups (kramdown leaves it as plain text otherwise) -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: { fontCache: 'global' }
+      };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+
     
     <title>{{ site.title }}</title>
     

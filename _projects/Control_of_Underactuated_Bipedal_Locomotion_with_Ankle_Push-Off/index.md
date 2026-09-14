@@ -1,5 +1,6 @@
 ---
 layout: post
+permalink: /projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/
 title: Control of Underactuated Bipedal Locomotion with Ankle Push-Off
 description: >
     Formulated, modeled, and implemented an open-loop and closed-loop control framework 

@@ -342,24 +342,26 @@
 
   .placeholder-note{ font-size:11.5px; color:var(--dim); font-style:italic; margin-top:10px; }
 
-  /* WORK — zigzag */
-  .work-list{ display:flex; flex-direction:column; gap:70px; margin-top:50px; }
-  .work-row{ display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:center; }
-  .work-row.reverse .work-media{ order:2; }
-  .work-row.reverse .work-info{ order:1; }
-  .work-media{ border-radius:24px; overflow:hidden; border:1px solid var(--border); aspect-ratio:16/10; }
-  .work-media img{ width:100%; height:100%; object-fit:cover; }
+  /* WORK — full-width video per project, details stacked below.
+     Drop a clip into assets/videos/work/ named as in the <source src>
+     and it autoplays here; until then the poster image (the project's
+     existing photo) is shown instead. See assets/videos/work/README.md. */
+  .work-list{ display:flex; flex-direction:column; gap:130px; margin-top:60px; }
+  .work-row{ display:flex; flex-direction:column; gap:30px; }
+  .work-media{ border-radius:24px; overflow:hidden; border:1px solid var(--border); aspect-ratio:21/9; background:var(--bg-panel); }
+  .work-media video{ width:100%; height:100%; object-fit:cover; display:block; }
+  .work-media.dual{ display:flex; gap:0; aspect-ratio:auto; background:none; border:none; overflow:visible; }
+  .work-media.dual > div{ flex:1; min-width:0; border-radius:0; overflow:hidden; border:1px solid var(--border); aspect-ratio:16/9; background:var(--bg-panel); }
+  .work-media.dual > div + div{ border-left:none; }
+  @media (max-width:700px){ .work-media.dual{ flex-direction:column; } .work-media.dual > div + div{ border-left:1px solid var(--border); border-top:none; } }
+  .work-info{ max-width:none; }
   .work-info h3{ font-size:clamp(1.5rem,2.4vw,1.875rem); font-weight:700; color:var(--strong); line-height:1.2; margin-bottom:12px; }
   .work-info .category{ color:var(--violet); font-size:14px; font-weight:500; letter-spacing:0.02em; margin-bottom:16px; }
-  .work-info p{ color:var(--dim); font-size:17px; line-height:1.625; margin-bottom:18px; }
+  .work-info p{ color:var(--dim); font-size:18px; line-height:1.7; margin-bottom:18px; max-width:none; }
   .work-tags{ display:flex; flex-wrap:wrap; gap:8px; }
   .work-tags span{ font-size:11px; font-weight:500; color:var(--violet); background:var(--violet-faint); border:1px solid var(--violet-dim); padding:4px 12px; border-radius:9999px; }
   .work-links{ margin-top:20px; }
   .work-links a{ font-size:15px; font-weight:600; color:var(--violet); }
-  @media (max-width:760px){
-    .work-row, .work-row.reverse{ grid-template-columns:1fr; }
-    .work-row.reverse .work-media, .work-row.reverse .work-info{ order:unset; }
-  }
 
   /* TIMELINE */
   .exp-card{ background:var(--bg-panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:24px; padding:30px 32px; margin-top:44px; }
@@ -628,62 +630,88 @@
 
 <section id="work">
   <div class="wrap">
-    <div class="sec-eyebrow reveal"><span class="dot"></span></div>
     <h2 class="sec-title reveal">My <span class="bold">Work</span></h2>
 
     <div class="work-list">
       <div class="work-row reveal">
-        <div class="work-media"><img src="_projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/fire_drone_main.jpeg" alt="Drone navigating a simulated fire environment"></div>
+        <div class="work-media dual">
+          <div>
+            <video autoplay muted loop playsinline preload="metadata" poster="_projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/fire_drone_main.jpeg">
+              <source src="assets/videos/work/fire-drone-navigation.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div>
+            <video autoplay muted loop playsinline preload="metadata" poster="_projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/fire_environment.jpeg">
+              <source src="assets/videos/work/fire-environment-simulation.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
         <div class="work-info">
           <h3>Autonomous Navigation in Fire Environments using Drone</h3>
           <div class="category">Reinforcement Learning / Aerial Robotics</div>
           <p>Autonomous navigation for a Crazyflie 2.1 micro-UAV using only local temperature feedback, evaluating Greedy, Epsilon-Greedy, and UCB strategies across thermal fields simulated in Webots with PyroSim/FDS.</p>
           <div class="work-tags"><span>ROS2</span><span>Webots</span><span>Thermal Modeling</span><span>RL</span></div>
-          <div class="work-links"><a href="projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/">Read case study →</a></div>
+          <div class="work-links"><a href="projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/">Find out more →</a></div>
         </div>
       </div>
 
-      <div class="work-row reverse reveal">
-        <div class="work-media"><img src="_projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/biped_hardware_front.jpeg" alt="Bipedal robot hardware setup"></div>
+      <div class="work-row reveal">
+        <div class="work-media">
+          <video autoplay muted loop playsinline preload="metadata" poster="_projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/biped_hardware_front.jpeg">
+            <source src="assets/videos/work/bipedal-ankle-pushoff.mp4" type="video/mp4">
+          </video>
+        </div>
         <div class="work-info">
           <h3>Underactuated Bipedal Locomotion with Ankle Push-Off</h3>
           <div class="category">Control Theory / IIT Bombay Research</div>
           <p>Open- and closed-loop control for a planar bipedal robot with pneumatic ankle push-off actuation, comparing PID and Model Predictive Control across simulation and hardware-in-the-loop testing.</p>
           <div class="work-tags"><span>MPC</span><span>PID</span><span>dSPACE HIL</span></div>
-          <div class="work-links"><a href="projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/">Read case study →</a></div>
+          <div class="work-links"><a href="projects/Control_of_Underactuated_Bipedal_Locomotion_with_Ankle_Push-Off/">Find out more →</a></div>
         </div>
       </div>
 
       <div class="work-row reveal">
-        <div class="work-media"><img src="_projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/mapless_navigation_front.jpg" alt="Mobile robot mapless navigation"></div>
+        <div class="work-media">
+          <video autoplay muted loop playsinline preload="metadata" poster="_projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/mapless_navigation_front.jpg">
+            <source src="assets/videos/work/mapless-navigation-rl.mp4" type="video/mp4">
+          </video>
+        </div>
         <div class="work-info">
           <h3>Virtual-to-Real Mapless Navigation via Deep RL</h3>
           <div class="category">Deep Reinforcement Learning / Sim-to-Real</div>
           <p>An asynchronous actor-critic (ADDPG) framework for continuous control of differential-drive mobile robots, trained entirely in PyBullet and transferred to a physical TurtleBot without fine-tuning.</p>
           <div class="work-tags"><span>ADDPG</span><span>PyTorch</span><span>Sim-to-Real</span></div>
-          <div class="work-links"><a href="projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/">Read case study →</a></div>
+          <div class="work-links"><a href="projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/">Find out more →</a></div>
         </div>
       </div>
 
-      <div class="work-row reverse reveal">
-        <div class="work-media"><img src="_projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/turtlebot_main.jpeg" alt="TurtleBot motion planning"></div>
+      <div class="work-row reveal">
+        <div class="work-media">
+          <video autoplay muted loop playsinline preload="metadata" poster="_projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/turtlebot_main.jpeg">
+            <source src="assets/videos/work/motion-planning-turtlebot.mp4" type="video/mp4">
+          </video>
+        </div>
         <div class="work-info">
           <h3>Motion Planning &amp; Coordination for Autonomous Vehicles</h3>
           <div class="category">Path Planning / Mobile Robotics</div>
           <p>Configuration-space modeling, A* grid search, and RRT sampling-based planning for a nonholonomic TurtleBot, deployed to hardware with AMCL localization and Pure Pursuit tracking.</p>
           <div class="work-tags"><span>A* / RRT</span><span>AMCL</span><span>ROS</span></div>
-          <div class="work-links"><a href="projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/">Read case study →</a></div>
+          <div class="work-links"><a href="projects/Motion_Planning_and_Coordination_for_Autonomous_Vehicles/">Find out more →</a></div>
         </div>
       </div>
 
       <div class="work-row reveal">
-        <div class="work-media"><img src="_projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/drone_2d_main.jpg" alt="2D drone trajectory optimization"></div>
+        <div class="work-media">
+          <video autoplay muted loop playsinline preload="metadata" poster="_projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/drone_2d_main.jpg">
+            <source src="assets/videos/work/receding-horizon-crazyflie.mp4" type="video/mp4">
+          </video>
+        </div>
         <div class="work-info">
           <h3>Receding Horizon Control for Crazyflie Navigation</h3>
           <div class="category">Optimal Control / Trajectory Optimization</div>
           <p>An open-loop 2D drone trajectory optimizer with double-integrator dynamics and RK4 discretization, using a smooth Softplus obstacle penalty solved via L-BFGS-B.</p>
           <div class="work-tags"><span>L-BFGS-B</span><span>RK4</span><span>Optimal Control</span></div>
-          <div class="work-links"><a href="projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/">Read case study →</a></div>
+          <div class="work-links"><a href="projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/">Find out more →</a></div>
         </div>
       </div>
     </div>

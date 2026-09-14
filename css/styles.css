@@ -646,6 +646,7 @@ footer p {
 /* PROJECT POST VIEW */
 
 .post-view {
+    max-width: 980px;
     margin: 25px auto;
     border: 1px solid var(--border-color);
     background: var(--light-background-color);
@@ -666,6 +667,29 @@ footer p {
 .post-view .title-header  h1 {
     line-height: normal;
     margin-bottom: 10px;
+}
+
+.post-view .project-links {
+    margin-bottom: 18px;
+}
+
+.post-view .project-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95em;
+    font-weight: 600;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 14px;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.post-view .project-links a:hover {
+    color: var(--link-color);
+    border-color: var(--link-color);
 }
 
 .post-view .summary img {
@@ -711,19 +735,23 @@ footer p {
 .post-view .content .image-gallery {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    align-content: flex-start;
+    justify-content: center;
+    align-items: stretch;
     width: 100%;
-    gap: 10px
+    gap: 16px;
+    margin: 1.2em 0;
 }
 
 .post-view .content .image-gallery img {
-    max-height: var(--gallery-height); 
-    width: auto; 
-    max-width: 100%;
+    flex: 1 1 260px;
+    min-width: 0;
+    max-height: var(--gallery-height);
+    width: 100%;
     object-fit: contain;
-    align-self: flex-start;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px;
 }
   
 .post-view .content  a {
@@ -742,9 +770,16 @@ footer p {
     text-decoration: underline;
   }
 
-.post-view .content ul, ol {
-    padding-left: 20px;
+.post-view .content ul, .post-view .content ol {
+    padding-left: 22px;
     margin: 1em 0;
+  }
+
+.post-view .content li {
+    color: var(--body-text-color);
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 0.4em;
   }
 
 .post-view .content blockquote {
@@ -753,7 +788,7 @@ footer p {
     padding: 10px 20px;
     background-color: rgba(140,108,255,0.07);
     color: var(--text-color);
-    font-size: calc(10px + 0.5vw);
+    font-size: clamp(0.9rem, 0.75rem + 0.4vw, 1.05rem);
   }
 
 .post-view .content   hr {
@@ -779,7 +814,7 @@ footer p {
     border-bottom: 1px solid var(--border-color);
     background-color: rgba(140,108,255,0.08);
     color: var(--text-color);
-    font-size: calc(10px + 0.5vw); /* Matches h2 size */
+    font-size: clamp(0.85rem, 0.7rem + 0.4vw, 1rem);
 }
 
 .post-view .content td {
@@ -787,7 +822,7 @@ footer p {
     text-align: left;
     border-bottom: 1px solid var(--border-color);
     color: var(--text-color);
-    font-size: calc(10px + 0.5vw); /* Matches p size */
+    font-size: clamp(0.85rem, 0.7rem + 0.4vw, 1rem);
 }
 
 .youtube-container {

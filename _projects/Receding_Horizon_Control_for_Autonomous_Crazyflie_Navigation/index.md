@@ -1,5 +1,6 @@
 ---
 layout: post
+permalink: /projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/
 title: Receding Horizon Control for Autonomous Crazyflie Navigation
 description: >
     Formulated and implemented an open-loop 2D drone trajectory optimization 

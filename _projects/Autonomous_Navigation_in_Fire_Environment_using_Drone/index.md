@@ -1,6 +1,8 @@
 ---
 layout: post
+permalink: /projects/Autonomous_Navigation_in_Fire_Environment_using_Drone/
 title: Autonomous Navigation in Fire Environment using Drone
+github: https://github.com/SohamBanerjeeRobotics/Drone-Localization-Project
 description: >
   Developed an autonomous navigation framework for a Crazyflie 2.1 micro-UAV operating in
   fire-affected environments using temperature feedback. Simulated realistic
@@ -37,7 +39,7 @@ The system runs in a continuous feedback loop linking physical fire dynamics wit
 2. **Reinforcement Learning Node:** Receives local temperature readings, evaluates directional gradients, and selects target waypoints based on the active exploration policy.
 3. **Control & Execution:** A proportional position controller converts target position coordinates into velocity commands, moving the drone inside Webots until position error falls below threshold.
 
-{% include image-gallery.html images="/fire_architecture_block_diagram.jpeg" height="400" %}
+{% include image-gallery.html images="/fire_architecture_block_diagram.jpg" height="400" %}
 <span style="font-size: 10px">System flow: ROS-Webots closed-loop integration with Pyrosim and RL decision nodes.</span>
 
 ---
@@ -68,13 +70,13 @@ Three spatial decision-making strategies were implemented and evaluated:
 ### 1. Greedy Hill Climbing
 The drone evaluates local temperature gradients by scanning candidate points on a perimeter circle of radius $r$ around its current coordinates. It strictly moves step-by-step along the vector of maximum thermal ascent.
 
-{% include image-gallery.html images="/algorithm_hill_climbing_pseudocode.jpeg" height="350" %}
+{% include image-gallery.html images="/algorithm_hill_climbing_pseudocode.jpg" height="350" %}
 <span style="font-size: 10px">Algorithm 1: Hill Climbing Algorithm (Greedy Approach).</span>
 
 ### 2. Multi-Armed Bandit (*epsilon*-Greedy Approach)
 To avoid getting trapped in zero-gradient or local maxima regions, the agent selects a random direction with probability $\epsilon$ and exploits the highest empirical temperature gradient direction with probability $1 - \epsilon$.
 
-{% include image-gallery.html images="/algorithm_egreedy_pseudocode.jpeg" height="400" %}
+{% include image-gallery.html images="/algorithm_egreedy_pseudocode.jpg" height="400" %}
 <span style="font-size: 10px">Algorithm 2: Multi-Armed Bandit Algorithm (*epsilon*-Greedy Approach).</span>
 
 ### 3. Multi-Armed Bandit (Upper Confidence Bound - UCB)
@@ -86,7 +88,7 @@ Here $Q(i)$ is the mean temperature gradient along arm $i$, $c$ is the explorati
 
 ### Convergence & Adaptive Update Mechanics
 
-{% include image-gallery.html images="/algorithm_convergence_and_adaptive_update.jpeg" height="400" %}
+{% include image-gallery.html images="/algorithm_convergence_and_adaptive_update.jpg" height="400" %}
 <span style="font-size: 10px">Algorithm 3 & 4: Convergence Criteria and Adaptive Update Rule of Exploration Constant.</span>
 
 ---
