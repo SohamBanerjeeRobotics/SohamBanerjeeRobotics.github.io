@@ -777,10 +777,15 @@ footer p {
    image-gallery include — a <div style="text-align:center"> wrapping an
    <img> and a <p>. text-align is inherited, but the general paragraph rule
    above matches the <p> directly (a specified value always beats an
-   inherited one), so it forces justify unless overridden back here. */
+   inherited one), so it forces justify unless overridden back here. The
+   caption's own inline style also hardcodes color:#666 — legible on the
+   light page these were originally written for, nearly invisible on our
+   dark panel — so that needs an !important override, inline styles beat
+   any external rule otherwise. */
 .post-view .content div[style*="text-align: center"] p {
     text-align: center;
     text-align-last: center;
+    color: var(--body-text-color) !important;
 }
 
 .post-view .content .image-gallery img {

@@ -35,8 +35,6 @@ By combining low-level continuous-time control models with high-level trajectory
 - **Co-Guide:** Prof. Vivek Sangwan (Department of Mechanical Engineering, IIT Bombay)
 - **Primary Objective:** Analyze the dynamic influence of active ankle push-off on underactuated planar bipedal gait stability under varying control architectures.
 
-> **Source Code & Repository:** Explore full codebase and hardware control implementations on GitHub at [SohamBanerjeeRobotics](https://github.com/SohamBanerjeeRobotics).
-
 ---
 
 ## State & Dynamic Formulation

@@ -670,16 +670,19 @@
       </div>
 
       <div class="work-row reveal">
-        <div class="work-media">
-          <video autoplay muted loop playsinline preload="metadata" poster="_projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/mapless_navigation_front.jpg">
-            <source src="assets/videos/work/mapless-navigation-rl.mp4" type="video/mp4">
-          </video>
+        <div class="work-media dual">
+          <div>
+            <video autoplay muted loop playsinline preload="metadata" poster="_projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/mapless_navigation_front.jpg">
+              <source src="assets/videos/work/mapless-navigation-rl.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div><img src="assets/images/work/addpg-network-architecture.jpg" alt="ADDPG actor-critic network architecture diagram" loading="lazy"></div>
         </div>
         <div class="work-info">
           <h3>Virtual-to-Real Mapless Navigation via Deep RL</h3>
           <div class="category">Deep Reinforcement Learning / Sim-to-Real</div>
-          <p>An asynchronous actor-critic (ADDPG) framework for continuous control of differential-drive mobile robots, trained entirely in PyBullet and transferred to a physical TurtleBot without fine-tuning.</p>
-          <div class="work-tags"><span>ADDPG</span><span>PyTorch</span><span>Sim-to-Real</span></div>
+          <p>An asynchronous actor-critic (ADDPG) framework for continuous control of differential-drive mobile robots, using a compressed 14-dimensional state of sparse laser readings, relative target position, and previous velocity commands to output smooth linear and angular velocity commands. Trained entirely in PyBullet simulation and transferred to a physical Kobuki-based TurtleBot without any real-world fine-tuning, achieving collision-free mapless navigation at roughly 100 Hz control frequency.</p>
+          <div class="work-tags"><span>ADDPG</span><span>PyTorch</span><span>Sim-to-Real</span><span>Continuous Control</span><span>Mobile Robotics</span><span>Python</span></div>
           <div class="work-links"><a href="projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/">Find out more →</a></div>
         </div>
       </div>

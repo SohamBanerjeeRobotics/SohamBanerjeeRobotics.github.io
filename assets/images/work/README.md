@@ -5,7 +5,8 @@ still photo pair instead of a video clip — same full-width, side-by-side
 layout as the video cards (`.work-media.dual`), just with `<img>` in place
 of `<video>`.
 
-| File                    | Card                                                 |
-| ------------------------ | ----------------------------------------------------- |
-| `biped-rig-front.jpg`    | Underactuated Bipedal Locomotion (left) |
-| `biped-rig-angle.jpg`    | Underactuated Bipedal Locomotion (right) |
+| File                          | Card                                                 |
+| ------------------------------ | ----------------------------------------------------- |
+| `biped-rig-front.jpg`          | Underactuated Bipedal Locomotion (left) |
+| `biped-rig-angle.jpg`          | Underactuated Bipedal Locomotion (right) |
+| `addpg-network-architecture.jpg` | Virtual-to-Real Mapless Navigation via Deep RL (right), paired with the live demo clip on the left — a copy of the project's own `network_architecture_code.jpg` (see that project's `_projects/` folder and README note there on how it was generated). |

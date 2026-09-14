@@ -2,6 +2,7 @@
 layout: post
 permalink: /projects/Deep_Reinforcement_Learning_for_Robot_Locomotion/
 title: Virtual-to-Real Mapless Navigation via Deep Reinforcement Learning
+github: https://github.com/SohamBanerjeeRobotics
 description: >
     Implemented an asynchronous actor-critic deep reinforcement learning (ADDPG) 
     framework for continuous control of differential-drive mobile robots. 
@@ -24,7 +25,7 @@ main-image: /mapless_navigation_front.jpg
 
 Traditional mobile robot navigation systems, such as SLAM-based architectures, rely on building dense obstacle maps from expensive high-resolution sensors . These methods are computationally intensive and slow to update dynamically . 
 
-This project implements an end-to-end mapless motion planner for differential-drive mobile robots using continuous Deep Reinforcement Learning . Based on **Asynchronous Deterministic Policy Gradient (ADDPG)**, the model takes a highly compressed 14-dimensional state representation—comprising 10 sparse laser range samples, 2D relative target positions in polar coordinates, and previous velocity commands—and outputs smooth continuous linear and angular velocity commands . Trained entirely within a simulated environment ( Pybullet), the learned policy directly transfers to physical robotic hardware (Kobuki-based TurtleBot) without any real-world fine-tuning . This is taken from the paper Virtual-to-Real Deep Reinforcement Learning:Continuous Control of Mobile Robotsfor Mapless Navigation by *Tai et al*
+This project implements an end-to-end mapless motion planner for differential-drive mobile robots using continuous Deep Reinforcement Learning . Based on **Asynchronous Deterministic Policy Gradient (ADDPG)**, the model takes a highly compressed 14-dimensional state representation—comprising 10 sparse laser range samples, 2D relative target positions in polar coordinates, and previous velocity commands—and outputs smooth continuous linear and angular velocity commands . Trained entirely within a simulated environment ( Pybullet), the learned policy directly transfers to physical robotic hardware (Kobuki-based TurtleBot) without any real-world fine-tuning . This is taken from the paper **_Virtual-to-Real Deep Reinforcement Learning: Continuous Control of Mobile Robots for Mapless Navigation_** by Tai et al.
 
 ---
 
@@ -49,21 +50,23 @@ The action vector $a_t = [v_t, \omega_t]^T \in \mathbb{R}^2$ commands continuous
 To accelerate sample generation without requiring multiple parallel simulation environments, sample collection is decoupled into dedicated asynchronous background threads while maintaining a centralized off-policy replay buffer $\mathcal{D}$ .
 
 <div style="text-align: center; margin: 20px 0;">
-  <img src="/addpg_pseudocode.png" alt="Asynchronous DDPG Algorithm Pseudocode" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="addpg_pseudocode.jpg" alt="Asynchronous DDPG Algorithm Pseudocode" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p style="font-size: 12px; color: #666; margin-top: 8px;"><em>Figure 1: Asynchronous DDPG (ADDPG) training algorithm pseudocode.</em></p>
 </div>
 
 ### Loss Formulations
 
-The **Critic Network** $Q(s, a | \theta^Q)$ is optimized by minimizing the Mean Squared Bellman Error (MSBE) across mini-batches sampled from $\mathcal{D}$ :
+The **Critic Network** $Q(s, a \mid \theta^Q)$ is trained as a regression problem: it minimizes the Mean Squared Bellman Error (MSBE) between its own prediction and a bootstrapped TD target $y_i$, built from each sampled transition's reward plus the discounted value that the *target* networks assign to the *next* state and the *next* action the target actor would take there. Using separate, slowly-tracking target networks ($\theta^{\mu'}$, $\theta^{Q'}$) to compute $y_i$ — instead of the online networks currently being updated — decouples the regression target from the parameters chasing it, which is what keeps this bootstrapped update stable rather than diverging:
 
 $$L(\theta^Q) = \frac{1}{M} \sum_{i=1}^{M} \left( Q(s_i, a_i | \theta^Q) - y_i \right)^2$$ 
 
 $$y_i = r_i + \gamma Q'\left(s'_{i}, \mu'(s'_{i} | \theta^{\mu'}) \middle| \theta^{Q'}\right)$$ 
 
-The **Actor Network** $\mu(s | \theta^\mu)$ is updated using the sampled Deterministic Policy Gradient :
+The **Actor Network** $\mu(s \mid \theta^\mu)$ has no target label of its own — instead it is nudged in whatever direction makes the critic's output larger. Concretely, the critic's gradient with respect to the action, $\nabla_a Q(s,a \mid \theta^Q)$, is evaluated at the action the actor would currently take, then backpropagated through the actor's own parameters via the chain rule. This is the Deterministic Policy Gradient — a policy update that borrows the critic as a differentiable proxy for "how good was that action":
 
 $$\nabla_{\theta^\mu} J \approx \frac{1}{M} \sum_{i=1}^{M} \left. \nabla_a Q(s, a | \theta^Q) \right|_{a=\mu(s_i)} \nabla_{\theta^\mu} \mu(s_i | \theta^\mu)$$ 
+
+Both updates are computed off-policy from mini-batches drawn out of the shared replay buffer $\mathcal{D}$, which the $N$ asynchronous worker threads in Figure 1 keep filling concurrently. Rather than being copied outright, the target networks $\theta^{\mu'}, \theta^{Q'}$ are then nudged toward the online networks with a small soft-update rate $\tau$, so the bootstrapped targets drift slowly instead of jumping step to step.
 
 ---
 
@@ -87,10 +90,8 @@ $$r(s_t, a_t) = \begin{cases} r_{\text{arrive}} & \text{if } d_t < c_d \text{ (T
 
 The policy network processes the 14-dimensional state vector through parallel dense layers before generating bounded velocity signals .
 
-> **Source Code:** View full repository details on GitHub at [SohamBanerjeeRobotics](https://github.com/SohamBanerjeeRobotics).
-
 <div style="text-align: center; margin: 20px 0;">
-  <img src="/network_architecture_code.png" alt="Actor-Critic Architecture Pseudocode Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <img src="network_architecture_code.jpg" alt="Actor-Critic Architecture Pseudocode Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   <p style="font-size: 12px; color: #666; margin-top: 8px;"><em>Figure 2: Network structure and layer configuration breakdown.</em></p>
 </div>
 
