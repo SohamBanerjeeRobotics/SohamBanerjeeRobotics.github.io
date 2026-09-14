@@ -808,10 +808,20 @@ footer p {
   }
 
 .post-view .content  p {
-    margin-bottom: 1em;
+    margin-bottom: 1.4em;
     text-align: justify;
     text-align-last: left;
     hyphens: auto;
+  }
+
+.post-view .content h2 {
+    margin-top: 0.5em;
+    margin-bottom: 0.6em;
+  }
+
+.post-view .content h3 {
+    margin-top: 1.3em;
+    margin-bottom: 0.5em;
   }
 
 .post-view .summary .project-description p {
@@ -853,7 +863,7 @@ footer p {
     border: 0;
     height: 1px;
     background: var(--border-color);
-    margin: 20px 0;
+    margin: 34px 0;
   }
 
   .post-view .content table {

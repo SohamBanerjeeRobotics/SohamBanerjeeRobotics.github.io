@@ -5,6 +5,9 @@
   background-color: #0e0e13;
   border-radius: 10px;
 }
+.highlight span {
+  color: inherit;
+}
 .highlight, .highlight pre {
   padding: 12px 14px;
   overflow-x: auto;

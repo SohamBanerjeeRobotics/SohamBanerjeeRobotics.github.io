@@ -710,16 +710,23 @@
       </div>
 
       <div class="work-row reveal">
-        <div class="work-media">
-          <video autoplay muted loop playsinline preload="metadata" poster="_projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/drone_2d_main.jpg">
-            <source src="assets/videos/work/receding-horizon-crazyflie.mp4" type="video/mp4">
-          </video>
+        <div class="work-media dual">
+          <div>
+            <video autoplay muted loop playsinline preload="metadata" poster="_projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/drone_2d_main.jpg">
+              <source src="assets/videos/work/receding-horizon-hardware.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div>
+            <video autoplay muted loop playsinline preload="metadata" poster="assets/images/work/crazyflie-sim-poster.jpg">
+              <source src="assets/videos/work/receding-horizon-crazyflie.mp4" type="video/mp4">
+            </video>
+          </div>
         </div>
         <div class="work-info">
           <h3>Receding Horizon Control for Crazyflie Navigation</h3>
           <div class="category">Optimal Control / Trajectory Optimization</div>
-          <p>An open-loop 2D drone trajectory optimizer with double-integrator dynamics and RK4 discretization, using a smooth Softplus obstacle penalty solved via L-BFGS-B.</p>
-          <div class="work-tags"><span>L-BFGS-B</span><span>RK4</span><span>Optimal Control</span></div>
+          <p>Formulated and implemented an open-loop 2D drone trajectory optimization framework with double-integrator dynamics, Runge-Kutta 4th Order (RK4) discretization, and a smooth Softplus-based non-convex obstacle penalty. Optimized via CasADi's IPOPT solver to balance control effort, jerk minimization, terminal goal-reaching, and collision avoidance, then validated the resulting trajectories on real quadrotor hardware.</p>
+          <div class="work-tags"><span>Trajectory Optimization</span><span>CasADi / IPOPT</span><span>RK4</span><span>Non-Convex Optimization</span><span>Softplus Penalty</span><span>ROS / Webots</span><span>Python</span></div>
           <div class="work-links"><a href="projects/Receding_Horizon_Control_for_Autonomous_Crazyflie_Navigation/">Find out more →</a></div>
         </div>
       </div>
